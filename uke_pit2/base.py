@@ -10,19 +10,98 @@
 import sys
 
 from inspect import currentframe
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 import uke_pit2
 
 from jsktoolbox.libs.base_data import BData
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.raisetool import Raise
+from jsktoolbox.configtool.main import Config as ConfigTool
+from jsktoolbox.logstool.logs import LoggerClient
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
     """Internal _Keys container class."""
 
     COMMAND_LINE_OPTS: str = "__clo__"
+    CONF: str = "__config__"
+    CONFIG_HANDLER: str = "__cfh__"
+    LOGGER_CLIENT: str = "__logger_client__"
+
+
+class BConfigHandler(BData):
+    """Base class for Config handler."""
+
+    @property
+    def cfh(self) -> Optional[ConfigTool]:
+        """Return config handler object."""
+        if _Keys.CONFIG_HANDLER not in self._data:
+            self._data[_Keys.CONFIG_HANDLER] = None
+        return self._data[_Keys.CONFIG_HANDLER]
+
+    @cfh.setter
+    def cfh(self, config_handler: Optional[ConfigTool]) -> None:
+        """Set config handler."""
+        if config_handler is not None and not isinstance(config_handler, ConfigTool):
+            raise Raise.error(
+                f"Expected ConfigTool type, received'{type(config_handler)}'.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.CONFIG_HANDLER] = config_handler
+
+
+class BConfig(BData):
+    """Base class for Config property."""
+
+    from uke_pit2.conf import Config
+
+    @property
+    def conf(self) -> Optional[Config]:
+        """Return Config class object."""
+        if _Keys.CONF not in self._data:
+            self._data[_Keys.CONF] = None
+        return self._data[_Keys.CONF]
+
+    @conf.setter
+    def conf(self, conf_obj: Config) -> None:
+        """Set Config class object."""
+
+        from uke_pit2.conf import Config
+
+        if not isinstance(conf_obj, Config):
+            raise Raise.error(
+                f"Expected Config class type, received: '{type(conf_obj)}'.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.CONF] = conf_obj
+
+
+class BLogs(BData):
+    """Base class for LoggerClient property."""
+
+    @property
+    def logs(self) -> LoggerClient:
+        """Return LoggerClient object or None."""
+        if _Keys.LOGGER_CLIENT not in self._data:
+            self._data[_Keys.LOGGER_CLIENT] = LoggerClient()
+        return self._data[_Keys.LOGGER_CLIENT]
+
+    @logs.setter
+    def logs(self, logger_client: LoggerClient) -> None:
+        """Set LoggerClient."""
+        if not isinstance(logger_client, LoggerClient):
+            raise Raise.error(
+                f"Expected LoggerClient type, received: '{type(logger_client)}'.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.LOGGER_CLIENT] = logger_client
 
 
 class BaseApp(BData):
