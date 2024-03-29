@@ -134,6 +134,7 @@ class Config(BLogs, BConfigHandler, BConfigSection):
                 self.logs.message_warning = "try to create default one"
                 if not self.__create_config_file():
                     return False
+
         out: bool = False
         try:
             if self.debug:
@@ -155,11 +156,21 @@ class Config(BLogs, BConfigHandler, BConfigSection):
 
     def save(self) -> bool:
         """Try to save config file."""
+        if self.cfh:
+            if self.cfh.save():
+                if self.debug:
+                    self.logs.message_debug = "config file saved successful"
+                return True
+            else:
+                self.logs.message_warning = (
+                    f"cannot save config file: '{self.config_file}'"
+                )
         return False
 
     def reload(self) -> bool:
         """Try to reload config file."""
-        return False
+        self.cfh = None
+        return self.load()
 
     def __create_config_file(self) -> bool:
         """Try to create the config file."""

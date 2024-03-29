@@ -18,7 +18,7 @@ from jsktoolbox.libs.base_data import BData
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.configtool.main import Config as ConfigTool
-from jsktoolbox.logstool.logs import LoggerClient
+from jsktoolbox.logstool.logs import LoggerClient, ThLoggerProcessor
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -29,6 +29,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
     CONFIG_FILE: str = "__config_file__"
     CONFIG_HANDLER: str = "__cfh__"
     LOGGER_CLIENT: str = "__logger_client__"
+    PROC_LOGS: str = "__logger_processor__"
     SECTION: str = "__config_section__"
 
 
@@ -135,8 +136,8 @@ class BLogs(BData):
         self._data[_Keys.LOGGER_CLIENT] = logger_client
 
 
-class BConfig(BData):
-    """Base class for Config property."""
+class BaseApp(BLogs, BConfigSection):
+    """Main app base class."""
 
     from uke_pit2.conf import Config
 
@@ -162,10 +163,6 @@ class BConfig(BData):
             )
         self._data[_Keys.CONF] = conf_obj
 
-
-class BaseApp(BData):
-    """Main app base class."""
-
     @property
     def version(self) -> str:
         """Returns version information string."""
@@ -186,6 +183,25 @@ class BaseApp(BData):
                 "Boolean flag expected.", TypeError, self._c_name, currentframe()
             )
         self._data[_Keys.COMMAND_LINE_OPTS] = flag
+
+    @property
+    def logs_processor(self) -> ThLoggerProcessor:
+        """Return logs_processor."""
+        if _Keys.PROC_LOGS not in self._data:
+            self._data[_Keys.PROC_LOGS] = None
+        return self._data[_Keys.PROC_LOGS]
+
+    @logs_processor.setter
+    def logs_processor(self, value: ThLoggerProcessor) -> None:
+        """Set logs_processor."""
+        if not isinstance(value, ThLoggerProcessor):
+            raise Raise.error(
+                f"Expected ThLoggerProcessor type, received: '{type(value)}'.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.PROC_LOGS] = value
 
     def _help(self, command_conf: Dict) -> None:
         """Show help information and shutdown."""
