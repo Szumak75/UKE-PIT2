@@ -98,6 +98,8 @@ class BModuleConfig(BConfigHandler, BConfigSection):
     class Keys(object, metaclass=ReadOnlyClass):
         """Keys definition container class."""
 
+        MODCONF: str = "__modconf__"
+
     def __init__(self, cfh: ConfigTool, section: Optional[str]) -> None:
         """Constructor."""
         self.cfh = cfh

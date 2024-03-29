@@ -15,6 +15,7 @@ from jsktoolbox.raisetool import Raise
 from jsktoolbox.configtool.main import Config as ConfigTool
 from jsktoolbox.logstool.logs import LoggerQueue, LoggerClient
 from jsktoolbox.stringtool.crypto import SimpleCrypto
+from jsktoolbox.netaddresstool.ipv4 import Address
 
 from uke_pit2.base import BLogs, BConfigHandler, BModuleConfig, BConfigSection
 
@@ -25,23 +26,71 @@ class _Keys(object, metaclass=ReadOnlyClass):
     APP_NAME: str = "__application_name__"
     CF: str = "__config_file_handler__"
     MAIN: str = "__main__"
-    MODCONF: str = "__modconf__"
-    DEBUG: str = "__debug__"
+
+    DEBUG: str = "debug"
+    LMS_DB: str = "db_database"
+    LMS_HOST: str = "db_host"
+    LMS_PASS: str = "db_password"
+    LMS_PORT: str = "db_port"
+    LMS_USER: str = "db_user"
+    SALT: str = "salt"
 
 
 class _ModuleConf(BModuleConfig):
     """Module config private class."""
 
-    class Keys(object, metaclass=ReadOnlyClass):
-        """Internal Keys class for naming variables in the config file."""
-
-        SALT: str = "salt"
-        DEBUG: str = "debug"
-
     @property
     def salt(self) -> int:
         """Return salt var."""
-        return self._get(_ModuleConf.Keys.SALT)
+        return self._get(_Keys.SALT)
+
+    @property
+    def debug(self) -> bool:
+        """Return debug var."""
+        var: Optional[bool] = self._get(_Keys.DEBUG)
+        if var is None:
+            return False
+        return var
+
+    @property
+    def lms_host(self) -> Optional[Address]:
+        """Returns lms_host ip address as optional Address."""
+        var: Optional[str] = self._get(_Keys.LMS_HOST)
+        if not var:
+            return None
+        return Address(var)
+
+    @property
+    def lms_port(self) -> Optional[int]:
+        """Returns lms_port optional int."""
+        var: Optional[int] = self._get(_Keys.LMS_PORT)
+        if not var:
+            return None
+        return var
+
+    @property
+    def lms_database(self) -> Optional[str]:
+        """Returns lms_database name."""
+        var: Optional[str] = self._get(_Keys.LMS_DB)
+        if not var:
+            return None
+        return var
+
+    @property
+    def lms_user(self) -> Optional[str]:
+        """Returns lms_user name."""
+        var: Optional[str] = self._get(_Keys.LMS_USER)
+        if not var:
+            return None
+        return var
+
+    @property
+    def lms_password(self) -> Optional[str]:
+        """Returns lms_password name."""
+        var: Optional[str] = self._get(_Keys.LMS_PASS)
+        if not var:
+            return None
+        return var
 
 
 class Config(BLogs, BConfigHandler, BConfigSection):
@@ -59,7 +108,7 @@ class Config(BLogs, BConfigHandler, BConfigSection):
 
         self.logs.message_info = "Config initialization..."
         self._data[_Keys.MAIN] = dict()
-        self._data[_Keys.MODCONF] = None
+        self._data[_ModuleConf.Keys.MODCONF] = None
         self.app_name = app_name
         self._data[_Keys.CF] = None
         self.logs.message_info = "... complete"
@@ -77,7 +126,7 @@ class Config(BLogs, BConfigHandler, BConfigSection):
         if self.cfh is None:
             config = ConfigTool(self.config_file, self.section)
             self.cfh = config
-            self._data[_Keys.MODCONF] = _ModuleConf(config, self.section)
+            self._data[_ModuleConf.Keys.MODCONF] = _ModuleConf(config, self.section)
             if not config.file_exists:
                 self.logs.message_warning = (
                     f"config file '{self.config_file}' does not exist"
@@ -119,19 +168,41 @@ class Config(BLogs, BConfigHandler, BConfigSection):
         # main section
         self.cfh.set(self.section, desc=f"{self.section} configuration file")
         # add debug
-        self.cfh.set(self.section, varname=_ModuleConf.Keys.DEBUG, value=False)
+        self.cfh.set(self.section, varname=_Keys.DEBUG, value=True)
         # add salt
         self.cfh.set(
             self.section,
-            varname=_ModuleConf.Keys.SALT,
+            varname=_Keys.SALT,
             value=SimpleCrypto.salt_generator(4),
             desc="[int] salt for passwords encode/decode",
         )
         # add mysql lms configuration
-
-        # add spider section
-
-        # add pit section
+        self.cfh.set(
+            self.section,
+            varname=_Keys.LMS_HOST,
+            desc="[str] lms mysql server IP",
+        )
+        self.cfh.set(
+            self.section,
+            varname=_Keys.LMS_PORT,
+            value=3306,
+            desc="[int] lms mysql server Port",
+        )
+        self.cfh.set(
+            self.section,
+            varname=_Keys.LMS_DB,
+            desc="[str] lms database name",
+        )
+        self.cfh.set(
+            self.section,
+            varname=_Keys.LMS_USER,
+            desc="[str] lms user name",
+        )
+        self.cfh.set(
+            self.section,
+            varname=_Keys.LMS_PASS,
+            desc="[str] lms user password",
+        )
 
         # try to save the config file
         out: bool = False
@@ -167,22 +238,22 @@ class Config(BLogs, BConfigHandler, BConfigSection):
 
     @property
     def __main(self) -> Dict:
-        """Return MAIN dict."""
+        """Returns MAIN dict."""
         return self._data[_Keys.MAIN]
 
     @property
     def debug(self) -> bool:
-        """Return debug flag."""
+        """Returns debug flag."""
         if _Keys.DEBUG not in self.__main:
             self.__main[_Keys.DEBUG] = False
         if self.cfh and self.section:
-            if self.cfh.get(self.section, _ModuleConf.Keys.DEBUG):
+            if self.cfh.get(self.section, _Keys.DEBUG):
                 return True
         return self.__main[_Keys.DEBUG]
 
     @debug.setter
     def debug(self, value: bool) -> None:
-        """Set debug flag."""
+        """Sets debug flag."""
         if not isinstance(value, bool):
             raise Raise.error(
                 f"Expected Boolean type, received: '{type(value)}'.",
@@ -194,8 +265,8 @@ class Config(BLogs, BConfigHandler, BConfigSection):
 
     @property
     def module_conf(self) -> Optional[_ModuleConf]:
-        """Return module conf object."""
-        return self._data[_Keys.MODCONF]
+        """Returns module conf object."""
+        return self._data[_ModuleConf.Keys.MODCONF]
 
 
 # #[EOF]#######################################################################
