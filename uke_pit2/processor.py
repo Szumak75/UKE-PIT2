@@ -21,6 +21,7 @@ from jsktoolbox.netaddresstool.ipv4 import Address
 from jsktoolbox.raisetool import Raise
 
 from uke_pit2.base import BLogs
+from uke_pit2.network import Pinger
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -66,7 +67,7 @@ class Processor(Thread, ThBaseObject, BLogs):
         # the main procedure
         if not self.has_stop_set:
             # check icmp to ip
-            pass
+            self.__check_icmp()
 
         if self._debug:
             self.logs.message_debug = "stopped"
@@ -77,6 +78,14 @@ class Processor(Thread, ThBaseObject, BLogs):
             if self._debug:
                 self.logs.message_debug = "stopping..."
             self._stop_event.set()
+
+    def __check_icmp(self) -> None:
+        """Check ipv4 responses."""
+        test = Pinger()
+        if not test.is_alive(f"{self.ip}"):
+            if self._debug:
+                self.logs.message_debug = f"host {self.ip} not responding."
+            self.stop()
 
     @property
     def ip(self) -> Address:
