@@ -26,6 +26,7 @@ from jsktoolbox.logstool.logs import (
 )
 from jsktoolbox.logstool.formatters import LogFormatterNull
 from jsktoolbox.libs.system import Env, PathChecker
+from jsktoolbox.stringtool.crypto import SimpleCrypto
 
 from uke_pit2.base import BaseApp, BModuleConfig
 from uke_pit2.conf import Config
@@ -34,9 +35,12 @@ from uke_pit2.conf import Config
 class _Keys(object, metaclass=ReadOnlyClass):
     """Internal _Keys container class."""
 
-    START_IP: str = "start_ip"
-    PASSWORDS: str = "router_passwords"
     CONFIGURED: str = "__conf_ok__"
+    PASSWORDS: str = "router_passwords"
+    SET_DB_PASS: str = "__set_db_pass__"
+    SET_IP: str = "__set_ip__"
+    SET_PASS: str = "__set_pass__"
+    START_IP: str = "start_ip"
 
 
 class _ModuleConf(BModuleConfig):
@@ -68,9 +72,6 @@ class SpiderApp(BaseApp):
         # set config section name
         self.section = self._c_name
 
-        # check command line
-        self.__init_command_line()
-
         # logging subsystem
         log_engine = LoggerEngine()
         log_queue: Optional[LoggerQueue] = log_engine.logs_queue
@@ -90,6 +91,9 @@ class SpiderApp(BaseApp):
         thl.logger_engine = log_engine
         thl.logger_client = self.logs
         self.logs_processor = thl
+
+        # check command line
+        self.__init_command_line()
 
         # add config handler
         if self.conf is None:
@@ -144,7 +148,20 @@ class SpiderApp(BaseApp):
         parser = CommandLineParser()
 
         # configuration for arguments
-        parser.configure_argument("h", "help", "this information")
+        parser.configure_argument("h", "help", "this information.")
+        parser.configure_argument(
+            "i",
+            "ip",
+            "add/modify starting router ip4.",
+            has_value=True,
+            example_value="192.168.1.1",
+        )
+        parser.configure_argument(
+            "R", "rbpassword", "add router password to connection list."
+        )
+        parser.configure_argument(
+            "p", "dbpassword", "set user password for lms database connection."
+        )
 
         # command line parsing
         parser.parse_arguments()
@@ -152,6 +169,38 @@ class SpiderApp(BaseApp):
         # check
         if parser.get_option("help") is not None:
             self._help(parser.dump())
+        if parser.get_option("ip") is not None:
+            try:
+                ip_str = parser.get_option("ip")
+                if ip_str:
+                    tmp = Address(ip_str)
+                    self._data[_Keys.SET_IP] = tmp
+            except Exception as ex:
+                self.logs.message_critical = (
+                    f"[command line] IPv4 address expected, received: '{ip_str}'"
+                )
+        if parser.get_option("rbpassword") is not None:
+            # get password string from console
+            while True:
+                password: str = input("Enter router password: ")
+                if password == "":
+                    print('Type: "Exit" to break.')
+                elif password == "EXIT":
+                    break
+                else:
+                    self._data[_Keys.SET_PASS] = password
+                    break
+        if parser.get_option("dbpassword") is not None:
+            # get password string from console
+            while True:
+                password: str = input("Enter database password: ")
+                if password == "":
+                    print('Type: "Exit" to break.')
+                elif password == "EXIT":
+                    break
+                else:
+                    self._data[_Keys.SET_DB_PASS] = password
+                    break
 
     def __check_config_section(self) -> None:
         """Check config option for section."""
@@ -190,6 +239,79 @@ class SpiderApp(BaseApp):
                     currentframe(),
                 )
 
+        # check command line updates
+        if _Keys.SET_IP in self._data:
+            self.conf.cfh.set(
+                section=self.section,
+                varname=_Keys.START_IP,
+                value=str(self._data[_Keys.SET_IP]),
+            )
+            if not self.conf.save():
+                raise Raise.error(
+                    "Configuration file writing error.",
+                    OSError,
+                    self._c_name,
+                    currentframe(),
+                )
+            self.conf.reload()
+        if _Keys.SET_DB_PASS in self._data:
+            password: str = self._data[_Keys.SET_DB_PASS]
+            mod: bool = False
+            if self.conf.module_conf:
+                salt: int = self.conf.module_conf.salt
+                password = SimpleCrypto.multiple_encrypt(salt, password)
+                if (
+                    not self.conf.module_conf.lms_password
+                    or self.conf.module_conf.lms_password
+                    and self.conf.module_conf.lms_password != password
+                ):
+                    self.conf.set_lms_password(password)
+
+        if _Keys.SET_PASS in self._data:
+            password: str = self._data[_Keys.SET_PASS]
+            mod: bool = False
+            if self.conf.module_conf:
+                salt: int = self.conf.module_conf.salt
+                password = SimpleCrypto.multiple_encrypt(salt, password)
+                pass_list: List[str] = self.conf.cfh.get(
+                    section=self.section, varname=_Keys.PASSWORDS
+                )
+                if pass_list is None or isinstance(pass_list, str):
+                    pass_list = [""]
+
+                if len(pass_list) == 1:
+                    if pass_list[0] == "":
+                        pass_list[0] = password
+                        self.conf.cfh.set(
+                            section=self.section,
+                            varname=_Keys.PASSWORDS,
+                            value=pass_list,
+                        )
+                        mod = True
+
+                test = False
+                for item in pass_list:
+                    if item == password:
+                        test = True
+                        break
+                if not test:
+                    pass_list.insert(0, password)
+                    self.conf.cfh.set(
+                        section=self.section,
+                        varname=_Keys.PASSWORDS,
+                        value=pass_list,
+                    )
+                    mod = True
+            if mod:
+                if not self.conf.save():
+                    raise Raise.error(
+                        "Configuration file writing error.",
+                        OSError,
+                        self._c_name,
+                        currentframe(),
+                    )
+                self.conf.reload()
+
         # set module conf
         self.module_conf = _ModuleConf(self.conf.cfh, self.section)
 
@@ -201,8 +323,6 @@ class SpiderApp(BaseApp):
         if not self.module_conf.router_passwords:
             self.logs.message_alert = f"'{_Keys.PASSWORDS}' is not set."
             configured = False
-        else:
-            print(self.module_conf.router_passwords)
 
         self.configured = configured
 

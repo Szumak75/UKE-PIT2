@@ -58,7 +58,12 @@ class _ModuleConf(BModuleConfig):
         var: Optional[str] = self._get(_Keys.LMS_HOST)
         if not var:
             return None
-        return Address(var)
+        address = None
+        try:
+            address = Address(var)
+        except Exception as e:
+            pass
+        return address
 
     @property
     def lms_port(self) -> Optional[int]:
@@ -146,6 +151,43 @@ class Config(BLogs, BConfigHandler, BConfigSection):
             if out:
                 if self.debug:
                     self.logs.message_debug = "config file loaded successful"
+                # check variables
+                if self.module_conf:
+                    # salt
+                    if self.module_conf.salt is None or not isinstance(
+                        self.module_conf.salt, int
+                    ):
+                        self.logs.message_critical = (
+                            f"'{_Keys.SALT}' is not set properly."
+                        )
+                    # lms_host
+                    if not self.module_conf.lms_host:
+                        self.logs.message_critical = (
+                            f"'{_Keys.LMS_HOST}' is not set properly."
+                        )
+                    # lms_port
+                    if not self.module_conf.lms_port or not isinstance(
+                        self.module_conf.lms_port, int
+                    ):
+                        self.logs.message_critical = (
+                            f"'{_Keys.LMS_PORT}' is not set properly."
+                        )
+                    # lms_database
+                    if not self.module_conf.lms_database:
+                        self.logs.message_critical = (
+                            f"'{_Keys.LMS_DB}' is not set properly."
+                        )
+                    # lms_user
+                    if not self.module_conf.lms_user:
+                        self.logs.message_critical = (
+                            f"'{_Keys.LMS_USER}' is not set properly."
+                        )
+                    # lms_pass
+                    if not self.module_conf.lms_password:
+                        self.logs.message_critical = (
+                            f"'{_Keys.LMS_PASS}' is not set properly."
+                        )
+
         except Exception as ex:
             self.logs.message_critical = (
                 f"cannot load config file: '{self.config_file}'"
@@ -226,6 +268,18 @@ class Config(BLogs, BConfigHandler, BConfigSection):
             if self.debug:
                 self.logs.message_debug = f"{ex}"
         return out
+
+    def set_lms_password(self, password: str) -> None:
+        """Sets lms password."""
+        if self.cfh is None or self.section is None:
+            self.logs.message_critical = f"Config isn't initialized properly."
+            return None
+
+        self.cfh.set(section=self.section, varname=_Keys.LMS_PASS, value=password)
+        if not self.save():
+            self.logs.message_critical = f"Cannot update lms password."
+        else:
+            self.reload()
 
     @property
     def app_name(self) -> Optional[str]:
