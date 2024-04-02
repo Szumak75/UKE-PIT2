@@ -302,6 +302,7 @@ class SpiderApp(BaseApp):
                         value=pass_list,
                     )
                     mod = True
+            # update config
             if mod:
                 if not self.conf.save():
                     raise Raise.error(
