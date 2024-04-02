@@ -27,6 +27,7 @@ from uke_pit2.network import Pinger
 class _Keys(object, metaclass=ReadOnlyClass):
     """Internal Keys container class."""
 
+    ACH: str = "__api_connector_handler__"
     IP: str = "__host_ip__"
 
 
