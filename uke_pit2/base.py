@@ -28,6 +28,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
     CONF: str = "__config__"
     CONFIG_FILE: str = "__config_file__"
     CONFIG_HANDLER: str = "__cfh__"
+    DEBUG: str = "__debug__"
     LOGGER_CLIENT: str = "__logger_client__"
     PROC_LOGS: str = "__logger_processor__"
     SECTION: str = "__config_section__"
@@ -111,6 +112,29 @@ class BModuleConfig(BConfigHandler, BConfigSection):
         if self.cfh and self.section:
             return self.cfh.get(self.section, varname)
         return None
+
+
+class BDebug(BData):
+    """Base class for debugging property."""
+
+    @property
+    def debug(self) -> bool:
+        """Returns debug flag."""
+        if _Keys.DEBUG not in self._data:
+            self._data[_Keys.DEBUG] = False
+        return self._data[_Keys.DEBUG]
+
+    @debug.setter
+    def debug(self, flag: bool) -> None:
+        """Sets debug flag."""
+        if not isinstance(flag, bool):
+            raise Raise.error(
+                f"Expected boolean type, received: '{type(flag)}'",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.DEBUG] = flag
 
 
 class BLogs(BData):
