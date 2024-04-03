@@ -30,6 +30,7 @@ from jsktoolbox.stringtool.crypto import SimpleCrypto
 
 from uke_pit2.base import BaseApp, BModuleConfig
 from uke_pit2.conf import Config
+from uke_pit2.processor import Processor
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -129,8 +130,20 @@ class SpiderApp(BaseApp):
         self.logs_processor.start()
 
         # main procedure
-        if self.configured:
-            time.sleep(5)
+        if self.configured and self.logs.logs_queue and self.module_conf.start_ip:
+            rb = Processor(
+                self.logs.logs_queue,
+                self.module_conf.start_ip,
+                self.__password_decryptor(self.module_conf.router_passwords),
+                self.conf.debug,
+            )
+
+            rb.start()
+
+            while rb.is_alive():
+                time.sleep(1)
+
+            rb.join()
 
         # exit
         time.sleep(1)
@@ -201,6 +214,24 @@ class SpiderApp(BaseApp):
                 else:
                     self._data[_Keys.SET_DB_PASS] = password
                     break
+
+    def __password_decryptor(self, passwords: List[str]) -> List[str]:
+        """Decrypt configured passwords."""
+        if not isinstance(passwords, list):
+            raise Raise.error(
+                f"Expecter list type, received: '{type(passwords)}'",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        out: List[str] = []
+        if self.conf and self.conf.module_conf:
+            for item in passwords:
+                if item and len(item) > 6:
+                    out.append(
+                        SimpleCrypto.multiple_decrypt(self.conf.module_conf.salt, item)
+                    )
+        return out
 
     def __check_config_section(self) -> None:
         """Check config option for section."""

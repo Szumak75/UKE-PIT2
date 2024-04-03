@@ -84,8 +84,15 @@ class Pinger(BData):
                 self._data[_Keys.MULTIPLIER],
             ) = tmp
 
-    def is_alive(self, ip: str) -> bool:
+    def is_alive(self, ip: Address) -> bool:
         """Check ICMP echo response."""
+        if not isinstance(ip, Address):
+            raise Raise.error(
+                f"Address type expected, '{type(ip)}' received.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
         if self._data[_Keys.COMMAND] is None:
             raise Raise.error(
                 "Command for testing ICMP echo not found.",
@@ -97,7 +104,7 @@ class Pinger(BData):
             os.system(
                 self._data[_Keys.COMMAND].format(
                     int(self._data[_Keys.TIMEOUT] * self._data[_Keys.MULTIPLIER]),
-                    str(Address(ip)),
+                    str(ip),
                 )
             )
         ) == 0:
