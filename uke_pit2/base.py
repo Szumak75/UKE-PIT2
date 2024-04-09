@@ -19,6 +19,7 @@ from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.configtool.main import Config as ConfigTool
 from jsktoolbox.logstool.logs import LoggerClient, ThLoggerProcessor
+from jsktoolbox.devices.mikrotik.routerboard import RouterBoard
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -32,6 +33,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
     LOGGER_CLIENT: str = "__logger_client__"
     PROC_LOGS: str = "__logger_processor__"
     SECTION: str = "__config_section__"
+    RB: str = "__rbh__"
 
 
 class BConfigSection(BData):
@@ -158,6 +160,29 @@ class BLogs(BData):
                 currentframe(),
             )
         self._data[_Keys.LOGGER_CLIENT] = logger_client
+
+
+class BRouterBoard(BData):
+    """Base class for router board property."""
+
+    @property
+    def rb(self) -> Optional[RouterBoard]:
+        """Returns RouterBoard handler."""
+        if _Keys.RB not in self._data:
+            self._data[_Keys.RB] = None
+        return self._data[_Keys.RB]
+
+    @rb.setter
+    def rb(self, value: RouterBoard) -> None:
+        """Sets Router Board handler."""
+        if not isinstance(value, RouterBoard):
+            raise Raise.error(
+                f"RouterBoard type expected, received: '{type(value)}'",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.RB] = value
 
 
 class BaseApp(BLogs, BConfigSection):

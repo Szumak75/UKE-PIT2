@@ -26,6 +26,7 @@ from jsktoolbox.devices.mikrotik.base import Element
 
 from uke_pit2.base import BLogs
 from uke_pit2.network import Pinger
+from uke_pit2.rb import IRouterBoardCollector, RouterBoardVersion
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -83,7 +84,6 @@ class Processor(Thread, ThBaseObject, BLogs):
             for passwd in self.__passwords:
                 if self._debug:
                     self.logs.message_debug = f"Try to connect..."
-                    self.logs.message_debug = f"The password is: '{passwd}'"
                 conn = API(
                     ip_address=self.ip,
                     port=8728,
@@ -95,6 +95,7 @@ class Processor(Thread, ThBaseObject, BLogs):
                     if conn.connect() and conn.is_alive:
                         if self._debug:
                             self.logs.message_debug = f"connected"
+                            self.logs.message_debug = f"The password is: '{passwd}'"
                         self.api_handler = conn
                         break
                 except Exception as e:
@@ -135,7 +136,7 @@ class Processor(Thread, ThBaseObject, BLogs):
 
     def __router_board_dialogs(self) -> None:
         """RB procedures."""
-        if self.api_handler:
+        if self.api_handler and self.logs.logs_queue:
             rb = RouterBoard(
                 connector=self.api_handler,
                 qlog=self.logs.logs_queue,
@@ -143,19 +144,33 @@ class Processor(Thread, ThBaseObject, BLogs):
             )
 
             # check system version
-            rbq = RBQuery()
-            rbq.add_attrib("current-firmware")
-            out: Optional[Element] = rb.element("/system/routerboard/", auto_load=True)
-            if out:
-                self.logs.message_debug = f"{out.search(rbq.query)}"
-                self.logs.message_debug = f"{out.attrib}"
+            csv = RouterBoardVersion(
+                logger_queue=self.logs.logs_queue,
+                rb_handler=rb,
+                debug=True if self._debug else False,
+            )
 
-            rbq = RBQuery()
-            rbq.add_attrib("interface", "routerid")
-            rbq.add_attrib("network", str(self.ip))
-            out: Optional[Element] = rb.element("/ip/address/", auto_load=True)
-            if out:
-                self.logs.message_debug = f"{out.search(rbq.query)}"
+            collector: Optional[IRouterBoardCollector] = csv.get_collector()
+
+            if collector:
+                self.logs.message_debug = f"{collector}"
+                collector.collect()
+                collector.dump()  # type: ignore
+
+            # tests
+            # rbq = RBQuery()
+            # rbq.add_attrib("current-firmware")
+            # out: Optional[Element] = rb.element("/system/routerboard/", auto_load=True)
+            # if out:
+            #     self.logs.message_debug = f"{out.search(rbq.query)}"
+            #     self.logs.message_debug = f"{out.attrib}"
+
+            # rbq = RBQuery()
+            # rbq.add_attrib("interface", "routerid")
+            # rbq.add_attrib("network", str(self.ip))
+            # out: Optional[Element] = rb.element("/ip/address/", auto_load=True)
+            # if out:
+            #     self.logs.message_debug = f"{out.search(rbq.query)}"
 
     @property
     def api_handler(self) -> Optional[API]:
