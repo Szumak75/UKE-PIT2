@@ -31,6 +31,7 @@ from jsktoolbox.stringtool.crypto import SimpleCrypto
 from uke_pit2.base import BaseApp, BModuleConfig
 from uke_pit2.conf import Config
 from uke_pit2.processor import Processor
+from uke_pit2.rb import RBData
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -129,21 +130,93 @@ class SpiderApp(BaseApp):
         # logger processor
         self.logs_processor.start()
 
+        # data
+        ips: List[Address] = []
+        run_limit: int = 5
+        th_proc: List[Processor] = []
+        th_run: List[Processor] = []
+        complete: List[RBData] = []
+        count: int = 0
+        count_limit: int = 10
+
         # main procedure
         if self.configured and self.logs.logs_queue and self.module_conf.start_ip:
-            rb = Processor(
-                self.logs.logs_queue,
-                self.module_conf.start_ip,
-                self.__password_decryptor(self.module_conf.router_passwords),
-                self.conf.debug,
+            # starting data
+            ips.append(self.module_conf.start_ip)
+            passwords: List[str] = self.__password_decryptor(
+                self.module_conf.router_passwords
+            )
+            th_proc.append(
+                Processor(
+                    self.logs.logs_queue,
+                    self.module_conf.start_ip,
+                    passwords,
+                    self.conf.debug,
+                )
             )
 
-            rb.start()
+            while th_proc or th_run:
 
-            while rb.is_alive():
-                time.sleep(1)
+                # add new processor to run list
+                if len(th_run) < run_limit:
+                    if th_proc:
+                        obj: Processor = th_proc.pop()
+                        obj.start()
+                        th_run.append(obj)
+                        count += 1
 
-            rb.join()
+                # check run list
+                for obj in th_run:
+                    if not obj.is_alive():
+                        # add neighbor routers
+                        rb: Optional[RBData] = obj.router_data()
+                        if rb:
+                            # add router-id
+                            rb.router_id = obj.ip
+                            # add output data
+                            complete.append(rb)
+                        if rb and rb.routers:
+                            for item in rb.routers:
+                                if "router-id" in item and item["router-id"] not in ips:
+                                    ip: Address = item["router-id"]
+                                    self.logs.message_debug = f"add {ip} to router list"
+                                    ips.append(ip)
+                                    th_proc.append(
+                                        Processor(
+                                            self.logs.logs_queue,
+                                            ip,
+                                            passwords,
+                                            self.conf.debug,
+                                        )
+                                    )
+
+                        # join
+                        obj.join()
+
+                        # remove finished processor
+                        th_run.remove(obj)
+
+                # break for coffee
+                time.sleep(0.2)
+
+                if count_limit > 0 and count == count_limit:
+                    # short procedure for debugging purpose
+                    break
+
+            # cleanup after break
+            while th_run:
+                for obj in th_run:
+                    if not obj.is_alive():
+                        obj.join()
+                        time.sleep(0.2)
+                        th_run.remove(obj)
+
+            # dump data
+            if self.conf.debug and complete:
+                count = 0
+                for item in complete:
+                    count += 1
+                    self.logs.message_debug = f"{count}: {item}"
 
         # exit
         time.sleep(1)

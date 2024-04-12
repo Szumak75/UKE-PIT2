@@ -38,7 +38,9 @@ class _Keys(object, metaclass=ReadOnlyClass):
     VLAN: str = "__vlan__"
 
     # RBData keys
+    CUSTOMERS: str = "__rb_data_customers__"
     ROUTERS: str = "__rb_data_routers__"
+    RID: str = "__rb_router_id__"
 
 
 class RBData(BData):
@@ -46,15 +48,39 @@ class RBData(BData):
 
     def __init__(self) -> None:
         """RBData constructor."""
+        self._data[_Keys.RID] = None
         self._data[_Keys.ROUTERS] = []
+        self._data[_Keys.CUSTOMERS] = []
 
     @property
-    def routers(self) -> List[Dict[str, str]]:
+    def customers(self) -> List[Dict[str, str]]:
+        """Returns list of dict for connected customers."""
+        return self._data[_Keys.CUSTOMERS]
+
+    @property
+    def router_id(self) -> Optional[Address]:
+        """Returns router-id."""
+        return self._data[_Keys.RID]
+
+    @router_id.setter
+    def router_id(self, address: Address) -> None:
+        """Sets router-id address."""
+        if not address or not isinstance(address, Address):
+            raise Raise.error(
+                f"Expected Address type, received '{type(address)}'.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.RID] = address
+
+    @property
+    def routers(self) -> List[Dict[str, Any]]:
         """Returns list of dict for neighbor routers."""
         return self._data[_Keys.ROUTERS]
 
     def __repr__(self) -> str:
-        return f"{self._c_name}(routers: {self.routers})"
+        return f"{self._c_name}(router-id: {self.router_id}, routers: {self.routers}, customers: {self.customers})"
 
 
 class IRouterBoardCollector(ABC):
@@ -92,10 +118,12 @@ class RouterBoardVersion(BLogs, BDebug, BRouterBoard):
                 rbq = RBQuery()
                 rbq.add_attrib("current-firmware")
                 self.logs.message_debug = f"{out.search(rbq.query)}"
-                search_query = out.search(rbq.query)
+                search_query: Optional[Union[List[Any], Dict[Any, Any]]] = out.search(
+                    rbq.query
+                )
                 if (
                     search_query
-                    and isinstance(search_query, dict)
+                    and isinstance(search_query, Dict)
                     and "current-firmware" in search_query
                 ):
                     ver = search_query["current-firmware"]
@@ -236,6 +264,48 @@ class __Collector(BLogs, BDebug, BRouterBoard):
                         tmp["vlan-id"] = vlan_id
                         tmp["network"] = network
                     out.append(tmp)
+            elif search and isinstance(search, Dict):
+                tmp: Dict[str, Any] = {}
+                if "router-id" in search:
+                    tmp["router-id"] = Address(search["router-id"])
+                if "address" in search:
+                    tmp["address"] = Address(search["address"])
+                    # search for interface
+                    inf: str
+                    vlan_id: Optional[int]
+                    network: Optional[Network]
+                    inf, vlan_id, network = self.__get_neighbor_interface(
+                        Address(search["address"])
+                    )
+                    tmp["interface"] = inf
+                    tmp["vlan-id"] = vlan_id
+                    tmp["network"] = network
+                out.append(tmp)
+        return out
+
+    def _build_customers_data(self) -> List[Dict[str, str]]:
+        """Builds and returns connected customer list."""
+        out: List[Dict[str, str]] = []
+        customer = RBQuery()
+        customer.add_attrib("service", "pppoe")
+        if self.ppp:
+            search: Optional[Union[List[Any], Dict[Any, Any]]] = self.ppp.search(
+                customer.query
+            )
+            if search and isinstance(search, List):
+                for item in search:
+                    # {'.id': '*80000077', 'name': '48:8F:5A:7C:13:3A', 'service': 'pppoe', 'caller-id': 'B8:69:F4:B7:52:BB',
+                    # 'address': '10.30.246.13', 'uptime': '3d17h14m31s', 'encoding': '', 'session-id': '0x81300077', 'limit-bytes-in': '0',
+                    # 'limit-bytes-out': '0', 'radius': 'true'}
+                    # {'.id': '*80000068', 'name': 'D4:CA:6D:D5:82:E3', 'service': 'pppoe', 'caller-id': 'B4:FB:E4:BE:86:DB',
+                    # 'address': '10.30.214.21', 'uptime': '5d18h59m42s', 'encoding': '', 'session-id': '0x81000068', 'limit-bytes-in': '0',
+                    # 'limit-bytes-out': '0', 'radius': 'true'}
+                    tmp: Dict[str, str] = {}
+                    if "name" in item and "address" in item:
+                        tmp["name"] = item["name"]
+                        tmp["address"] = item["address"]
+                    if tmp:
+                        out.append(tmp)
         return out
 
     @property
@@ -284,10 +354,6 @@ class __Collector(BLogs, BDebug, BRouterBoard):
         self.logs.message_debug = f"{self.neighbors}"
         # self.logs.message_debug = f"{self.addresses}"
         # self.logs.message_debug = f"{self.ppp}"
-
-
-class BRouterBoardCollector:
-    """Base class for RouterBoardCollector."""
 
 
 class RouterBoardCollector6(IRouterBoardCollector, __Collector):
@@ -354,6 +420,9 @@ class RouterBoardCollector6(IRouterBoardCollector, __Collector):
         # routers
         for item in self._build_routers_data():
             out.routers.append(item)
+        # customers
+        for item in self._build_customers_data():
+            out.customers.append(item)
 
         return out
 
@@ -420,6 +489,9 @@ class RouterBoardCollector7(IRouterBoardCollector, __Collector):
         # routers
         for item in self._build_routers_data():
             out.routers.append(item)
+        # customers
+        for item in self._build_customers_data():
+            out.customers.append(item)
 
         return out
 

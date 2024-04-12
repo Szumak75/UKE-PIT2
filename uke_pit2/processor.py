@@ -26,13 +26,14 @@ from jsktoolbox.devices.mikrotik.base import Element
 
 from uke_pit2.base import BLogs
 from uke_pit2.network import Pinger
-from uke_pit2.rb import IRouterBoardCollector, RouterBoardVersion
+from uke_pit2.rb import IRouterBoardCollector, RBData, RouterBoardVersion
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
     """Internal Keys container class."""
 
     ACH: str = "__api_connector_handler__"
+    DATA: str = "__router_data__"
     IP: str = "__host_ip__"
     PASS: str = "__passwords_list__"
 
@@ -67,6 +68,8 @@ class Processor(Thread, ThBaseObject, BLogs):
         self._debug = debug
         # logger
         self.logs = LoggerClient(logger_queue, f"{self._c_name} {ip}")
+        # data container
+        self._data[_Keys.DATA] = None
 
     def run(self) -> None:
         """Start processor."""
@@ -156,6 +159,7 @@ class Processor(Thread, ThBaseObject, BLogs):
                 self.logs.message_debug = f"{collector}"
                 collector.collect()
                 self.logs.message_debug = f"{collector.get_data()}"
+                self._data[_Keys.DATA] = collector.get_data()
                 # collector.dump()  # type: ignore
 
             # tests
@@ -172,6 +176,10 @@ class Processor(Thread, ThBaseObject, BLogs):
             # out: Optional[Element] = rb.element("/ip/address/", auto_load=True)
             # if out:
             #     self.logs.message_debug = f"{out.search(rbq.query)}"
+
+    def router_data(self) -> Optional[RBData]:
+        """Returns collected Router Board data."""
+        return self._data[_Keys.DATA]
 
     @property
     def api_handler(self) -> Optional[API]:
