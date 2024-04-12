@@ -11,14 +11,14 @@ import re
 
 from abc import ABC, abstractmethod
 from inspect import currentframe
-from typing import Optional, List, Dict, Any
+from typing import Optional, Union, List, Dict, Any
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.logstool.logs import LoggerClient, LoggerQueue
 from jsktoolbox.libs.base_data import BData
 from jsktoolbox.libs.base_th import ThBaseObject
 from jsktoolbox.libs.base_logs import BLoggerQueue
-from jsktoolbox.netaddresstool.ipv4 import Address
+from jsktoolbox.netaddresstool.ipv4 import Address, Network
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.devices.network.connectors import API
 from jsktoolbox.devices.mikrotik.routerboard import RouterBoard
@@ -28,12 +28,45 @@ from jsktoolbox.devices.mikrotik.base import Element
 from uke_pit2.base import BLogs, BDebug, BRouterBoard
 
 
+class _Keys(object, metaclass=ReadOnlyClass):
+    """Internal keys container class."""
+
+    ADDRESS: str = "__addr__"
+    ETHER: str = "__eth__"
+    NEIGHBOR: str = "__nb__"
+    PPP: str = "__ppp__"
+    VLAN: str = "__vlan__"
+
+    # RBData keys
+    ROUTERS: str = "__rb_data_routers__"
+
+
+class RBData(BData):
+    """Router board data container class."""
+
+    def __init__(self) -> None:
+        """RBData constructor."""
+        self._data[_Keys.ROUTERS] = []
+
+    @property
+    def routers(self) -> List[Dict[str, str]]:
+        """Returns list of dict for neighbor routers."""
+        return self._data[_Keys.ROUTERS]
+
+    def __repr__(self) -> str:
+        return f"{self._c_name}(routers: {self.routers})"
+
+
 class IRouterBoardCollector(ABC):
     """Collector interface class."""
 
     @abstractmethod
     def collect(self) -> None:
         """Fire up collector procedures."""
+
+    @abstractmethod
+    def get_data(self) -> RBData:
+        """Returns collected data."""
 
 
 class RouterBoardVersion(BLogs, BDebug, BRouterBoard):
@@ -105,6 +138,106 @@ class __Collector(BLogs, BDebug, BRouterBoard):
         self._data[_Keys.NEIGHBOR] = None
         self._data[_Keys.PPP] = None
 
+    def __get_vlan_interface(
+        self, interface: str
+    ) -> tuple[Optional[str], Optional[int]]:
+        """Returns vlan interface if found."""
+        vlans = RBQuery()
+        vlans.add_attrib("name", interface)
+
+        real_interface: Optional[str] = None
+        vlan_id: Optional[int] = None
+
+        if self.vlans:
+            search: Optional[Union[List[Any], Dict[Any, Any]]] = self.vlans.search(
+                vlans.query
+            )
+            if search and isinstance(search, List):
+                for item in search:
+                    real_interface = item["interface"]
+                    vlan_id = item["vlan-id"]
+
+        return real_interface, vlan_id
+
+    def __get_neighbor_interface(
+        self, address: Address
+    ) -> tuple[str, Optional[int], Optional[Network]]:
+        """Returns real interface name and optional vlan-id."""
+        # neighbor = RBQuery()
+        # neighbor.add_attrib("address", str(address))
+
+        # if self.neighbors:
+        #     neighbor_search: Optional[Union[List[Any], Dict[Any, Any]]] = (
+        #         self.neighbors.search(neighbor.query)
+        #     )
+        #     if neighbor_search and isinstance(neighbor_search, List):
+        #         self.logs.message_debug = f"{neighbor_search}"
+
+        # compare addresses
+        interface: str = ""
+        vlan_id: Optional[int] = None
+        network: Optional[Network] = None
+
+        addresses = RBQuery()
+        addresses.add_attrib("dynamic", "false")
+        addresses.add_attrib("disabled", "false")
+
+        if self.addresses:
+            search: Optional[Union[List[Any], Dict[Any, Any]]] = self.addresses.search(
+                addresses.query
+            )
+            if search and isinstance(search, List):
+                for item in search:
+                    if "address" in item:
+                        network = Network(item["address"])
+                        if address >= network.network and address <= network.broadcast:
+                            # found item
+                            interface = item["interface"]
+                            break
+
+        # check vlans
+        out_interface: Optional[str] = None
+        out_vlan_id: Optional[int] = None
+        while True:
+            out_interface, out_vlan_id = self.__get_vlan_interface(interface)
+            if out_interface:
+                interface = out_interface
+                if not vlan_id and out_vlan_id:
+                    vlan_id = out_vlan_id
+            else:
+                break
+
+        return interface, vlan_id, network
+
+    def _build_routers_data(self) -> List[Dict[str, Any]]:
+        """Build and returns list of routers data from collected elements."""
+        out: List[Dict[str, Any]] = []
+        neighbors = RBQuery()
+        neighbors.add_attrib("state", "Full")
+        if self.neighbors:
+            search: Optional[Union[List[Any], Dict[Any, Any]]] = self.neighbors.search(
+                neighbors.query
+            )
+            if search and isinstance(search, List):
+                for item in search:
+                    tmp: Dict[str, Any] = {}
+                    if "router-id" in item:
+                        tmp["router-id"] = Address(item["router-id"])
+                    if "address" in item:
+                        tmp["address"] = Address(item["address"])
+                        # search for interface
+                        inf: str
+                        vlan_id: Optional[int]
+                        network: Optional[Network]
+                        inf, vlan_id, network = self.__get_neighbor_interface(
+                            Address(item["address"])
+                        )
+                        tmp["interface"] = inf
+                        tmp["vlan-id"] = vlan_id
+                        tmp["network"] = network
+                    out.append(tmp)
+        return out
+
     @property
     def addresses(self) -> Optional[Element]:
         return self._data[_Keys.ADDRESS]
@@ -148,19 +281,13 @@ class __Collector(BLogs, BDebug, BRouterBoard):
     def dump(self) -> None:
         # self.logs.message_debug = f"{self.ethers}"
         # self.logs.message_debug = f"{self.vlans}"
-        # self.logs.message_debug = f"{self.neighbors}"
+        self.logs.message_debug = f"{self.neighbors}"
         # self.logs.message_debug = f"{self.addresses}"
-        self.logs.message_debug = f"{self.ppp}"
+        # self.logs.message_debug = f"{self.ppp}"
 
 
-class _Keys(object, metaclass=ReadOnlyClass):
-    """Internal keys container class."""
-
-    ADDRESS: str = "__addr__"
-    ETHER: str = "__eth__"
-    NEIGHBOR: str = "__nb__"
-    PPP: str = "__ppp__"
-    VLAN: str = "__vlan__"
+class BRouterBoardCollector:
+    """Base class for RouterBoardCollector."""
 
 
 class RouterBoardCollector6(IRouterBoardCollector, __Collector):
@@ -221,6 +348,15 @@ class RouterBoardCollector6(IRouterBoardCollector, __Collector):
         # 'limit-bytes-out': '0', 'radius': 'true'}
         self.ppp = self.rb.element("/ppp/active/", auto_load=True)
 
+    def get_data(self) -> RBData:
+        """Returns RBData objects."""
+        out = RBData()
+        # routers
+        for item in self._build_routers_data():
+            out.routers.append(item)
+
+        return out
+
 
 class RouterBoardCollector7(IRouterBoardCollector, __Collector):
     """Collector class for ROS 7."""
@@ -277,6 +413,15 @@ class RouterBoardCollector7(IRouterBoardCollector, __Collector):
         # 'address': '10.30.214.21', 'uptime': '5d18h59m42s', 'encoding': '', 'session-id': '0x81000068', 'limit-bytes-in': '0',
         # 'limit-bytes-out': '0', 'radius': 'true'}
         self.ppp = self.rb.element("/ppp/active/", auto_load=True)
+
+    def get_data(self) -> RBData:
+        """Returns RBData objects."""
+        out = RBData()
+        # routers
+        for item in self._build_routers_data():
+            out.routers.append(item)
+
+        return out
 
 
 # #[EOF]#######################################################################

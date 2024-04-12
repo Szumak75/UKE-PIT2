@@ -155,6 +155,7 @@ class Processor(Thread, ThBaseObject, BLogs):
             if collector:
                 self.logs.message_debug = f"{collector}"
                 collector.collect()
+                self.logs.message_debug = f"{collector.get_data()}"
                 collector.dump()  # type: ignore
 
             # tests
