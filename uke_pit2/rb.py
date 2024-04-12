@@ -59,9 +59,13 @@ class RouterBoardVersion(BLogs, BDebug, BRouterBoard):
                 rbq = RBQuery()
                 rbq.add_attrib("current-firmware")
                 self.logs.message_debug = f"{out.search(rbq.query)}"
-                squery = out.search(rbq.query)
-                if squery and isinstance(squery, dict) and "current-firmware" in squery:
-                    ver = squery["current-firmware"]
+                search_query = out.search(rbq.query)
+                if (
+                    search_query
+                    and isinstance(search_query, dict)
+                    and "current-firmware" in search_query
+                ):
+                    ver = search_query["current-firmware"]
                     self.logs.message_debug = f"The version is: {ver}"
 
                     if re.match(r"^6\.", ver):
@@ -95,32 +99,58 @@ class __Collector(BLogs, BDebug, BRouterBoard):
         self.debug = debug
 
         # init tables
-        self._data[_Keys.ETHER] = []
-        self._data[_Keys.VLAN] = []
-        self._data[_Keys.ADDRESS] = []
-        self._data[_Keys.NEIGHBOR] = []
+        self._data[_Keys.ETHER] = None
+        self._data[_Keys.VLAN] = None
+        self._data[_Keys.ADDRESS] = None
+        self._data[_Keys.NEIGHBOR] = None
+        self._data[_Keys.PPP] = None
 
     @property
-    def addresses(self) -> List[Dict[str, Any]]:
+    def addresses(self) -> Optional[Element]:
         return self._data[_Keys.ADDRESS]
 
+    @addresses.setter
+    def addresses(self, value: Optional[Element]) -> None:
+        self._data[_Keys.ADDRESS] = value
+
     @property
-    def ethers(self) -> List[Dict[str, Any]]:
+    def ethers(self) -> Optional[Element]:
         return self._data[_Keys.ETHER]
 
+    @ethers.setter
+    def ethers(self, value: Optional[Element]) -> None:
+        self._data[_Keys.ETHER] = value
+
     @property
-    def neighbors(self) -> List[Dict[str, Any]]:
+    def neighbors(self) -> Optional[Element]:
         return self._data[_Keys.NEIGHBOR]
 
+    @neighbors.setter
+    def neighbors(self, value: Optional[Element]) -> None:
+        self._data[_Keys.NEIGHBOR] = value
+
     @property
-    def vlans(self) -> List[Dict[str, Any]]:
+    def ppp(self) -> Optional[Element]:
+        return self._data[_Keys.PPP]
+
+    @ppp.setter
+    def ppp(self, value: Optional[Element]) -> None:
+        self._data[_Keys.PPP] = value
+
+    @property
+    def vlans(self) -> Optional[Element]:
         return self._data[_Keys.VLAN]
 
+    @vlans.setter
+    def vlans(self, value: Optional[Element]) -> None:
+        self._data[_Keys.VLAN] = value
+
     def dump(self) -> None:
-        self.logs.message_debug = f"{self.ethers}"
-        self.logs.message_debug = f"{self.vlans}"
-        self.logs.message_debug = f"{self.neighbors}"
-        self.logs.message_debug = f"{self.addresses}"
+        # self.logs.message_debug = f"{self.ethers}"
+        # self.logs.message_debug = f"{self.vlans}"
+        # self.logs.message_debug = f"{self.neighbors}"
+        # self.logs.message_debug = f"{self.addresses}"
+        self.logs.message_debug = f"{self.ppp}"
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -129,6 +159,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
     ADDRESS: str = "__addr__"
     ETHER: str = "__eth__"
     NEIGHBOR: str = "__nb__"
+    PPP: str = "__ppp__"
     VLAN: str = "__vlan__"
 
 
@@ -141,6 +172,55 @@ class RouterBoardCollector6(IRouterBoardCollector, __Collector):
         if not self.rb:
             return None
 
+        # interfaces
+        # example:
+        # {'.id': '*9', 'name': 'ether9', 'default-name': 'ether9', 'mtu': '1500', 'l2mtu': '1592', 'mac-address': 'DC:2C:6E:0F:57:67',
+        # 'orig-mac-address': 'DC:2C:6E:0F:57:67', 'arp': 'enabled', 'arp-timeout': 'auto', 'loop-protect': 'default',
+        # 'loop-protect-status': 'off', 'loop-protect-send-interval': '5s', 'loop-protect-disable-time': '5m', 'auto-negotiation': 'true',
+        # 'advertise': '10M-half,10M-full,100M-half,100M-full,1000M-half,1000M-full', 'full-duplex': 'true', 'tx-flow-control': 'off',
+        # 'rx-flow-control': 'off', 'speed': '1Gbps', 'bandwidth': 'unlimited/unlimited', 'switch': 'switch2',
+        # 'driver-rx-byte': '4689493024635', 'driver-rx-packet': '29087429173', 'driver-tx-byte': '76438567589070',
+        # 'driver-tx-packet': '59971028302', 'rx-bytes': '4788662691081', 'rx-broadcast': '2231013', 'rx-pause': '0',
+        # 'rx-multicast': '57934019', 'rx-fcs-error': '0', 'rx-fragment': '0', 'rx-unknown-op': '0', 'rx-code-error': '0',
+        # 'rx-jabber': '0', 'rx-drop': '0', 'tx-bytes': '76669861134963', 'tx-broadcast': '1274818', 'tx-pause': '0',
+        # 'tx-multicast': '150818408', 'tx-collision': '0', 'tx-excessive-collision': '0', 'tx-multiple-collision': '0',
+        # 'tx-single-collision': '0', 'tx-deferred': '0', 'tx-late-collision': '0', 'tx-drop': '0', 'tx-rx-64': '13318772',
+        # 'tx-rx-65-127': '20979172934', 'tx-rx-128-255': '2202001769', 'tx-rx-256-511': '1194620381', 'tx-rx-512-1023': '1250729860',
+        # 'tx-rx-1024-1518': '55351848828', 'rx-unicast': '24732296476', 'tx-unicast': '59818934528', 'running': 'true',
+        # 'disabled': 'false', 'comment': 'SOHO'}
+        self.ethers = self.rb.element("/interface/ethernet/", auto_load=True)
+
+        # vlans
+        # example:
+        # {'.id': '*12', 'name': 'vlan154-air_kosowo', 'mtu': '1500', 'l2mtu': '1588', 'mac-address': 'DC:2C:6E:0F:57:67',
+        # 'arp': 'enabled', 'arp-timeout': 'auto', 'loop-protect': 'default', 'loop-protect-status': 'off',
+        # 'loop-protect-send-interval': '5s', 'loop-protect-disable-time': '5m', 'vlan-id': '154', 'interface': 'ether9',
+        # 'use-service-tag': 'false', 'running': 'true', 'disabled': 'false'}, {'.id': '*18', 'name': 'vlan222', 'mtu': '1500',
+        # 'l2mtu': '1588', 'mac-address': 'DC:2C:6E:0F:57:67', 'arp': 'enabled', 'arp-timeout': 'auto', 'loop-protect': 'default',
+        # 'loop-protect-status': 'off', 'loop-protect-send-interval': '5s', 'loop-protect-disable-time': '5m', 'vlan-id': '222',
+        # 'interface': 'ether9', 'use-service-tag': 'false', 'running': 'true', 'disabled': 'false'}
+        self.vlans = self.rb.element("/interface/vlan/", auto_load=True)
+
+        # ospf-neighbors
+        # example:
+        # {'.id': '*30C5B8', 'instance': 'default', 'router-id': '10.1.68.154', 'address': '10.0.68.226', 'interface': 'vlan154-air_kosowo',
+        # 'priority': '1', 'dr-address': '0.0.0.0', 'backup-dr-address': '0.0.0.0', 'state': 'Full', 'state-changes': '8',
+        # 'ls-retransmits': '0', 'ls-requests': '0', 'db-summaries': '0', 'adjacency': '14w6d14h42m11s'}
+        self.neighbors = self.rb.element("/routing/ospf/neighbor/", auto_load=True)
+
+        # address
+        # example:
+        # {'.id': '*A', 'address': '10.0.68.225/30', 'network': '10.0.68.224', 'interface': 'vlan154-air_kosowo',
+        # 'actual-interface': 'vlan154-air_kosowo', 'invalid': 'false', 'dynamic': 'false', 'disabled': 'false'}
+        self.addresses = self.rb.element("/ip/address/", auto_load=True)
+
+        # ppp
+        # example
+        # {'.id': '*80000077', 'name': '48:8F:5A:7C:13:3A', 'service': 'pppoe', 'caller-id': 'B8:69:F4:B7:52:BB',
+        # 'address': '10.30.246.13', 'uptime': '3d17h14m31s', 'encoding': '', 'session-id': '0x81300077', 'limit-bytes-in': '0',
+        # 'limit-bytes-out': '0', 'radius': 'true'}
+        self.ppp = self.rb.element("/ppp/active/", auto_load=True)
+
 
 class RouterBoardCollector7(IRouterBoardCollector, __Collector):
     """Collector class for ROS 7."""
@@ -152,71 +232,51 @@ class RouterBoardCollector7(IRouterBoardCollector, __Collector):
             return None
 
         # interfaces
-        inf: Optional[Element] = self.rb.element("/interface/ethernet/", auto_load=True)
-        if inf:
-            query = RBQuery()
-            query.add_attrib("type", "ether")
-            query.add_attrib("disabled", "false")
-            query.add_attrib("running", "true")
-            out = inf.search(query.query)
-            if out:
-                for item in out:
-                    self.ethers.append(
-                        {
-                            ".id": item[".id"],
-                            "name": item["name"],
-                            "default-name": item["default-name"],
-                            "mtu": item["mtu"],
-                            "l2mtu": item["l2mtu"],
-                            "mac-address": item["mac-address"],
-                        }
-                    )
+        # example:
+        # {'.id': '*2', 'name': 'sfp-sfpplus2', 'default-name': 'sfp-sfpplus2', 'mtu': '1500', 'l2mtu': '1580', 'mac-address': '64:D1:54:3B:20:87',
+        # 'orig-mac-address': '64:D1:54:3B:20:87', 'arp': 'enabled', 'arp-timeout': 'auto', 'loop-protect': 'default', 'loop-protect-status': 'off',
+        # 'loop-protect-send-interval': '5s', 'loop-protect-disable-time': '5m', 'auto-negotiation': 'true', 'advertise': '1000M-full,10000M-full',
+        # 'tx-flow-control': 'off', 'rx-flow-control': 'off', 'bandwidth': 'unlimited/unlimited', 'sfp-rate-select': 'high',
+        # 'sfp-shutdown-temperature': '95', 'driver-rx-byte': '2653989249963585', 'driver-rx-packet': '4258597579513',
+        # 'driver-tx-byte': '736967427358593', 'driver-tx-packet': '3291524111452', 'rx-bytes': '2661690913444462', 'rx-packet': '2433236930193',
+        # 'rx-too-short': '0', 'rx-64': '48350420886', 'rx-65-127': '342172077400', 'rx-128-255': '57102386351', 'rx-256-511': '37087502813',
+        # 'rx-512-1023': '33888927492', 'rx-1024-1518': '1912048884034', 'rx-1519-max': '2586731217', 'rx-too-long': '0',
+        # 'rx-broadcast': '2603251807', 'rx-pause': '0', 'rx-multicast': '2863955093', 'rx-fcs-error': '0', 'rx-align-error': '0',
+        # 'rx-overflow': '0', 'rx-length-error': '0', 'rx-code-error': '0', 'rx-jabber': '0', 'rx-ip-header-checksum-error': '0',
+        # 'rx-tcp-checksum-error': '0', 'rx-udp-checksum-error': '0', 'tx-bytes': '742565666175825', 'tx-packet': '1736745950222',
+        # 'tx-64': '100846746263', 'tx-65-127': '1071026858665', 'tx-128-255': '63678629009', 'tx-256-511': '28625710225',
+        # 'tx-512-1023': '24084519187', 'tx-1024-1518': '443480477106', 'tx-1519-max': '5003009767', 'tx-broadcast': '1874135',
+        # 'tx-pause': '0', 'tx-multicast': '257942994', 'tx-underrun': '0', 'tx-excessive-collision': '0', 'tx-multiple-collision': '0',
+        # 'tx-single-collision': '0', 'tx-deferred': '0', 'tx-late-collision': '0', 'tx-fcs-error': '63', 'tx-carrier-sense-error': '0',
+        # 'running': 'true', 'disabled': 'false'}
+        self.ethers = self.rb.element("/interface/ethernet/", auto_load=True)
 
         # vlans
-        vlan: Optional[Element] = self.rb.element("/interface/vlan/", auto_load=True)
-        if vlan:
-            query = RBQuery()
-            query.add_attrib("disabled", "false")
-            query.add_attrib("running", "true")
-            out = vlan.search(query.query)
-            if out:
-                for item in out:
-                    self.vlans.append(
-                        {
-                            ".id": item[".id"],
-                            "name": item["name"],
-                            "mtu": item["mtu"],
-                            "l2mtu": item["l2mtu"],
-                            "mac-address": item["mac-address"],
-                            "interface": item["interface"],
-                            "vlan-id": item["vlan-id"],
-                        }
-                    )
+        # example:
+        # {'.id': '*1D', 'name': 'vlan165-dude', 'mtu': '1500', 'l2mtu': '1576', 'mac-address': '64:D1:54:3B:20:87', 'arp': 'enabled',
+        # 'arp-timeout': 'auto', 'loop-protect': 'default', 'loop-protect-status': 'off', 'loop-protect-send-interval': '5s',
+        # 'loop-protect-disable-time': '5m', 'vlan-id': '165', 'interface': 'sfp-sfpplus2', 'use-service-tag': 'false', 'running': 'true',
+        # 'disabled': 'false'}
+        self.vlans = self.rb.element("/interface/vlan/", auto_load=True)
 
         # ospf-neighbors
-        neighbor: Optional[Element] = self.rb.element(
-            "/routing/ospf/neighbor/", auto_load=True
-        )
-        if neighbor:
-            query = RBQuery()
-            query.add_attrib("state", "Full")
-            out = neighbor.search(query.query)
-            if out:
-                for item in out:
-                    self.neighbors.append(
-                        {"router-id": item["router-id"], "address": item["address"]}
-                    )
+        # example:
+        # {'.id': '*F3FED9A8', 'instance': 'ospf-lan', 'area': 'ospf-area-backbone', 'address': '10.0.0.74', 'router-id': '10.1.0.165',
+        # 'state': 'Full', 'state-changes': '4', 'ls-retransmits': '2', 'adjacency': '1h49m55s', 'timeout': '32s', 'dynamic': 'true'}
+        self.neighbors = self.rb.element("/routing/ospf/neighbor/", auto_load=True)
 
         # address
-        address: Optional[Element] = self.rb.element("/ip/address/", auto_load=True)
-        if address:
-            query = RBQuery()
-            query.add_attrib("disabled", "false")
-            query.add_attrib("dynamic", "false")
-            out = address.search(query.query)
-            if out:
-                for item in out:
-                    self.addresses.append(item)
+        # example:
+        # {'.id': '*25', 'address': '10.0.0.73/30', 'network': '10.0.0.72', 'interface': 'vlan165-dude', 'actual-interface': 'vlan165-dude',
+        # 'invalid': 'false', 'dynamic': 'false', 'disabled': 'false'}
+        self.addresses = self.rb.element("/ip/address/", auto_load=True)
+
+        # ppp
+        # example
+        # {'.id': '*80000068', 'name': 'D4:CA:6D:D5:82:E3', 'service': 'pppoe', 'caller-id': 'B4:FB:E4:BE:86:DB',
+        # 'address': '10.30.214.21', 'uptime': '5d18h59m42s', 'encoding': '', 'session-id': '0x81000068', 'limit-bytes-in': '0',
+        # 'limit-bytes-out': '0', 'radius': 'true'}
+        self.ppp = self.rb.element("/ppp/active/", auto_load=True)
 
 
 # #[EOF]#######################################################################
