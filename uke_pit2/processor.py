@@ -156,7 +156,7 @@ class Processor(Thread, ThBaseObject, BLogs):
                 self.logs.message_debug = f"{collector}"
                 collector.collect()
                 self.logs.message_debug = f"{collector.get_data()}"
-                collector.dump()  # type: ignore
+                # collector.dump()  # type: ignore
 
             # tests
             # rbq = RBQuery()
