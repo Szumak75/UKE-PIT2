@@ -304,40 +304,24 @@ class Processor(Thread, ThBaseObject, BLogs):
     @property
     def api_handler(self) -> Optional[API]:
         """Returns API object."""
-        if _Keys.ACH not in self._data:
-            self._data[_Keys.ACH] = None
-        return self._data[_Keys.ACH]
+        return self._get_data(key=_Keys.ACH, set_default_type=Optional[API])
 
     @api_handler.setter
     def api_handler(self, api: API) -> None:
         """Sets API object."""
-        if not isinstance(api, API):
-            raise Raise.error(
-                f"Expected API type, received: '{type(api)}'",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.ACH] = api
+        self._set_data(key=_Keys.ACH, value=api)
 
     @property
     def ip(self) -> Address:
         """Returns IPv4 router board address."""
-        if _Keys.IP not in self._data:
-            self._data[_Keys.IP] = Address("127.0.0.1")
-        return self._data[_Keys.IP]
+        return self._get_data(
+            key=_Keys.IP, set_default_type=Address, default_value=Address("127.0.0.1")
+        )  # type: ignore
 
     @ip.setter
     def ip(self, value: Address) -> None:
         """Sets IPv4 router board address."""
-        if not isinstance(value, Address):
-            raise Raise.error(
-                f"Address type expected, type: '{type(value)}' received.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.IP] = value
+        self._set_data(key=_Keys.IP, value=value)
 
     @property
     def __passwords(self) -> List[str]:
