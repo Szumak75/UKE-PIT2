@@ -11,6 +11,7 @@
 from typing import Optional, List
 from threading import Event, Thread
 from inspect import currentframe
+from queue import Queue
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.logstool.logs import LoggerClient, LoggerQueue
@@ -34,8 +35,134 @@ class _Keys(object, metaclass=ReadOnlyClass):
 
     ACH: str = "__api_connector_handler__"
     DATA: str = "__router_data__"
+    DB_DATA: str = "__db_database__"
+    DB_HOST: str = "__db_host__"
+    DB_PASS: str = "__db_password__"
+    DB_PORT: str = "__db_port__"
+    DB_USER: str = "__db_username__"
     IP: str = "__host_ip__"
     PASS: str = "__passwords_list__"
+
+
+class DbProcessor(Thread, ThBaseObject, BLogs):
+    """Database Processor class for router board object."""
+
+    def __init__(
+        self,
+        logger_queue: LoggerQueue,
+        comms_queue: Queue,
+        debug: bool = False,
+    ) -> None:
+        """Processor constructor.
+
+        # Arguments:
+        - logger_queue [LoggerQueue] - logger queue for communication.
+        - comms_queue [Queue] - communication queue.
+        - debug [bool] - debug flag.
+        """
+        # init thread
+        Thread.__init__(self, name=f"{self._c_name}")
+        self._stop_event = Event()
+        self.sleep_period = 0.2
+        # debug
+        self._debug = debug
+        # logger
+        self.logs = LoggerClient(logger_queue, f"{self._c_name}")
+
+    def run(self) -> None:
+        """Start processor."""
+
+    def stop(self) -> None:
+        """Sets stop event."""
+        if self._stop_event:
+            if self._debug:
+                self.logs.message_debug = "stopping..."
+            self._stop_event.set()
+
+    @property
+    def db_host(self) -> Optional[Address]:
+        if _Keys.DB_HOST not in self._data:
+            self._data[_Keys.DB_HOST] = None
+        return self._data[_Keys.DB_HOST]
+
+    @db_host.setter
+    def db_host(self, value: Optional[Address]) -> None:
+        if value is not None and not isinstance(value, Address):
+            raise Raise.error(
+                f"Address type expected, received: '{type(value)}'.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.DB_HOST] = value
+
+    @property
+    def db_port(self) -> Optional[int]:
+        if _Keys.DB_PORT not in self._data:
+            self._data[_Keys.DB_PORT] = None
+        return self._data[_Keys.DB_PORT]
+
+    @db_port.setter
+    def db_port(self, value: Optional[int]) -> None:
+        if value is not None and not isinstance(value, int):
+            raise Raise.error(
+                f"int type expected, received: '{type(value)}'.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.DB_PORT] = value
+
+    @property
+    def db_database(self) -> Optional[str]:
+        if _Keys.DB_DATA not in self._data:
+            self._data[_Keys.DB_DATA] = None
+        return self._data[_Keys.DB_DATA]
+
+    @db_database.setter
+    def db_database(self, value: Optional[str]) -> None:
+        if value is not None and not isinstance(value, str):
+            raise Raise.error(
+                f"str type expected, received: '{type(value)}'.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.DB_DATA] = value
+
+    @property
+    def db_username(self) -> Optional[str]:
+        if _Keys.DB_USER not in self._data:
+            self._data[_Keys.DB_USER] = None
+        return self._data[_Keys.DB_USER]
+
+    @db_username.setter
+    def db_username(self, value: Optional[str]) -> None:
+        if value is not None and not isinstance(value, str):
+            raise Raise.error(
+                f"str type expected, received: '{type(value)}'.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.DB_USER] = value
+
+    @property
+    def db_password(self) -> Optional[str]:
+        if _Keys.DB_PASS not in self._data:
+            self._data[_Keys.DB_PASS] = None
+        return self._data[_Keys.DB_PASS]
+
+    @db_password.setter
+    def db_password(self, value: Optional[str]) -> None:
+        if value is not None and not isinstance(value, str):
+            raise Raise.error(
+                f"str type expected, received: '{type(value)}'.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.DB_PASS] = value
 
 
 class Processor(Thread, ThBaseObject, BLogs):

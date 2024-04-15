@@ -7,6 +7,7 @@
   Purpose: Project main classes.
 """
 
+from queue import Queue
 import os, sys, time
 
 from inspect import currentframe
@@ -30,7 +31,7 @@ from jsktoolbox.stringtool.crypto import SimpleCrypto
 
 from uke_pit2.base import BaseApp, BModuleConfig
 from uke_pit2.conf import Config
-from uke_pit2.processor import Processor
+from uke_pit2.processor import DbProcessor, Processor
 from uke_pit2.rb import RBData
 
 
@@ -138,9 +139,29 @@ class SpiderApp(BaseApp):
         complete: List[RBData] = []
         count: int = 0
         count_limit: int = 10
+        comms_queue: Queue = Queue()
 
         # main procedure
-        if self.configured and self.logs.logs_queue and self.module_conf.start_ip:
+        if (
+            self.configured
+            and self.logs.logs_queue
+            and self.module_conf.start_ip
+            and self.conf.module_conf
+        ):
+            # set up database processor
+            db_proc: DbProcessor = DbProcessor(
+                self.logs.logs_queue, comms_queue, self.conf.debug
+            )
+            db_proc.db_host = self.conf.module_conf.lms_host
+            db_proc.db_port = self.conf.module_conf.lms_port
+            db_proc.db_database = self.conf.module_conf.lms_database
+            db_proc.db_username = self.conf.module_conf.lms_user
+            if self.conf.module_conf.lms_password:
+                db_proc.db_password = self.__password_decryptor(
+                    [self.conf.module_conf.lms_password]
+                )[0]
+            db_proc.start()
+
             # starting data
             ips.append(self.module_conf.start_ip)
             passwords: List[str] = self.__password_decryptor(
@@ -217,6 +238,12 @@ class SpiderApp(BaseApp):
                 for item in complete:
                     count += 1
                     self.logs.message_debug = f"{count}: {item}"
+
+            # database processor
+            db_proc.stop()
+            while db_proc.is_alive():
+                time.sleep(0.1)
+            db_proc.join()
 
         # exit
         time.sleep(1)
