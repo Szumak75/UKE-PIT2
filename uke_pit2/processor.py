@@ -42,6 +42,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
     DB_USER: str = "__db_username__"
     IP: str = "__host_ip__"
     PASS: str = "__passwords_list__"
+    QUEUE: str = "__comms_queue__"
 
 
 class DbProcessor(Thread, ThBaseObject, BLogs):
@@ -68,9 +69,17 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
         self._debug = debug
         # logger
         self.logs = LoggerClient(logger_queue, f"{self._c_name}")
+        # communication queue
+        self.__comms_queue = comms_queue
 
     def run(self) -> None:
         """Start processor."""
+
+        if not self.__check_config():
+            self.logs.message_critical = (
+                "Unable to continue due to lack of configuration."
+            )
+            return None
 
     def stop(self) -> None:
         """Sets stop event."""
@@ -78,6 +87,37 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
             if self._debug:
                 self.logs.message_debug = "stopping..."
             self._stop_event.set()
+
+    def __check_config(self) -> bool:
+        """Check if the connection variables are set."""
+        if (
+            self.db_database
+            and self.db_host
+            and self.db_password
+            and self.db_port
+            and self.db_username
+        ):
+            return True
+        return False
+
+    @property
+    def __comms_queue(self) -> Optional[Queue]:
+        """Returns communication queue if set."""
+        if _Keys.QUEUE not in self._data:
+            self._data[_Keys.QUEUE] = None
+        return self._data[_Keys.QUEUE]
+
+    @__comms_queue.setter
+    def __comms_queue(self, comms_queue: Optional[Queue]) -> None:
+        """Sets communication queue."""
+        if comms_queue and not isinstance(comms_queue, Queue):
+            raise Raise.error(
+                f'Queue type expected, received "{type(comms_queue)}".',
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._data[_Keys.QUEUE] = comms_queue
 
     @property
     def db_host(self) -> Optional[Address]:
