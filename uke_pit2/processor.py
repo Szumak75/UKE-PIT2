@@ -74,12 +74,17 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
 
     def run(self) -> None:
         """Start processor."""
-
         if not self.__check_config():
             self.logs.message_critical = (
                 "Unable to continue due to lack of configuration."
             )
             return None
+
+        if self._debug:
+            self.logs.message_debug = "starting..."
+
+        if self._debug:
+            self.logs.message_debug = "stopped"
 
     def stop(self) -> None:
         """Sets stop event."""
@@ -103,106 +108,54 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
     @property
     def __comms_queue(self) -> Optional[Queue]:
         """Returns communication queue if set."""
-        if _Keys.QUEUE not in self._data:
-            self._data[_Keys.QUEUE] = None
-        return self._data[_Keys.QUEUE]
+        return self._get_data(key=_Keys.QUEUE, set_default_type=Optional[Queue])
 
     @__comms_queue.setter
     def __comms_queue(self, comms_queue: Optional[Queue]) -> None:
         """Sets communication queue."""
-        if comms_queue and not isinstance(comms_queue, Queue):
-            raise Raise.error(
-                f'Queue type expected, received "{type(comms_queue)}".',
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.QUEUE] = comms_queue
+        self._set_data(key=_Keys.QUEUE, value=comms_queue)
 
     @property
     def db_host(self) -> Optional[Address]:
-        if _Keys.DB_HOST not in self._data:
-            self._data[_Keys.DB_HOST] = None
-        return self._data[_Keys.DB_HOST]
+        return self._get_data(key=_Keys.DB_HOST, set_default_type=Optional[Address])
 
     @db_host.setter
     def db_host(self, value: Optional[Address]) -> None:
-        if value is not None and not isinstance(value, Address):
-            raise Raise.error(
-                f"Address type expected, received: '{type(value)}'.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.DB_HOST] = value
+        self._set_data(key=_Keys.DB_HOST, value=value)
 
     @property
     def db_port(self) -> Optional[int]:
-        if _Keys.DB_PORT not in self._data:
-            self._data[_Keys.DB_PORT] = None
-        return self._data[_Keys.DB_PORT]
+        return self._get_data(
+            key=_Keys.DB_PORT, set_default_type=int, default_value=3306
+        )
 
     @db_port.setter
     def db_port(self, value: Optional[int]) -> None:
-        if value is not None and not isinstance(value, int):
-            raise Raise.error(
-                f"int type expected, received: '{type(value)}'.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.DB_PORT] = value
+        self._set_data(key=_Keys.DB_PORT, value=value)
 
     @property
     def db_database(self) -> Optional[str]:
-        if _Keys.DB_DATA not in self._data:
-            self._data[_Keys.DB_DATA] = None
-        return self._data[_Keys.DB_DATA]
+        return self._get_data(key=_Keys.DB_DATA, set_default_type=Optional[str])
 
     @db_database.setter
     def db_database(self, value: Optional[str]) -> None:
-        if value is not None and not isinstance(value, str):
-            raise Raise.error(
-                f"str type expected, received: '{type(value)}'.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.DB_DATA] = value
+        self._set_data(key=_Keys.DB_DATA, value=value)
 
     @property
     def db_username(self) -> Optional[str]:
-        if _Keys.DB_USER not in self._data:
-            self._data[_Keys.DB_USER] = None
-        return self._data[_Keys.DB_USER]
+        return self._get_data(key=_Keys.DB_USER, set_default_type=Optional[str])
 
     @db_username.setter
     def db_username(self, value: Optional[str]) -> None:
-        if value is not None and not isinstance(value, str):
-            raise Raise.error(
-                f"str type expected, received: '{type(value)}'.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.DB_USER] = value
+        self._set_data(key=_Keys.DB_USER, value=value)
 
     @property
     def db_password(self) -> Optional[str]:
-        if _Keys.DB_PASS not in self._data:
-            self._data[_Keys.DB_PASS] = None
-        return self._data[_Keys.DB_PASS]
+        return self._get_data(key=_Keys.DB_PASS, set_default_type=Optional[str])
 
     @db_password.setter
     def db_password(self, value: Optional[str]) -> None:
-        if value is not None and not isinstance(value, str):
-            raise Raise.error(
-                f"str type expected, received: '{type(value)}'.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.DB_PASS] = value
+        self._set_data(key=_Keys.DB_PASS, value=value)
 
 
 class Processor(Thread, ThBaseObject, BLogs):
