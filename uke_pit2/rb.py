@@ -48,7 +48,6 @@ class RBData(BData):
 
     def __init__(self) -> None:
         """RBData constructor."""
-        self._data[_Keys.RID] = None
         self._data[_Keys.ROUTERS] = []
         self._data[_Keys.CUSTOMERS] = []
 
@@ -60,19 +59,12 @@ class RBData(BData):
     @property
     def router_id(self) -> Optional[Address]:
         """Returns router-id."""
-        return self._data[_Keys.RID]
+        return self._get_data(key=_Keys.RID, set_default_type=Optional[Address])
 
     @router_id.setter
     def router_id(self, address: Address) -> None:
         """Sets router-id address."""
-        if not address or not isinstance(address, Address):
-            raise Raise.error(
-                f"Expected Address type, received '{type(address)}'.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.RID] = address
+        self._set_data(key=_Keys.RID, value=address)
 
     @property
     def routers(self) -> List[Dict[str, Any]]:
@@ -310,43 +302,43 @@ class __Collector(BLogs, BDebug, BRouterBoard):
 
     @property
     def addresses(self) -> Optional[Element]:
-        return self._data[_Keys.ADDRESS]
+        return self._get_data(key=_Keys.ADDRESS, set_default_type=Optional[Element])
 
     @addresses.setter
     def addresses(self, value: Optional[Element]) -> None:
-        self._data[_Keys.ADDRESS] = value
+        self._set_data(key=_Keys.ADDRESS, value=value)
 
     @property
     def ethers(self) -> Optional[Element]:
-        return self._data[_Keys.ETHER]
+        return self._get_data(key=_Keys.ETHER, set_default_type=Optional[Element])
 
     @ethers.setter
     def ethers(self, value: Optional[Element]) -> None:
-        self._data[_Keys.ETHER] = value
+        self._set_data(key=_Keys.ETHER, value=value)
 
     @property
     def neighbors(self) -> Optional[Element]:
-        return self._data[_Keys.NEIGHBOR]
+        return self._get_data(key=_Keys.NEIGHBOR, set_default_type=Optional[Element])
 
     @neighbors.setter
     def neighbors(self, value: Optional[Element]) -> None:
-        self._data[_Keys.NEIGHBOR] = value
+        self._set_data(key=_Keys.NEIGHBOR, value=value)
 
     @property
     def ppp(self) -> Optional[Element]:
-        return self._data[_Keys.PPP]
+        return self._get_data(key=_Keys.PPP, set_default_type=Optional[Element])
 
     @ppp.setter
     def ppp(self, value: Optional[Element]) -> None:
-        self._data[_Keys.PPP] = value
+        self._set_data(key=_Keys.PPP, value=value)
 
     @property
     def vlans(self) -> Optional[Element]:
-        return self._data[_Keys.VLAN]
+        return self._get_data(key=_Keys.VLAN, set_default_type=Optional[Element])
 
     @vlans.setter
     def vlans(self, value: Optional[Element]) -> None:
-        self._data[_Keys.VLAN] = value
+        self._set_data(key=_Keys.VLAN, value=value)
 
     def dump(self) -> None:
         # self.logs.message_debug = f"{self.ethers}"

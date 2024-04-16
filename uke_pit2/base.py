@@ -42,16 +42,12 @@ class BConfigSection(BData):
     @property
     def section(self) -> Optional[str]:
         """Return section name."""
-        if _Keys.SECTION not in self._data:
-            self._data[_Keys.SECTION] = None
-        return self._data[_Keys.SECTION]
+        return self._get_data(key=_Keys.SECTION, set_default_type=Optional[str])
 
     @section.setter
     def section(self, section_name: Optional[str]) -> None:
         """Set section name."""
-        if section_name is None:
-            self._data[_Keys.SECTION] = None
-        self._data[_Keys.SECTION] = str(section_name).lower()
+        self._set_data(key=_Keys.SECTION, value=str(section_name).lower())
 
 
 class BConfigHandler(BData):
@@ -60,40 +56,24 @@ class BConfigHandler(BData):
     @property
     def cfh(self) -> Optional[ConfigTool]:
         """Returns config handler object."""
-        if _Keys.CONFIG_HANDLER not in self._data:
-            self._data[_Keys.CONFIG_HANDLER] = None
-        return self._data[_Keys.CONFIG_HANDLER]
+        return self._get_data(
+            key=_Keys.CONFIG_HANDLER, set_default_type=Optional[ConfigTool]
+        )
 
     @cfh.setter
     def cfh(self, config_handler: Optional[ConfigTool]) -> None:
         """Sets config handler."""
-        if config_handler is not None and not isinstance(config_handler, ConfigTool):
-            raise Raise.error(
-                f"Expected ConfigTool type, received'{type(config_handler)}'.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.CONFIG_HANDLER] = config_handler
+        self._set_data(key=_Keys.CONFIG_HANDLER, value=config_handler)
 
     @property
     def config_file(self) -> Optional[str]:
         """Return config_file path string."""
-        if _Keys.CONFIG_FILE not in self._data:
-            self._data[_Keys.CONFIG_FILE] = None
-        return self._data[_Keys.CONFIG_FILE]
+        return self._get_data(key=_Keys.CONFIG_FILE, set_default_type=Optional[str])
 
     @config_file.setter
     def config_file(self, value: str) -> None:
         """Set config_file path string."""
-        if not isinstance(value, str):
-            raise Raise.error(
-                f"Expected String type, received: '{type(value)}'.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.CONFIG_FILE] = value
+        self._set_data(key=_Keys.CONFIG_FILE, value=value)
 
 
 class BModuleConfig(BConfigHandler, BConfigSection):
@@ -122,21 +102,14 @@ class BDebug(BData):
     @property
     def debug(self) -> bool:
         """Returns debug flag."""
-        if _Keys.DEBUG not in self._data:
-            self._data[_Keys.DEBUG] = False
-        return self._data[_Keys.DEBUG]
+        return self._get_data(
+            key=_Keys.DEBUG, set_default_type=bool, default_value=False
+        )  # type: ignore
 
     @debug.setter
     def debug(self, flag: bool) -> None:
         """Sets debug flag."""
-        if not isinstance(flag, bool):
-            raise Raise.error(
-                f"Expected boolean type, received: '{type(flag)}'",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.DEBUG] = flag
+        self._set_data(key=_Keys.DEBUG, value=flag)
 
 
 class BLogs(BData):
@@ -144,22 +117,17 @@ class BLogs(BData):
 
     @property
     def logs(self) -> LoggerClient:
-        """Returns LoggerClient object or None."""
-        if _Keys.LOGGER_CLIENT not in self._data:
-            self._data[_Keys.LOGGER_CLIENT] = LoggerClient()
-        return self._data[_Keys.LOGGER_CLIENT]
+        """Returns LoggerClient object."""
+        return self._get_data(
+            key=_Keys.LOGGER_CLIENT,
+            set_default_type=LoggerClient,
+            default_value=LoggerClient(),
+        )  # type: ignore
 
     @logs.setter
     def logs(self, logger_client: LoggerClient) -> None:
         """Sets LoggerClient."""
-        if not isinstance(logger_client, LoggerClient):
-            raise Raise.error(
-                f"Expected LoggerClient type, received: '{type(logger_client)}'.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.LOGGER_CLIENT] = logger_client
+        self._set_data(key=_Keys.LOGGER_CLIENT, value=logger_client)
 
 
 class BRouterBoard(BData):
@@ -168,21 +136,12 @@ class BRouterBoard(BData):
     @property
     def rb(self) -> Optional[RouterBoard]:
         """Returns RouterBoard handler."""
-        if _Keys.RB not in self._data:
-            self._data[_Keys.RB] = None
-        return self._data[_Keys.RB]
+        return self._get_data(key=_Keys.RB, set_default_type=Optional[RouterBoard])
 
     @rb.setter
     def rb(self, value: RouterBoard) -> None:
         """Sets Router Board handler."""
-        if not isinstance(value, RouterBoard):
-            raise Raise.error(
-                f"RouterBoard type expected, received: '{type(value)}'",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.RB] = value
+        self._set_data(key=_Keys.RB, value=value)
 
 
 class BaseApp(BLogs, BConfigSection):
@@ -193,9 +152,9 @@ class BaseApp(BLogs, BConfigSection):
     @property
     def conf(self) -> Optional[Config]:
         """Return Config class object."""
-        if _Keys.CONF not in self._data:
-            self._data[_Keys.CONF] = None
-        return self._data[_Keys.CONF]
+        from uke_pit2.conf import Config
+
+        return self._get_data(key=_Keys.CONF, set_default_type=Optional[Config])
 
     @conf.setter
     def conf(self, conf_obj: Config) -> None:
@@ -203,14 +162,7 @@ class BaseApp(BLogs, BConfigSection):
 
         from uke_pit2.conf import Config
 
-        if not isinstance(conf_obj, Config):
-            raise Raise.error(
-                f"Expected Config class type, received: '{type(conf_obj)}'.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.CONF] = conf_obj
+        self._set_data(key=_Keys.CONF, value=conf_obj)
 
     @property
     def version(self) -> str:
@@ -220,37 +172,26 @@ class BaseApp(BLogs, BConfigSection):
     @property
     def command_opts(self) -> bool:
         """Returns commands line flag"""
-        if _Keys.COMMAND_LINE_OPTS not in self._data:
-            self._data[_Keys.COMMAND_LINE_OPTS] = False
-        return self._data[_Keys.COMMAND_LINE_OPTS]
+        return self._get_data(
+            key=_Keys.COMMAND_LINE_OPTS, set_default_type=bool, default_value=False
+        )  # type: ignore
 
     @command_opts.setter
     def command_opts(self, flag: bool) -> None:
         """Sets commands line flag."""
-        if not isinstance(flag, bool):
-            raise Raise.error(
-                "Boolean flag expected.", TypeError, self._c_name, currentframe()
-            )
-        self._data[_Keys.COMMAND_LINE_OPTS] = flag
+        self._set_data(key=_Keys.COMMAND_LINE_OPTS, value=flag)
 
     @property
     def logs_processor(self) -> ThLoggerProcessor:
         """Return logs_processor."""
-        if _Keys.PROC_LOGS not in self._data:
-            self._data[_Keys.PROC_LOGS] = None
-        return self._data[_Keys.PROC_LOGS]
+        return self._get_data(
+            key=_Keys.PROC_LOGS, set_default_type=ThLoggerProcessor
+        )  # type: ignore
 
     @logs_processor.setter
     def logs_processor(self, value: ThLoggerProcessor) -> None:
         """Set logs_processor."""
-        if not isinstance(value, ThLoggerProcessor):
-            raise Raise.error(
-                f"Expected ThLoggerProcessor type, received: '{type(value)}'.",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_Keys.PROC_LOGS] = value
+        self._set_data(key=_Keys.PROC_LOGS, value=value)
 
     def _help(self, command_conf: Dict) -> None:
         """Show help information and shutdown."""

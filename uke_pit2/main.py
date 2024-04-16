@@ -549,33 +549,22 @@ class SpiderApp(BaseApp):
     @property
     def module_conf(self) -> _ModuleConf:
         """Return module conf object."""
-        if _ModuleConf.Keys.MODCONF not in self._data:
-            return None  # type: ignore
-        return self._data[_ModuleConf.Keys.MODCONF]
+        return self._get_data(key=_ModuleConf.Keys.MODCONF, set_default_type=_ModuleConf)  # type: ignore
 
     @module_conf.setter
     def module_conf(self, value: _ModuleConf) -> None:
         """Sets ModuleConf object."""
-        if not isinstance(value, _ModuleConf):
-            raise Raise.error(
-                f"_ModuleConf type expected, '{type(value)} received.'",
-                TypeError,
-                self._c_name,
-                currentframe(),
-            )
-        self._data[_ModuleConf.Keys.MODCONF] = value
+        self._set_data(key=_ModuleConf.Keys.MODCONF, value=value)
 
     @property
     def configured(self) -> bool:
         """Returns configured flag."""
-        if _Keys.CONFIGURED not in self._data:
-            self._data[_Keys.CONFIGURED] = False
-        return self._data[_Keys.CONFIGURED]
+        return self._get_data(key=_Keys.CONFIGURED, set_default_type=bool, default_value=False)  # type: ignore
 
     @configured.setter
     def configured(self, flag: bool) -> None:
         """Sets configured flag."""
-        self._data[_Keys.CONFIGURED] = flag
+        self._set_data(key=_Keys.CONFIGURED, value=flag)
 
     @property
     def stop(self) -> bool:
