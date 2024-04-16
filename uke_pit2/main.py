@@ -8,7 +8,7 @@
 """
 
 from queue import Queue
-import os, sys, time
+import os, sys, time, signal
 
 from inspect import currentframe
 from typing import Optional, List
@@ -44,6 +44,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
     SET_IP: str = "__set_ip__"
     SET_PASS: str = "__set_pass__"
     START_IP: str = "start_ip"
+    SET_STOP: str = "__set_stop__"
 
 
 class _ModuleConf(BModuleConfig):
@@ -116,6 +117,10 @@ class SpiderApp(BaseApp):
         # update debug
         self.logs_processor._debug = self.conf.debug
 
+        # signal handling
+        signal.signal(signal.SIGTERM, self.__sig_exit)
+        signal.signal(signal.SIGINT, self.__sig_exit)
+
         # init section config
         self.__check_config_section()
 
@@ -136,7 +141,6 @@ class SpiderApp(BaseApp):
         run_limit: int = 5
         th_proc: List[Processor] = []
         th_run: List[Processor] = []
-        complete: List[RBData] = []
         count: int = 0
         count_limit: int = 10
         comms_queue: Queue = Queue()
@@ -194,8 +198,8 @@ class SpiderApp(BaseApp):
                         if rb:
                             # add router-id
                             rb.router_id = obj.ip
-                            # add output data
-                            complete.append(rb)
+                            # add to database queue
+                            comms_queue.put(rb)
                         if rb and rb.routers:
                             for item in rb.routers:
                                 if "router-id" in item and item["router-id"] not in ips:
@@ -224,6 +228,10 @@ class SpiderApp(BaseApp):
                     # short procedure for debugging purpose
                     break
 
+                if self.stop:
+                    # TERM or INT signal was set
+                    break
+
             # cleanup after break
             while th_run:
                 for obj in th_run:
@@ -231,13 +239,6 @@ class SpiderApp(BaseApp):
                         obj.join()
                         time.sleep(0.2)
                         th_run.remove(obj)
-
-            # dump data
-            if self.conf.debug and complete:
-                count = 0
-                for item in complete:
-                    count += 1
-                    self.logs.message_debug = f"{count}: {item}"
 
             # database processor
             db_proc.stop()
@@ -255,6 +256,12 @@ class SpiderApp(BaseApp):
             time.sleep(0.1)
 
         sys.exit(0)
+
+    def __sig_exit(self, signum: int, frame) -> None:
+        """Received TERM|INT signal."""
+        if self.conf and self.conf.debug:
+            self.logs.message_debug = "TERM or INT signal received."
+        self.stop = True
 
     def __init_command_line(self) -> None:
         """Initialize command line."""
@@ -569,6 +576,18 @@ class SpiderApp(BaseApp):
     def configured(self, flag: bool) -> None:
         """Sets configured flag."""
         self._data[_Keys.CONFIGURED] = flag
+
+    @property
+    def stop(self) -> bool:
+        """Returns STOP flag."""
+        return self._get_data(
+            key=_Keys.SET_STOP, set_default_type=bool, default_value=False
+        )  # type: ignore
+
+    @stop.setter
+    def stop(self, flag: bool) -> None:
+        """Sets STOP flag."""
+        self._set_data(key=_Keys.SET_STOP, value=flag)
 
 
 class UkeApp(BaseApp):

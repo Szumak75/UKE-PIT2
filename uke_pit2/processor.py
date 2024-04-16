@@ -7,11 +7,12 @@
   Purpose: processor class.
 """
 
+import time
 
 from typing import Optional, List
 from threading import Event, Thread
 from inspect import currentframe
-from queue import Queue
+from queue import Queue, Empty
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.logstool.logs import LoggerClient, LoggerQueue
@@ -74,6 +75,12 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
 
     def run(self) -> None:
         """Start processor."""
+        if not self._stop_event:
+            return None
+        if not self.__comms_queue:
+            self.logs.message_critical = f"Communication queue was not set properly."
+            return None
+
         if not self.__check_config():
             self.logs.message_critical = (
                 "Unable to continue due to lack of configuration."
@@ -82,6 +89,19 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
 
         if self._debug:
             self.logs.message_debug = "starting..."
+
+        while not self._stop_event.is_set():
+            try:
+                item: RBData = self.__comms_queue.get(block=False)
+                self.logs.message_info = f"{item}"
+            except Empty:
+                time.sleep(0.2)
+                continue
+            except Exception as ex:
+                self.logs.message_critical = (
+                    f"exception was thrown while processing the queue: {ex}"
+                )
+                continue
 
         if self._debug:
             self.logs.message_debug = "stopped"
@@ -276,9 +296,9 @@ class Processor(Thread, ThBaseObject, BLogs):
             collector: Optional[IRouterBoardCollector] = csv.get_collector()
 
             if collector:
-                self.logs.message_debug = f"{collector}"
+                # self.logs.message_debug = f"{collector}"
                 collector.collect()
-                self.logs.message_debug = f"{collector.get_data()}"
+                # self.logs.message_debug = f"{collector.get_data()}"
                 self._data[_Keys.DATA] = collector.get_data()
                 # collector.dump()  # type: ignore
 
