@@ -114,7 +114,7 @@ class Database(BDebug, BLogs):
     ) -> None:
         """Database constructor.
 
-        ## Arguments:
+        ### Arguments:
         - logger_queue [LoggerQueue] - logger queue for logs subsystem communication.
         - config_obj [DbConfig] - config options for database communication.
         - debug [bool] - debugging flag, default: False.

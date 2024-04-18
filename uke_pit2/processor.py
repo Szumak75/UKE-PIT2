@@ -59,7 +59,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
     ) -> None:
         """Processor constructor.
 
-        # Arguments:
+        ### Arguments:
         - logger_queue [LoggerQueue] - logger queue for communication.
         - comms_queue [Queue] - communication queue.
         - debug [bool] - debug flag.
@@ -105,6 +105,12 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
             self.logs.message_critical = "connection to database error."
             return None
 
+        # create session
+        session = self.database.session
+        if not session:
+            self.logs.message_debug = "database session error"
+            return None
+
         if self._debug:
             self.logs.message_debug = "starting..."
 
@@ -120,6 +126,8 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
                     f"exception was thrown while processing the queue: {ex}"
                 )
                 continue
+
+        session.close()
 
         if self._debug:
             self.logs.message_debug = "stopped"
@@ -218,7 +226,7 @@ class Processor(Thread, ThBaseObject, BLogs):
     ) -> None:
         """Processor constructor.
 
-        # Arguments:
+        ### Arguments:
         - logger_queue [LoggerQueue] - logger queue for communication.
         - ip [Address] - router ip address.
         - passwords [List[str]] - list of router passwords
