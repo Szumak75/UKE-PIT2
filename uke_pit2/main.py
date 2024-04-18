@@ -142,7 +142,7 @@ class SpiderApp(BaseApp):
         th_proc: List[Processor] = []
         th_run: List[Processor] = []
         count: int = 0
-        count_limit: int = 10
+        count_limit: int = 20
         comms_queue: Queue = Queue()
 
         # main procedure

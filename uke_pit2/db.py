@@ -21,7 +21,7 @@ from jsktoolbox.logstool.logs import LoggerQueue, LoggerClient, BData
 from jsktoolbox.datetool import Timestamp
 
 from uke_pit2.base import BDebug, BLogs, LmsBase
-from uke_pit2.db_models import TLastUpdate
+from uke_pit2.db_models import TLastUpdate, TRouter
 
 
 class DbConfigKeys(object, metaclass=ReadOnlyClass):

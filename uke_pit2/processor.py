@@ -14,6 +14,8 @@ from threading import Event, Thread
 from inspect import currentframe
 from queue import Queue, Empty
 
+from sqlalchemy.orm import Session, Query
+
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.logstool.logs import LoggerClient, LoggerQueue
 from jsktoolbox.libs.base_data import BData
@@ -27,7 +29,9 @@ from jsktoolbox.devices.mikrotik.elements.libs.search import RBQuery
 from jsktoolbox.devices.mikrotik.base import Element
 from jsktoolbox.datetool import Timestamp
 
+
 from uke_pit2.base import BLogs
+from uke_pit2.db_models.spider import TCustomer, TRouter
 from uke_pit2.db_models.update import TLastUpdate
 from uke_pit2.network import Pinger
 from uke_pit2.rb import IRouterBoardCollector, RBData, RouterBoardVersion
@@ -131,6 +135,11 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
             try:
                 item: RBData = self.__comms_queue.get(block=False)
                 self.logs.message_info = f"{item}"
+                # update router information
+                rid: int = self.__update_routers(session, item)
+                if item.customers:
+                    self.__update_router_customers(session, item, rid)
+
             except Empty:
                 time.sleep(0.2)
                 continue
@@ -151,6 +160,62 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
             if self._debug:
                 self.logs.message_debug = "stopping..."
             self._stop_event.set()
+
+    def __update_router_customers(
+        self, session: Session, data: RBData, router_record_id: int
+    ) -> None:
+        """Update router customers information."""
+        runtime: Optional[int] = self._get_data(_Keys.RUNTIME)
+        if runtime and session and data and data.customers:
+            for item in data.customers:
+                if "name" in item and "address" in item:
+                    row: Optional[TCustomer] = (
+                        session.query(TCustomer)
+                        .filter(TCustomer.name == item["name"])
+                        .first()
+                    )
+                    if row:
+                        if row.rid != router_record_id:
+                            row.rid = router_record_id
+                        if row.ip != int(Address(item["address"])):
+                            row.ip = int(Address(item["address"]))
+                        row.last_update = runtime
+                    else:
+                        customer = TCustomer()
+                        customer.rid = router_record_id
+                        customer.name = item["name"]
+                        customer.ip = int(Address(item["address"]))
+                        customer.last_update = runtime
+                        session.add(customer)
+                    session.commit()
+
+    def __update_routers(self, session: Session, data: RBData) -> int:
+        """Check and update routers information in database.
+
+        ### Arguments:
+        - session - database session,
+        - data - router board collected data object,
+
+        ### Returns:
+        id [int] - database record ID.
+        """
+        runtime: Optional[int] = self._get_data(_Keys.RUNTIME)
+        if runtime and session and data and data.router_id:
+            row: Optional[TRouter] = (
+                session.query(TRouter)
+                .filter(TRouter.router_id == int(data.router_id))
+                .first()
+            )
+            if row:
+                row.last_update = runtime
+            else:
+                router = TRouter()
+                router.router_id = int(data.router_id)
+                router.last_update = runtime
+                session.add(router)
+
+            session.commit()
+        return router.id
 
     def __check_config(self) -> bool:
         """Check if the connection variables are set."""

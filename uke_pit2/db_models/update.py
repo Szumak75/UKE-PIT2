@@ -6,7 +6,7 @@
   
   Purpose: 
 """
-from typing import Tuple
+
 from sqlalchemy import Integer
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.mysql import (
