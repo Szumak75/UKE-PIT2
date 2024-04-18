@@ -176,6 +176,9 @@ class __Collector(BLogs, BDebug, BRouterBoard):
                 for item in search:
                     real_interface = item["interface"]
                     vlan_id = item["vlan-id"]
+            elif search and isinstance(search, Dict):
+                real_interface = search["interface"]
+                vlan_id = search["vlan-id"]
 
         return real_interface, vlan_id
 
@@ -212,6 +215,7 @@ class __Collector(BLogs, BDebug, BRouterBoard):
                         network = Network(item["address"])
                         if address >= network.network and address <= network.broadcast:
                             # found item
+                            # self.logs.message_debug = f"{search}"
                             interface = item["interface"]
                             break
 
@@ -298,6 +302,13 @@ class __Collector(BLogs, BDebug, BRouterBoard):
                         tmp["address"] = item["address"]
                     if tmp:
                         out.append(tmp)
+            elif search and isinstance(search, Dict):
+                tmp: Dict[str, str] = {}
+                if "name" in search and "address" in search:
+                    tmp["name"] = search["name"]
+                    tmp["address"] = search["address"]
+                if tmp:
+                    out.append(tmp)
         return out
 
     @property

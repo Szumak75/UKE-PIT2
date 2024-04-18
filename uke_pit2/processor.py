@@ -274,7 +274,7 @@ class Processor(Thread, ThBaseObject, BLogs):
                     if conn.connect() and conn.is_alive:
                         if self._debug:
                             self.logs.message_debug = f"connected"
-                            self.logs.message_debug = f"The password is: '{passwd}'"
+                            # self.logs.message_debug = f"The password is: '{passwd}'"
                         self.api_handler = conn
                         break
                 except Exception as e:
