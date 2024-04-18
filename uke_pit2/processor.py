@@ -29,6 +29,7 @@ from jsktoolbox.devices.mikrotik.base import Element
 from uke_pit2.base import BLogs
 from uke_pit2.network import Pinger
 from uke_pit2.rb import IRouterBoardCollector, RBData, RouterBoardVersion
+from uke_pit2.db import DbConfig, DbConfigKeys, Database
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -36,6 +37,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
 
     ACH: str = "__api_connector_handler__"
     DATA: str = "__router_data__"
+    DATABASE: str = "__database__"
     DB_DATA: str = "__db_database__"
     DB_HOST: str = "__db_host__"
     DB_PASS: str = "__db_password__"
@@ -85,6 +87,22 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
             self.logs.message_critical = (
                 "Unable to continue due to lack of configuration."
             )
+            return None
+
+        # configuring database connection
+        if not self.logs or not self.logs.logs_queue or self._debug is None:
+            return None
+        conf = DbConfig()
+        conf.host = self.db_host  # type: ignore
+        conf.port = self.db_port  # type: ignore
+        conf.database = self.db_database  # type: ignore
+        conf.user = self.db_username  # type: ignore
+        conf.password = self.db_password  # type: ignore
+        # self.logs.message_debug = f"{conf}"
+        self.database = Database(self.logs.logs_queue, conf, self._debug)
+        # create connection
+        if not self.database.create_connection():
+            self.logs.message_critical = "connection to database error."
             return None
 
         if self._debug:
@@ -176,6 +194,16 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
     @db_password.setter
     def db_password(self, value: Optional[str]) -> None:
         self._set_data(key=_Keys.DB_PASS, value=value)
+
+    @property
+    def database(self) -> Database:
+        """Returns Database object."""
+        return self._get_data(key=_Keys.DATABASE)  # type: ignore
+
+    @database.setter
+    def database(self, database: Database) -> None:
+        """Sets Database object."""
+        self._set_data(key=_Keys.DATABASE, set_default_type=Database, value=database)
 
 
 class Processor(Thread, ThBaseObject, BLogs):
