@@ -9,7 +9,7 @@
 from typing import Dict, Any, Optional
 
 from sqlalchemy import Subquery, create_engine, and_, or_, text, func
-from sqlalchemy.orm import Session, DeclarativeBase
+from sqlalchemy.orm import Session
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.engine import URL, engine_from_config
@@ -18,8 +18,10 @@ from sqlalchemy.util import immutabledict
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.netaddresstool.ipv4 import Address
 from jsktoolbox.logstool.logs import LoggerQueue, LoggerClient, BData
+from jsktoolbox.datetool import Timestamp
 
-from uke_pit2.base import BDebug, BLogs
+from uke_pit2.base import BDebug, BLogs, LmsBase
+from uke_pit2.db_models import TLastUpdate
 
 
 class DbConfigKeys(object, metaclass=ReadOnlyClass):
@@ -99,10 +101,6 @@ class DbConfig(BData):
         self._set_data(DbConfigKeys.PASS, value=value)
 
 
-class LmsBase(DeclarativeBase):
-    """Declarative Base class."""
-
-
 class Database(BDebug, BLogs):
     """LMS Database class."""
 
@@ -139,6 +137,8 @@ class Database(BDebug, BLogs):
         try:
             with engine.connect() as connection:
                 connection.execute(text("SELECT 1"))
+                if connection is not None:
+                    LmsBase.metadata.create_all(engine)
                 if self.debug:
                     self.logs.message_debug = f"add connection to server: {self._get_data(_Keys.CONF).host} with backend: pymysql"  # type: ignore
                     self._set_data(_Keys.DB_POLL, value=engine)

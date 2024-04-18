@@ -12,6 +12,8 @@ import sys
 from inspect import currentframe
 from typing import List, Dict, Optional, Any
 
+from sqlalchemy.orm import DeclarativeBase
+
 import uke_pit2
 
 from jsktoolbox.libs.base_data import BData
@@ -237,6 +239,10 @@ class BaseApp(BLogs, BConfigSection):
         for item in desc_opts:
             print(item)
         sys.exit(2)
+
+
+class LmsBase(DeclarativeBase):
+    """Declarative Base class."""
 
 
 # #[EOF]#######################################################################

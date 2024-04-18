@@ -25,11 +25,15 @@ from jsktoolbox.devices.network.connectors import API
 from jsktoolbox.devices.mikrotik.routerboard import RouterBoard
 from jsktoolbox.devices.mikrotik.elements.libs.search import RBQuery
 from jsktoolbox.devices.mikrotik.base import Element
+from jsktoolbox.datetool import Timestamp
 
 from uke_pit2.base import BLogs
+from uke_pit2.db_models.update import TLastUpdate
 from uke_pit2.network import Pinger
 from uke_pit2.rb import IRouterBoardCollector, RBData, RouterBoardVersion
 from uke_pit2.db import DbConfig, DbConfigKeys, Database
+
+from uke_pit2 import db_models
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -46,6 +50,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
     IP: str = "__host_ip__"
     PASS: str = "__passwords_list__"
     QUEUE: str = "__comms_queue__"
+    RUNTIME: str = "__runtime__"
 
 
 class DbProcessor(Thread, ThBaseObject, BLogs):
@@ -74,6 +79,8 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
         self.logs = LoggerClient(logger_queue, f"{self._c_name}")
         # communication queue
         self.__comms_queue = comms_queue
+        # set runtime
+        self._set_data(_Keys.RUNTIME, set_default_type=int, value=Timestamp.now)
 
     def run(self) -> None:
         """Start processor."""
@@ -113,6 +120,12 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
 
         if self._debug:
             self.logs.message_debug = "starting..."
+
+        # set runtime
+        tlu = TLastUpdate()
+        tlu.last_update = self._get_data(_Keys.RUNTIME, default_value=Timestamp.now)  # type: ignore
+        session.add(tlu)
+        session.commit()
 
         while not self._stop_event.is_set():
             try:
