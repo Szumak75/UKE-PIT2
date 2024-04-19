@@ -21,7 +21,7 @@ from jsktoolbox.logstool.logs import LoggerClient, LoggerQueue
 from jsktoolbox.libs.base_data import BData
 from jsktoolbox.libs.base_th import ThBaseObject
 from jsktoolbox.libs.base_logs import BLoggerQueue
-from jsktoolbox.netaddresstool.ipv4 import Address
+from jsktoolbox.netaddresstool.ipv4 import Address, Network
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.devices.network.connectors import API
 from jsktoolbox.devices.mikrotik.routerboard import RouterBoard
@@ -31,7 +31,13 @@ from jsktoolbox.datetool import Timestamp
 
 
 from uke_pit2.base import BLogs
-from uke_pit2.db_models.spider import TCustomer, TRouter
+from uke_pit2.db_models.spider import (
+    TConnection,
+    TCustomer,
+    TInterface,
+    TInterfaceName,
+    TRouter,
+)
 from uke_pit2.db_models.update import TLastUpdate
 from uke_pit2.network import Pinger
 from uke_pit2.rb import IRouterBoardCollector, RBData, RouterBoardVersion
@@ -117,7 +123,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
             return None
 
         # create session
-        session = self.database.session
+        session: Optional[Session] = self.database.session
         if not session:
             self.logs.message_debug = "database session error"
             return None
@@ -131,14 +137,31 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
         session.add(tlu)
         session.commit()
 
-        while not self._stop_event.is_set():
+        # stats counters
+        stat_routers: int = 0
+        stat_connections: int = 0
+        stat_customers: int = 0
+
+        while True:
+            if self.__comms_queue.empty() and self._stop_event.is_set():
+                break
             try:
                 item: RBData = self.__comms_queue.get(block=False)
-                self.logs.message_info = f"{item}"
+                self.logs.message_info = f"Update router information: {item.router_id}"
+                self.logs.message_info = f" connections count: {len(item.routers)}"
+                self.logs.message_info = f" customers count: {len(item.customers)}"
+
+                # stats
+                stat_routers += 1
+                stat_connections += len(item.routers)
+                stat_customers += len(item.customers)
+
                 # update router information
                 rid: int = self.__update_routers(session, item)
                 if item.customers:
                     self.__update_router_customers(session, item, rid)
+                if item.routers:
+                    self.__update_router_connections(session, item, rid)
 
             except Empty:
                 time.sleep(0.2)
@@ -151,8 +174,16 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
 
         session.close()
 
+        # finished
+        self.logs.message_info = "########################"
+        self.logs.message_info = "Database update finished"
+        self.logs.message_info = f"* Routers: {stat_routers}"
+        self.logs.message_info = f"* Connections: {stat_connections}"
+        self.logs.message_info = f"* Customers: {stat_customers}"
+        self.logs.message_info = "########################"
+
         if self._debug:
-            self.logs.message_debug = "stopped"
+            self.logs.message_debug = "stopped."
 
     def stop(self) -> None:
         """Sets stop event."""
@@ -160,6 +191,74 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
             if self._debug:
                 self.logs.message_debug = "stopping..."
             self._stop_event.set()
+
+    def __update_router_connections(
+        self, session: Session, data: RBData, router_record_id: int
+    ) -> None:
+        """Update information about inter-router connections."""
+        runtime: Optional[int] = self._get_data(_Keys.RUNTIME)
+        if runtime and session and data and data.routers:
+            for item in data.routers:
+                inf = inf_name_id = cid = network = vid = None  # type: ignore
+                if "interface" in item:
+                    inf: str = item["interface"]
+                if "network" in item:
+                    network: Network = item["network"]
+                if "vlan-id" in item:
+                    vid: int = item["vlan-id"]
+                else:
+                    vid = 1
+
+                # check interface name
+                row = (
+                    session.query(TInterfaceName)
+                    .filter(TInterfaceName.name == inf)
+                    .first()
+                )
+                if not row:
+                    row = TInterfaceName()
+                    row.name = inf
+                    session.add(row)
+                    session.commit()
+                inf_name_id: int = row.id
+
+                # check connection
+                row = (
+                    session.query(TConnection)
+                    .filter(
+                        TConnection.rid == router_record_id,
+                        TConnection.vlan_id == vid,
+                        TConnection.network == int(network.network),
+                    )
+                    .first()
+                )
+                if row:
+                    row.last_update = runtime
+                else:
+                    row = TConnection()
+                    row.network = int(network.network)
+                    row.rid = router_record_id
+                    row.vlan_id = vid
+                    row.last_update = runtime
+                    session.add(row)
+                session.commit()
+                cid: int = row.id
+
+                # check interface
+                row = (
+                    session.query(TInterface)
+                    .filter(TInterface.cid == cid, TInterface.if_id == inf_name_id)
+                    .first()
+                )
+                if row:
+                    row.last_update = runtime
+                else:
+                    row = TInterface()
+                    row.cid = cid
+                    row.if_id = inf_name_id
+                    row.last_update = runtime
+                    session.add(row)
+                session.commit()
 
     def __update_router_customers(
         self, session: Session, data: RBData, router_record_id: int
@@ -209,13 +308,13 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
             if row:
                 row.last_update = runtime
             else:
-                router = TRouter()
-                router.router_id = int(data.router_id)
-                router.last_update = runtime
-                session.add(router)
+                row = TRouter()
+                row.router_id = int(data.router_id)
+                row.last_update = runtime
+                session.add(row)
 
             session.commit()
-        return router.id
+        return row.id
 
     def __check_config(self) -> bool:
         """Check if the connection variables are set."""

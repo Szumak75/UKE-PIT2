@@ -142,7 +142,7 @@ class SpiderApp(BaseApp):
         th_proc: List[Processor] = []
         th_run: List[Processor] = []
         count: int = 0
-        count_limit: int = 20
+        count_limit: int = 0
         comms_queue: Queue = Queue()
 
         # main procedure
@@ -188,11 +188,11 @@ class SpiderApp(BaseApp):
                         obj: Processor = th_proc.pop()
                         obj.start()
                         th_run.append(obj)
-                        count += 1
 
                 # check run list
                 for obj in th_run:
                     if not obj.is_alive():
+                        count += 1
                         # add neighbor routers
                         rb: Optional[RBData] = obj.router_data()
                         if rb:
