@@ -6,22 +6,20 @@
   
   Purpose: Classes for lms database connection
 """
-from typing import Dict, Any, Optional
+from typing import Optional
 
-from sqlalchemy import Subquery, create_engine, and_, or_, text, func
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.engine import URL, engine_from_config
+from sqlalchemy.engine import URL
 from sqlalchemy.util import immutabledict
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.netaddresstool.ipv4 import Address
 from jsktoolbox.logstool.logs import LoggerQueue, LoggerClient, BData
-from jsktoolbox.datetool import Timestamp
 
 from uke_pit2.base import BDebug, BLogs, LmsBase
-from uke_pit2.db_models import TLastUpdate, TRouter
 
 
 class DbConfigKeys(object, metaclass=ReadOnlyClass):

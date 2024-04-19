@@ -27,7 +27,7 @@ from jsktoolbox.logstool.logs import (
     ThLoggerProcessor,
 )
 from jsktoolbox.logstool.formatters import LogFormatterNull, LogFormatterDateTime
-from jsktoolbox.libs.system import Env, PathChecker
+from jsktoolbox.libs.system import Env
 from jsktoolbox.stringtool.crypto import SimpleCrypto
 
 from uke_pit2.base import BaseApp, BModuleConfig

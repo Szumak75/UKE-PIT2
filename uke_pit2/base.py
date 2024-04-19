@@ -9,7 +9,6 @@
 
 import sys
 
-from inspect import currentframe
 from typing import List, Dict, Optional, Any
 
 from sqlalchemy.orm import DeclarativeBase
@@ -18,7 +17,6 @@ import uke_pit2
 
 from jsktoolbox.libs.base_data import BData
 from jsktoolbox.attribtool import ReadOnlyClass
-from jsktoolbox.raisetool import Raise
 from jsktoolbox.configtool.main import Config as ConfigTool
 from jsktoolbox.logstool.logs import LoggerClient, ThLoggerProcessor
 from jsktoolbox.devices.mikrotik.routerboard import RouterBoard

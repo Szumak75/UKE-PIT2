@@ -9,11 +9,10 @@
 
 
 import os
-import subprocess
 
 from inspect import currentframe
 from distutils.spawn import find_executable
-from typing import Optional, Dict, List
+from typing import Optional
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.raisetool import Raise

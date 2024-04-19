@@ -14,19 +14,15 @@ from threading import Event, Thread
 from inspect import currentframe
 from queue import Queue, Empty
 
-from sqlalchemy.orm import Session, Query
+from sqlalchemy.orm import Session
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.logstool.logs import LoggerClient, LoggerQueue
-from jsktoolbox.libs.base_data import BData
 from jsktoolbox.libs.base_th import ThBaseObject
-from jsktoolbox.libs.base_logs import BLoggerQueue
 from jsktoolbox.netaddresstool.ipv4 import Address, Network
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.devices.network.connectors import API
 from jsktoolbox.devices.mikrotik.routerboard import RouterBoard
-from jsktoolbox.devices.mikrotik.elements.libs.search import RBQuery
-from jsktoolbox.devices.mikrotik.base import Element
 from jsktoolbox.datetool import Timestamp
 
 
@@ -41,9 +37,7 @@ from uke_pit2.db_models.spider import (
 from uke_pit2.db_models.update import TLastUpdate
 from uke_pit2.network import Pinger
 from uke_pit2.rb import IRouterBoardCollector, RBData, RouterBoardVersion
-from uke_pit2.db import DbConfig, DbConfigKeys, Database
-
-from uke_pit2 import db_models
+from uke_pit2.db import DbConfig, Database
 
 
 class _Keys(object, metaclass=ReadOnlyClass):

@@ -10,17 +10,12 @@
 import re
 
 from abc import ABC, abstractmethod
-from inspect import currentframe
 from typing import Optional, Union, List, Dict, Any
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.logstool.logs import LoggerClient, LoggerQueue
 from jsktoolbox.libs.base_data import BData
-from jsktoolbox.libs.base_th import ThBaseObject
-from jsktoolbox.libs.base_logs import BLoggerQueue
 from jsktoolbox.netaddresstool.ipv4 import Address, Network
-from jsktoolbox.raisetool import Raise
-from jsktoolbox.devices.network.connectors import API
 from jsktoolbox.devices.mikrotik.routerboard import RouterBoard
 from jsktoolbox.devices.mikrotik.elements.libs.search import RBQuery
 from jsktoolbox.devices.mikrotik.base import Element

@@ -9,14 +9,6 @@
 
 from sqlalchemy import Integer
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.dialects.mysql import (
-    DECIMAL,
-    INTEGER,
-    SMALLINT,
-    TEXT,
-    TINYINT,
-    VARCHAR,
-)
 
 from uke_pit2.base import LmsBase
 
