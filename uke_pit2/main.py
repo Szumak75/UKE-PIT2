@@ -21,11 +21,12 @@ from jsktoolbox.logstool.logs import (
     LoggerEngine,
     LoggerClient,
     LoggerEngineStdout,
+    LoggerEngineFile,
     LoggerQueue,
     LogsLevelKeys,
     ThLoggerProcessor,
 )
-from jsktoolbox.logstool.formatters import LogFormatterNull
+from jsktoolbox.logstool.formatters import LogFormatterNull, LogFormatterDateTime
 from jsktoolbox.libs.system import Env, PathChecker
 from jsktoolbox.stringtool.crypto import SimpleCrypto
 
@@ -509,6 +510,16 @@ class SpiderApp(BaseApp):
                 formatter=LogFormatterNull(),
             ),
         )
+        lff_notice = LoggerEngineFile(
+            name=f"{self._c_name}", formatter=LogFormatterDateTime()
+        )
+        lff_notice.logdir = "/tmp"
+        lff_notice.logfile = "uke-pit-spider.NOTICE.log"
+        engine.add_engine(
+            LogsLevelKeys.NOTICE,
+            lff_notice,
+        )
+
         # CRITICAL
         engine.add_engine(
             LogsLevelKeys.CRITICAL,
@@ -517,6 +528,15 @@ class SpiderApp(BaseApp):
                 # formatter=LogFormatterDateTime(),
                 formatter=LogFormatterNull(),
             ),
+        )
+        lff_critical = LoggerEngineFile(
+            name=f"{self._c_name}", formatter=LogFormatterDateTime()
+        )
+        lff_critical.logdir = "/tmp"
+        lff_critical.logfile = "uke-pit-spider.CRITICAL.log"
+        engine.add_engine(
+            LogsLevelKeys.CRITICAL,
+            lff_critical,
         )
         # EMERGENCY
         engine.add_engine(

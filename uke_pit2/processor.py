@@ -175,12 +175,12 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
         session.close()
 
         # finished
-        self.logs.message_info = "########################"
-        self.logs.message_info = "Database update finished"
-        self.logs.message_info = f"* Routers: {stat_routers}"
-        self.logs.message_info = f"* Connections: {stat_connections}"
-        self.logs.message_info = f"* Customers: {stat_customers}"
-        self.logs.message_info = "########################"
+        self.logs.message_notice = "########################"
+        self.logs.message_notice = "Database update finished"
+        self.logs.message_notice = f"* Routers: {stat_routers}"
+        self.logs.message_notice = f"* Connections: {stat_connections}"
+        self.logs.message_notice = f"* Customers: {stat_customers}"
+        self.logs.message_notice = "########################"
 
         if self._debug:
             self.logs.message_debug = "stopped."
