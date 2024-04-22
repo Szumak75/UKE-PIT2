@@ -51,8 +51,8 @@ class Pinger(BData):
                 currentframe(),
             )
         self._data[_Keys.TIMEOUT] = timeout
-        self._data[_Keys.COMMANDS] = []
         self._data[_Keys.MULTIPLIER] = 1
+        self._data[_Keys.COMMANDS] = []
         self._data[_Keys.COMMANDS].append(
             {
                 _Keys.CMD: "fping",
