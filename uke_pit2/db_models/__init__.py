@@ -6,4 +6,10 @@
   Purpose: 
 """
 from uke_pit2.db_models.update import TLastUpdate
-from uke_pit2.db_models.spider import TRouter, TCustomer
+from uke_pit2.db_models.spider import (
+    TRouter,
+    TCustomer,
+    TInterface,
+    TInterfaceName,
+    TConnection,
+)
