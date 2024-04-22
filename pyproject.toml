@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "uke-pit2"
-version = "0.1.0"
+version = "1.0.1"
 description = ""
 authors = ["Jacek Kotlarski <szumak@virthost.pl>"]
 readme = "README.md"
