@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ -L $0 ]; then
+    cd "`dirname "$(readlink -f $0)"`/.."
+else
+    cd "`dirname $0`/.."
+fi
+
+PDIR=`pwd`
+if [ -d "$PDIR/.venv" ]; then
+    . $PDIR/.venv/bin/activate
+    $PDIR/spider.py $@
+fi
