@@ -1,0 +1,2 @@
+[pip installation fix]
+pip install --config-settings="--build-option=build_ext" --config-settings="--build-option=-I/usr/local/include" pysqlite3
