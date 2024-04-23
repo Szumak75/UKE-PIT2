@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block body_header %}
+Logowanie do systemu.
+{% endblock %}
+
+{% block body_content %}
+    <center>
+        <form method="POST">
+            {{ form.csrf_token }}
+            <table class="login">
+                <tr><td class="login">{{ form.login.label }}</td><td class="login">{{ form.login(size=20) }}</td></tr>
+                <tr><td class="login">{{ form.passwd.label }}</td><td class="login">{{ form.passwd(size=20) }}</td></tr>
+                <tr><td class="login" colspan="2"></td></tr>
+                <tr><td class="login" colspan="2"><center>{{ form.submit }}</center></td></tr>
+            </table>
+        </form>
+    </center>
+    <br>
+    <br>
+    {% if form.login.errors %}
+        {% for error in form.login.errors %}
+            <div id="flash"><h1>{{ error }}</h1></div>
+        {% endfor %}
+    {% endif %}
+    {% if form.passwd.errors %}
+        {% for error in form.passwd.errors %}
+            <div id="flash"><h1>{{ error }}</h1></div>
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}

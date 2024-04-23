@@ -1,0 +1,25 @@
+{% from "macros.html" import show_flash_message, show_all_flash_messages %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Narzędzia LMS</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control">
+        <meta content="no-cache" http-equiv="Pragma">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+
+        {% if login %}
+            {% include "menu.html" %}
+        {% endif %}
+
+        {{ show_all_flash_messages() }}
+
+        <center><h2>{% block body_header %} {% endblock %}</h2></center>
+
+        {% block body_content %} {% endblock %}
+
+    </body>
+</html>

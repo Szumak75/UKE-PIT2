@@ -1,0 +1,26 @@
+{% macro show_flash_message(message) %}
+    <div id="flash"><h1>{{ message }}</h1></div>
+{% endmacro %}
+
+{% macro show_flash_message_in_table(message) %}
+    <tr><td>{{ message }}</td></tr>
+{% endmacro %}
+
+{% macro show_all_flash_messages() %}
+    {% for message in get_flashed_messages(category_filter=('message')) %}
+        {{ show_flash_message(message) }}
+    {% endfor %}
+    {% with table = get_flashed_messages(category_filter=('table')) %}
+        {% if table %}
+            <center>
+                <table>
+                    <tr><th>Lista duplikatów</th></tr>
+                    {% for message in table %}
+                        {{ show_flash_message_in_table(message) }}
+                    {% endfor %}
+                </table>
+            </center>
+        {% endif %}
+    {% endwith %}
+{% endmacro %}
+
