@@ -138,6 +138,11 @@ if not conf.errors:
                 return redirect("/")
         return render_template("login.html", form=form, login="username" in session)
 
+    @app.route("/logout")
+    def logout():
+        session.pop("username", None)
+        return redirect(url_for("index"))
+
 else:
 
     @app.route("/")
