@@ -12,7 +12,7 @@ import os, secrets, tempfile
 
 from functools import wraps
 from pathlib import Path
-from typing import Optional, List, Any
+from typing import Optional, Union, List, Any
 
 from jsktoolbox.datetool import DateTime
 from jsktoolbox.stringtool.crypto import SimpleCrypto
