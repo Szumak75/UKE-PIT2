@@ -8,7 +8,7 @@
   Purpose: 
 """
 
-from sanlms import routes
+from web_service import routes
 
 if __name__ == "__main__":
     routes.app.run()

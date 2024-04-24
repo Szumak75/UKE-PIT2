@@ -1,2 +1,5 @@
 [pip installation fix]
-pip install --config-settings="--build-option=build_ext" --config-settings="--build-option=-I/usr/local/include" pysqlite3
+$ pip install --config-settings="--build-option=build_ext" --config-settings="--build-option=-I/usr/local/include" pysqlite3
+
+[flask test run]
+$ flask -A web_service.routes run
