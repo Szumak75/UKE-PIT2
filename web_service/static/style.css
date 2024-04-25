@@ -34,3 +34,20 @@ A:hover		        { text-decoration: underline; color: #336600; }
 .submit             { text-align: right; font-weight: bold; font-family: Tahoma, Verdana, Arial, Helvetica; margin-top: 1%; margin-right: 5px;}
 .submit A           { color: rgb(0, 0, 0); background-color: #cebd9b; padding: 5px 11px; border: 1px solid black; }
 .submit A:hover     { border: 1px solid #fff; }  
+.Width80            { width: 80px;  }
+.Width100           { width: 100px; }
+.Width110           { width: 110px; }
+.Width120           { width: 120px; }
+.Width130           { width: 130px; }
+.Width140           { width: 140px; }
+.Width150           { width: 150px; }
+.Width160           { width: 160px; }
+.Width170           { width: 170px; }
+.Width180           { width: 180px; }
+.Width190           { width: 190px; }
+.Width200           { width: 200px; }
+.Width512           { width: 512px; }
+.Width600           { width: 600px; }
+.Height512          { height: 512px; }
+.TextLT             { text-decoration: line-through; }
+.TextGray           { color: gray; }

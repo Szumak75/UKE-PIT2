@@ -10,7 +10,7 @@
 import time
 import datetime
 
-from typing import Dict, List, Any
+from typing import Dict, List, Tuple, Any
 
 from crypt import crypt
 
@@ -58,6 +58,8 @@ from jsktoolbox.datetool import DateTime
 from web_service.routes import db
 
 
+###
+# LMS tables
 class User(db.Model):
     __tablename__: str = "users"
 
@@ -208,5 +210,133 @@ class Customer(db.Model):
             f"paytime='{self.paytime}' ) "
         )
 
+
+class Division(db.Model):
+    __tablename__: str = "divisions"
+
+    id: Mapped[int] = mapped_column(
+        INTEGER(11), primary_key=True, nullable=False, autoincrement=True
+    )
+    shortname: Mapped[str] = mapped_column(VARCHAR(255), nullable=False, default="")
+    name: Mapped[str] = mapped_column(TEXT(), nullable=False)
+    ten: Mapped[str] = mapped_column(VARCHAR(128), nullable=False, default="")
+    regon: Mapped[str] = mapped_column(VARCHAR(255), nullable=False, default="")
+    rbe: Mapped[str] = mapped_column(VARCHAR(255), nullable=False, default="")
+    rbename: Mapped[str] = mapped_column(VARCHAR(255), nullable=False, default="")
+    telecomnumber: Mapped[str] = mapped_column(VARCHAR(255), nullable=False, default="")
+    account: Mapped[str] = mapped_column(VARCHAR(48), nullable=False, default="")
+    # inv_header: Mapped[str] = mapped_column(TEXT(), nullable=False)
+    # inv_footer: Mapped[str] = mapped_column(TEXT(), nullable=False)
+    # inv_author: Mapped[str] = mapped_column(TEXT(), nullable=False)
+    # inv_paytime: Mapped[int] = mapped_column(SMALLINT(6), default=None)
+    # inv_paytype: Mapped[int] = mapped_column(SMALLINT(6), default=None)
+    description: Mapped[str] = mapped_column(TEXT(), nullable=False)
+    status: Mapped[int] = mapped_column(TINYINT(1), nullable=False, default=0)
+    tax_office_code: Mapped[str] = mapped_column(VARCHAR(8), default=None)
+    # address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"))
+    # inv_cplace: Mapped[str] = mapped_column(TEXT(), nullable=False)
+    # PRIMARY KEY (`id`),
+    # UNIQUE KEY `shortname` (`shortname`),
+    # KEY `divisions_address_id_fk` (`address_id`),
+    # CONSTRAINT `divisions_address_id_fk` FOREIGN KEY (`address_id`) REFERENCES `addresses` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+    # address: Mapped["Address"] = relationship("Address")
+
+    def __repr__(self) -> str:
+        return (
+            f"Division(id='{self.id}', "
+            f"shortname='{self.shortname}', "
+            f"name='{self.name}', "
+            f"ten='{self.ten}', "
+            f"regon='{self.regon}', "
+            f"rbe='{self.rbe}', "
+            f"rbename='{self.rbename}', "
+            f"telecomnumber='{self.telecomnumber}', "
+            f"account='{self.account}', "
+            # f"inv_header='{self.inv_header}', "
+            # f"inv_footer='{self.inv_footer}', "
+            # f"inv_author='{self.inv_author}', "
+            # f"inv_paytime='{self.inv_paytime}', "
+            # f"inv_paytype='{self.inv_paytype}', "
+            # f"inv_cplace='{self.inv_cplace}', "
+            f"description='{self.description}', "
+            f"status='{self.status}', "
+            f"tax_office_code='{self.tax_office_code}', "
+            # f"address_id='{self.address_id}', "
+            # f"address='{self.address}' "
+            ") "
+        )
+
+
+class NetNode(db.Model):
+    __tablename__: str = "netnodes"
+
+    id: Mapped[int] = mapped_column(
+        INTEGER(11), primary_key=True, nullable=False, autoincrement=True
+    )
+    name: Mapped[str] = mapped_column(VARCHAR(255), nullable=False)
+    type: Mapped[int] = mapped_column(TINYINT(4), default=0)
+    # invprojectid: Mapped[int] = mapped_column(INTEGER(11), default=None)
+    status: Mapped[int] = mapped_column(TINYINT(4), default=0)
+    longitude: Mapped[float] = mapped_column(DECIMAL(10, 6), default=None)
+    latitude: Mapped[float] = mapped_column(DECIMAL(10, 6), default=None)
+    ownership: Mapped[int] = mapped_column(TINYINT(1), default=0)
+    # coowner: Mapped[str] = mapped_column(VARCHAR(255), default="")
+    uip: Mapped[int] = mapped_column(TINYINT(1), default=0)
+    miar: Mapped[int] = mapped_column(TINYINT(1), default=0)
+    createtime: Mapped[int] = mapped_column(INTEGER(11), default=None)
+    # lastinspectiontime: Mapped[int] = mapped_column(INTEGER(11), default=None)
+    admcontact: Mapped[str] = mapped_column(TEXT())
+    # divisionid: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
+    # address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"))
+    info: Mapped[str] = mapped_column(TEXT())
+    # PRIMARY KEY (`id`),
+    # KEY `netnodes_address_id_fkey` (`address_id`),
+    # KEY `invprojectid` (`invprojectid`),
+    # KEY `divisionid` (`divisionid`),
+    # CONSTRAINT `netnodes_address_id_fkey` FOREIGN KEY (`address_id`) REFERENCES `addresses` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+    # address: Mapped["Address"] = relationship("Address")
+    # CONSTRAINT `netnodes_ibfk_1` FOREIGN KEY (`invprojectid`) REFERENCES `invprojects` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+    # CONSTRAINT `netnodes_ibfk_2` FOREIGN KEY (`divisionid`) REFERENCES `divisions` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+    # division: Mapped["Division"] = relationship("Division")
+
+    def __repr__(self) -> str:
+        return (
+            f"NetNode(id='{self.id}', "
+            f"name='{self.name}', "
+            f"type='{self.type}', "
+            # f"invprojectid='{self.invprojectid}', "
+            f"status='{self.status}', "
+            f"longitude='{self.longitude}', "
+            f"latitude='{self.latitude}', "
+            f"ownership='{self.ownership}', "
+            # f"coowner='{self.coowner}', "
+            f"uip='{self.uip}', "
+            f"miar='{self.miar}', "
+            f"createtime='{self.createtime}', "
+            # f"lastinspectiontime='{self.lastinspectiontime}', "
+            f"admcontact='{self.admcontact}', "
+            # f"divisionid='{self.divisionid}', "
+            # f"address_id='{self.address_id}', "
+            f"info='{self.info}', "
+            # f"address='{self.address}', "
+            # f"division='{self.division}'"
+            ")"
+        )
+
+    # class methods
+    @classmethod
+    def all(cls) -> List[Any]:
+        return cls.query.all()
+
+    @classmethod
+    def get_list(cls):
+        out: List[Tuple[int, str]] = []
+        for item in cls.all():
+            out.append((item.id, item.name))  # type: ignore
+        return out
+
+
+###
+# UKE-PIT-Spider tables
 
 # #[EOF]#######################################################################

@@ -8,10 +8,12 @@
 """
 
 from crypt import methods
+from ctypes.wintypes import SIZE
 import os, secrets, tempfile
 
 from functools import wraps
 from pathlib import Path
+from turtle import onclick
 from typing import Optional, Union, List, Any
 
 from jsktoolbox.datetool import DateTime
@@ -31,9 +33,16 @@ from flask import (
 )
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+from werkzeug import Response
 from werkzeug.utils import secure_filename
 
-from wtforms.fields import StringField, PasswordField, SubmitField
+from wtforms.fields import (
+    StringField,
+    PasswordField,
+    SubmitField,
+    FieldList,
+    SelectField,
+)
 from wtforms.validators import DataRequired
 
 from flask_sqlalchemy import SQLAlchemy
@@ -44,6 +53,7 @@ from sqlalchemy import func, text
 from logging.config import dictConfig
 
 from web_service.tools import WebConfig
+
 
 basedir: Path = Path(__file__).resolve().parent
 
@@ -111,18 +121,38 @@ class LoginForm(FlaskForm):
     submit = SubmitField(label="Zaloguj się")
 
 
-if not conf.errors:
+class NodesForm(FlaskForm):
 
+    nodes = SelectField(
+        label="Węzły: ",
+        coerce=int,
+        description="Lista węzłów.",
+        choices=[],
+        render_kw={"size": "40", "onclick": "nodeClick()"},
+    )
+
+    routers = SelectField(
+        label="Routery: ", description="Lista routerów do przypisania.", choices=[]
+    )
+
+    node_connections = SelectField(
+        label="Powiązania: ",
+        description="Routery przypisane do wybranego węzła.",
+        choices=[],
+    )
+
+
+if not conf.errors:
     from web_service import models
 
     @app.route("/")
-    def index():
+    def index() -> Union[Response, str]:
         if "username" not in session:
             return redirect(url_for("login"))
         return render_template("index.html", login="username" in session)
 
     @app.route("/login", methods=["GET", "POST"])
-    def login():
+    def login() -> Union[Response, str]:
         if "username" in session:
             return redirect("/")
         form = LoginForm()
@@ -134,20 +164,39 @@ if not conf.errors:
             ):
                 session["username"] = form.login.data
                 if conf.debug:
-                    app.logger.info(f"{form.login.data} logged in successfully")
+                    app.logger.info(f"{form.login.data} logged is successfully")
                 return redirect("/")
         return render_template("login.html", form=form, login="username" in session)
 
     @app.route("/logout")
-    def logout():
+    def logout() -> Response:
         session.pop("username", None)
         return redirect(url_for("index"))
+
+    @app.route("/nodes", methods=["GET", "POST"])
+    def nodes() -> Union[Response, str]:
+        if "username" not in session:
+            return redirect(url_for("login"))
+
+        node_form = NodesForm()
+
+        # fill nodes into node_form
+        node_form.nodes.choices = models.NetNode.get_list()  # type: ignore
+
+        # debug
+        for x in node_form.nodes.iter_choices():
+            print(x)
+
+        # if node_form.validate_on_submit():
+        #     print("OK")
+        return render_template(
+            "nodes.html", form=node_form, login="username" in session
+        )
 
 else:
 
     @app.route("/")
-    def index_ie():
-
+    def index_internal_error():
         return "Internal error."
 
 

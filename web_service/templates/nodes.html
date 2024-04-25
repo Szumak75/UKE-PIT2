@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block body_header %}
+Routery w węzłach.
+{% endblock %}
+
+{% block body_content %}
+    <script>
+        function nodeClick()
+        {
+            document.nnode.submit();
+        }
+    </script>
+    <center>
+        <form name="nnode" method="post">
+            {{ form.csrf_token }}
+            {{ form.nodes }}
+        </form>
+    </center>
+
+{% endblock %}
