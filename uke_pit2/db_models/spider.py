@@ -130,4 +130,27 @@ class TInterface(LmsBase):
         )
 
 
+class TNodeAssignment(LmsBase):
+    """Mapping class for assigning routers to nodes."""
+
+    __tablename__: str = "uke_pit_assignment"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    # lms netnode.id
+    nid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    # router.id
+    rid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"nid='{self.nid}',"
+            f"rid='{self.rid}'"
+            ")"
+        )
+
+
 # #[EOF]#######################################################################

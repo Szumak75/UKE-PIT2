@@ -123,23 +123,55 @@ class LoginForm(FlaskForm):
 
 class NodesForm(FlaskForm):
 
+    select_size: int = 40
+
     nodes = SelectField(
         label="Węzły: ",
         coerce=int,
         description="Lista węzłów.",
         choices=[],
-        render_kw={"size": "40", "onclick": "nodeClick()"},
+        render_kw={
+            "class": "Width80",
+            "size": select_size,
+            "onclick": "nodeClick()",
+        },
     )
 
     routers = SelectField(
-        label="Routery: ", description="Lista routerów do przypisania.", choices=[]
+        label="Routery: ",
+        coerce=int,
+        description="Lista routerów do przypisania.",
+        choices=[],
+        render_kw={
+            "class": "Width100",
+            "size": select_size,
+            "onclick": "nodeClick()",
+        },
     )
 
-    node_connections = SelectField(
+    connections = SelectField(
         label="Powiązania: ",
         description="Routery przypisane do wybranego węzła.",
         choices=[],
+        render_kw={
+            "class": "Width100",
+            "size": select_size,
+            "onclick": "nodeClick()",
+        },
     )
+
+    def nodes_load(self) -> None:
+        self.nodes.choices = models.NetNode.get_all_list()  # type: ignore
+
+    def routers_load(self) -> None:
+        self.routers.choices = models.Router.get_unbound_list()  # type: ignore
+
+    def connection_load(self, id_str: str) -> None:
+        try:
+            id = int(id_str)
+        except Exception as e:
+            return None
+        self.connections.choices = models.NodeAssignment.get_routers_list(id)  # type: ignore
 
 
 if not conf.errors:
@@ -180,12 +212,38 @@ if not conf.errors:
 
         node_form = NodesForm()
 
-        # fill nodes into node_form
-        node_form.nodes.choices = models.NetNode.get_list()  # type: ignore
+        # check selected node
+        nid: Optional[str] = None
+        if "nodes" in request.form:
+            nid = request.form.get("nodes", default=None)
+
+        if "routers" in request.form:
+            rid: Optional[str] = request.form.get("routers", default=None)
+            if nid and nid.isnumeric() and rid and rid.isnumeric():
+                print(f"node id: {nid}, router id: {rid}")
+                na: models.NodeAssignment = models.NodeAssignment.new(nid, rid)
+                db.session.add(na)
+                db.session.commit()
+
+        if nid and "connections" in request.form:
+            rid: Optional[str] = request.form.get("connections", default=None)
+            print(f"to remove: {rid}")
+            if rid:
+                na_to_remove = models.NodeAssignment.remove(rid)
+            if na_to_remove:
+                db.session.delete(na_to_remove)
+                db.session.commit()
+
+        # fill select lists
+        node_form.nodes_load()
+        node_form.routers_load()
+        if nid and nid.isnumeric():
+            node_form.connection_load(nid)
 
         # debug
-        for x in node_form.nodes.iter_choices():
-            print(x)
+        print(request.form.keys())
+        # for x in node_form.nodes.iter_choices():
+        #     print(x)
 
         # if node_form.validate_on_submit():
         #     print("OK")

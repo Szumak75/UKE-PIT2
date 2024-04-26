@@ -5,17 +5,50 @@ Routery w węzłach.
 {% endblock %}
 
 {% block body_content %}
-    <script>
+<center>
+    <form name="net_node" method="post">
+        <table>
+            <tr>
+                <td class="VaT">
+                    <!-- Nodes -->
+                    <div>{{ form.nodes.label }}</div>
+                    {{ form.nodes }}
+                </td>
+                <td class="VaT">
+                    <!-- Routers -->
+                    <div>{{ form.routers.label }}</div>
+                    {{ form.routers }}
+                </td>
+                <td class="VaT">
+                    <!-- Connections -->
+                    <div>{{ form.connections.label }}</div>
+                    {{ form.connections }}
+                </td>
+            </tr>
+        </table>
+    </form>
+    <script type="text/javascript">
+        const node_select = document.getElementById("nodes");
+        const router_select=document.getElementById("routers");
+        const conn_select=document.getElementById("connections");
+
+        if (node_select.selectedIndex == -1) {
+            router_select.disabled = true;
+            conn_select.disabled = true;
+        } else {
+            router_select.disabled = false;
+            conn_select.disabled = false;
+        }
+
+        node_select.addEventListener("change",() => {
+            router_select.selectedIndex = -1;
+            conn_select.selectedIndex = -1;
+        });
+
         function nodeClick()
         {
-            document.nnode.submit();
-        }
+            document.net_node.submit();
+        };
     </script>
-    <center>
-        <form name="nnode" method="post">
-            {{ form.csrf_token }}
-            {{ form.nodes }}
-        </form>
-    </center>
-
+</center>
 {% endblock %}

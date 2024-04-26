@@ -10,12 +10,12 @@
 import time
 import datetime
 
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple, Any, TypeVar, Optional
 
 from crypt import crypt
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func, text
+from sqlalchemy import Integer, func, text
 from sqlalchemy.orm import Mapped, mapped_column, Query
 from sqlalchemy.dialects.mysql import (
     BIGINT,
@@ -54,8 +54,15 @@ from sqlalchemy.dialects.mysql import (
 )
 
 from jsktoolbox.datetool import DateTime
+from jsktoolbox.netaddresstool.ipv4 import Address
 
+from uke_pit2.db_models.spider import TRouter
 from web_service.routes import db
+
+###
+# Types bound
+
+TRouter = TypeVar("TRouter", bound="Router")
 
 
 ###
@@ -329,7 +336,7 @@ class NetNode(db.Model):
         return cls.query.all()
 
     @classmethod
-    def get_list(cls):
+    def get_all_list(cls) -> List[Tuple[int, str]]:
         out: List[Tuple[int, str]] = []
         for item in cls.all():
             out.append((item.id, item.name))  # type: ignore
@@ -338,5 +345,107 @@ class NetNode(db.Model):
 
 ###
 # UKE-PIT-Spider tables
+
+
+class Router(db.Model):
+    """Mapping class for routers data."""
+
+    __tablename__: str = "uke_pit_routers"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    # router identification IP address as int
+    router_id: Mapped[int] = mapped_column(
+        Integer, unique=True, nullable=False, index=True
+    )
+    last_update: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"router_id='{Address(self.router_id)}',"
+            f"last_update='{self.last_update}'"
+            ")"
+        )
+
+    @classmethod
+    def all(cls) -> List[TRouter]:
+        """Gets all routers from database."""
+        return cls.query.order_by(Router.router_id).all()
+
+    @classmethod
+    def get_all_list(cls) -> List[Tuple[int, str]]:
+        out = []
+        for item in cls.all():
+            out.append((item.id, str(Address(item.router_id))))
+        return out
+
+    @classmethod
+    def get_unbound_list(cls) -> List[Tuple[int, str]]:
+        out = []
+        rows = (
+            cls.query.outerjoin(NodeAssignment, Router.id == NodeAssignment.rid)
+            .filter(NodeAssignment.id == None)
+            .order_by(Router.router_id)
+            .all()
+        )
+        if rows:
+            for item in rows:
+                out.append((item.id, str(Address(item.router_id))))
+        return out
+
+
+class NodeAssignment(db.Model):
+    """Mapping class for assigning routers to nodes."""
+
+    __tablename__: str = "uke_pit_assignment"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    # lms netnode.id
+    nid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    # router.id
+    rid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"nid='{self.nid}',"
+            f"rid='{self.rid}'"
+            ")"
+        )
+
+    @classmethod
+    def get_routers_list(cls, node_id: int) -> List[Tuple[int, str]]:
+        out = []
+        rows: List[Router] = (
+            Router.query.join(NodeAssignment, Router.id == NodeAssignment.rid)
+            .filter(NodeAssignment.nid == node_id)
+            .order_by(Router.router_id)
+            .all()
+        )
+        if rows:
+            for item in rows:
+                out.append((item.id, str(Address(item.router_id))))
+        return out
+
+    @classmethod
+    def new(cls, node_id: str, router_id: str) -> "NodeAssignment":
+        """Create new NodeAssignment object."""
+        obj = NodeAssignment()
+        obj.nid = int(node_id)
+        obj.rid = int(router_id)
+        return obj
+
+    @classmethod
+    def remove(cls, router_id: str) -> Optional["NodeAssignment"]:
+        """Returns object for remove."""
+        obj = cls.query.filter(NodeAssignment.rid == int(router_id)).first()
+        return obj
+
 
 # #[EOF]#######################################################################
