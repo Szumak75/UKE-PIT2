@@ -7,6 +7,7 @@
   Purpose: processor class.
 """
 
+from operator import and_
 import time
 
 from typing import Optional, List
@@ -14,6 +15,7 @@ from threading import Event, Thread
 from inspect import currentframe
 from queue import Queue, Empty
 
+from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
 from jsktoolbox.attribtool import ReadOnlyClass
@@ -166,6 +168,9 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
                 )
                 continue
 
+        # clean up
+        self.__purge_updates(session=session)
+
         session.close()
 
         # finished
@@ -185,6 +190,33 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
             if self._debug:
                 self.logs.message_debug = "stopping..."
             self._stop_event.set()
+
+    def __purge_updates(self, session: Session) -> None:
+        """Purge updates counter base."""
+        if session:
+            rows = (
+                session.query(TLastUpdate)
+                .outerjoin(TRouter, TLastUpdate.last_update == TRouter.last_update)
+                .outerjoin(
+                    TConnection, TConnection.last_update == TLastUpdate.last_update
+                )
+                .outerjoin(TCustomer, TCustomer.last_update == TLastUpdate.last_update)
+                .outerjoin(
+                    TInterface, TInterface.last_update == TLastUpdate.last_update
+                )
+                .filter(
+                    TRouter.id == None,
+                    TConnection.id == None,
+                    TCustomer.id == None,
+                    TInterface.id == None,
+                )
+                .all()
+            )
+
+            if rows:
+                for item in rows:
+                    session.delete(item)
+                session.commit()
 
     def __update_router_connections(
         self, session: Session, data: RBData, router_record_id: int
