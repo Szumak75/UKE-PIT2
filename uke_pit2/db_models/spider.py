@@ -7,7 +7,7 @@
   Purpose: 
 """
 
-from sqlalchemy import Integer, String, text
+from sqlalchemy import Boolean, Integer, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from jsktoolbox.netaddresstool.ipv4 import Address
@@ -115,7 +115,9 @@ class TInterface(LmsBase):
     id: Mapped[int] = mapped_column(
         primary_key=True, nullable=False, autoincrement=True
     )
+    # connection id
     cid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    # interface name id
     if_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     last_update: Mapped[int] = mapped_column(Integer, nullable=False)
 
@@ -149,6 +151,31 @@ class TNodeAssignment(LmsBase):
             f"id='{self.id}',"
             f"nid='{self.nid}',"
             f"rid='{self.rid}'"
+            ")"
+        )
+
+
+class TDivisions(LmsBase):
+    """Mapping class for select main lms division."""
+
+    __tablename__: str = "uke_pit_divisions"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    # lms divisions.id
+    did: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    # main flag
+    main: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=text("0")
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"nid='{self.did}',"
+            f"rid='{self.main}'"
             ")"
         )
 

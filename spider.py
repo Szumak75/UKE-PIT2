@@ -13,6 +13,7 @@ from uke_pit2.main import SpiderApp
 
 if __name__ == "__main__":
     app = SpiderApp()
+    app.run()
     sys.exit(0)
 
 # #[EOF]#######################################################################

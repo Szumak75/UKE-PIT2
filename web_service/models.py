@@ -15,7 +15,7 @@ from typing import Dict, List, Tuple, Any, TypeVar, Optional
 from crypt import crypt
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, func, text
+from sqlalchemy import Integer, Boolean, func, text
 from sqlalchemy.orm import Mapped, mapped_column, Query
 from sqlalchemy.dialects.mysql import (
     BIGINT,
@@ -446,6 +446,31 @@ class NodeAssignment(db.Model):
         """Returns object for remove."""
         obj = cls.query.filter(NodeAssignment.rid == int(router_id)).first()
         return obj
+
+
+class Divisions(db.Model):
+    """Mapping class for select main lms division."""
+
+    __tablename__: str = "uke_pit_divisions"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    # lms divisions.id
+    did: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    # main flag
+    main: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=text("0")
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"nid='{self.did}',"
+            f"rid='{self.main}'"
+            ")"
+        )
 
 
 # #[EOF]#######################################################################

@@ -127,8 +127,6 @@ class SpiderApp(BaseApp):
 
         # check single run options
 
-        self.run()
-
     def run(self) -> None:
         """Start application."""
         if not self.conf:
