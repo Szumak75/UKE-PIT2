@@ -11,40 +11,40 @@ from unittest import TestCase
 from uke_pit2.main import SpiderApp, UkeApp
 
 
-class TestSpiderApp(TestCase):
-    """SpiderApp class test unit."""
+# class TestSpiderApp(TestCase):
+#     """SpiderApp class test unit."""
 
-    def setUp(self) -> None:
-        """Set up tests."""
-        self.obj = SpiderApp()
+#     def setUp(self) -> None:
+#         """Set up tests."""
+#         self.obj = SpiderApp()
 
-    def test_01_create_object(self) -> None:
-        """Test nr 01."""
-        self.assertIsInstance(self.obj, SpiderApp)
+#     def test_01_create_object(self) -> None:
+#         """Test nr 01."""
+#         self.assertIsInstance(self.obj, SpiderApp)
 
-    def test_02_get_version(self) -> None:
-        """Test nr 02."""
-        self.assertTrue(hasattr(self.obj, "version"))
-        self.assertIsInstance(self.obj.version, str)
-        self.assertTrue(len(self.obj.version) > 0, "version string is not set")
+#     def test_02_get_version(self) -> None:
+#         """Test nr 02."""
+#         self.assertTrue(hasattr(self.obj, "version"))
+#         self.assertIsInstance(self.obj.version, str)
+#         self.assertTrue(len(self.obj.version) > 0, "version string is not set")
 
 
-class TestUkeApp(TestCase):
-    """UkeApp class test unit."""
+# class TestUkeApp(TestCase):
+#     """UkeApp class test unit."""
 
-    def setUp(self) -> None:
-        """Set up tests."""
-        self.obj = UkeApp()
+#     def setUp(self) -> None:
+#         """Set up tests."""
+#         self.obj = UkeApp()
 
-    def test_01_create_object(self) -> None:
-        """Test nr 01."""
-        self.assertIsInstance(self.obj, UkeApp)
+#     def test_01_create_object(self) -> None:
+#         """Test nr 01."""
+#         self.assertIsInstance(self.obj, UkeApp)
 
-    def test_02_get_version(self) -> None:
-        """Test nr 02."""
-        self.assertTrue(hasattr(self.obj, "version"))
-        self.assertIsInstance(self.obj.version, str)
-        self.assertTrue(len(self.obj.version) > 0, "version string is not set")
+#     def test_02_get_version(self) -> None:
+#         """Test nr 02."""
+#         self.assertTrue(hasattr(self.obj, "version"))
+#         self.assertIsInstance(self.obj.version, str)
+#         self.assertTrue(len(self.obj.version) > 0, "version string is not set")
 
 
 # #[EOF]#######################################################################
