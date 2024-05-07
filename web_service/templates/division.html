@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block body_header %}
+Firmy.
+{% endblock %}
+
+{% block body_content %}
+<center>
+    <form name="set_division" method="post">
+        <table>
+            {% for subfield in form.division %}
+            <tr>
+                <td>{{ subfield }}</td>
+                <td>{{ subfield.label(title='Wybierz główną spółkę.') }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </form>
+</center>
+<script type="text/javascript">
+    function itemClick()
+    {
+        document.set_division.submit();
+    };
+</script>
+{% endblock %}

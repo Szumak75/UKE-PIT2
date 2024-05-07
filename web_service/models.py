@@ -15,8 +15,8 @@ from typing import Dict, List, Tuple, Any, TypeVar, Optional
 from crypt import crypt
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, Boolean, func, text
-from sqlalchemy.orm import Mapped, mapped_column, Query
+from sqlalchemy import ForeignKey, Integer, Boolean, func, text
+from sqlalchemy.orm import Mapped, mapped_column, Query, relationship
 from sqlalchemy.dialects.mysql import (
     BIGINT,
     BINARY,
@@ -67,7 +67,7 @@ TRouter = TypeVar("TRouter", bound="Router")
 
 ###
 # LMS tables
-class User(db.Model):
+class LmsUser(db.Model):
     __tablename__: str = "users"
 
     # Table schema
@@ -147,7 +147,7 @@ class User(db.Model):
         return False
 
 
-class Customer(db.Model):
+class LmsCustomer(db.Model):
     __tablename__: str = "customers"
 
     # Table schema
@@ -218,7 +218,7 @@ class Customer(db.Model):
         )
 
 
-class Division(db.Model):
+class LmsDivision(db.Model):
     __tablename__: str = "divisions"
 
     id: Mapped[int] = mapped_column(
@@ -247,6 +247,7 @@ class Division(db.Model):
     # KEY `divisions_address_id_fk` (`address_id`),
     # CONSTRAINT `divisions_address_id_fk` FOREIGN KEY (`address_id`) REFERENCES `addresses` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
     # address: Mapped["Address"] = relationship("Address")
+    main: Mapped["Division"] = relationship("Division")
 
     def __repr__(self) -> str:
         return (
@@ -270,11 +271,30 @@ class Division(db.Model):
             f"tax_office_code='{self.tax_office_code}', "
             # f"address_id='{self.address_id}', "
             # f"address='{self.address}' "
+            f"main='{self.main}'"
             ") "
         )
 
+    @classmethod
+    def get_division_list(cls) -> List[Tuple[int, str, int]]:
+        """Returns division list."""
+        out = []
 
-class NetNode(db.Model):
+        rows = cls.query.all()
+        if rows:
+            for item in rows:
+                # print(item)
+                if item.main is None:
+                    out.append((item.id, item.name, 0))
+                else:
+                    out.append((item.id, item.name, int(item.main.main)))
+        else:
+            print("error")
+
+        return out
+
+
+class LmsNetNode(db.Model):
     __tablename__: str = "netnodes"
 
     id: Mapped[int] = mapped_column(
@@ -448,7 +468,7 @@ class NodeAssignment(db.Model):
         return obj
 
 
-class Divisions(db.Model):
+class Division(db.Model):
     """Mapping class for select main lms division."""
 
     __tablename__: str = "uke_pit_divisions"
@@ -457,7 +477,8 @@ class Divisions(db.Model):
         primary_key=True, nullable=False, autoincrement=True
     )
     # lms divisions.id
-    did: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    # did: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    did: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
     # main flag
     main: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False, server_default=text("0")
@@ -467,10 +488,14 @@ class Divisions(db.Model):
         return (
             f"{self.__class__.__name__}("
             f"id='{self.id}',"
-            f"nid='{self.did}',"
-            f"rid='{self.main}'"
+            f"did='{self.did}',"
+            f"main='{self.main}'"
             ")"
         )
+
+    @classmethod
+    def all(cls) -> List["Division"]:
+        return cls.query.all()
 
 
 # #[EOF]#######################################################################

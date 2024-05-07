@@ -42,6 +42,8 @@ from wtforms.fields import (
     SubmitField,
     FieldList,
     SelectField,
+    RadioField,
+    BooleanField,
 )
 from wtforms.validators import DataRequired
 
@@ -161,7 +163,7 @@ class NodesForm(FlaskForm):
     )
 
     def nodes_load(self) -> None:
-        self.nodes.choices = models.NetNode.get_all_list()  # type: ignore
+        self.nodes.choices = models.LmsNetNode.get_all_list()  # type: ignore
 
     def routers_load(self) -> None:
         self.routers.choices = models.Router.get_unbound_list()  # type: ignore
@@ -172,6 +174,32 @@ class NodesForm(FlaskForm):
         except Exception as e:
             return None
         self.connections.choices = models.NodeAssignment.get_routers_list(id)  # type: ignore
+
+
+class DivisionForm(FlaskForm):
+
+    division = RadioField(
+        "Lista firm",
+        choices=[],
+        coerce=int,
+        render_kw={"onclick": "itemClick()", "title": "Wybierz główną spółkę."},
+    )
+
+    def division_load(self) -> None:
+        div = models.LmsDivision.get_division_list()
+        out = []
+        default = None
+        for item in div:
+            if item[2]:
+                default = item[0]
+            out.append((item[0], item[1]))
+        if default:
+            self.division.default = default
+        self.division.choices = out
+
+
+class ForeignForm(FlaskForm):
+    pass
 
 
 if not conf.errors:
@@ -192,7 +220,7 @@ if not conf.errors:
             if (
                 form.login.data
                 and form.passwd.data
-                and models.User.check_login(form.login.data, form.passwd.data)
+                and models.LmsUser.check_login(form.login.data, form.passwd.data)
             ):
                 session["username"] = form.login.data
                 if conf.debug:
@@ -250,6 +278,54 @@ if not conf.errors:
         return render_template(
             "nodes.html", form=node_form, login="username" in session
         )
+
+    @app.route("/division", methods=["GET", "POST"])
+    def division() -> Union[Response, str]:
+        if "username" not in session:
+            return redirect(url_for("login"))
+
+        division_form = DivisionForm()
+
+        # submit
+        # if request.method=='POST' and division_form.validate()
+        if "division" in request.form:
+            did: Optional[str] = request.form.get("division", default=None)
+            if did:
+                # set choice
+                rows = models.Division.all()
+                test = True
+                if rows:
+                    for item in rows:
+                        if item.did == int(did):
+                            test = False
+                            item.main = True
+                        else:
+                            if item.main:
+                                item.main = False
+                if test:
+                    new = models.Division()
+                    new.did = int(did)
+                    new.main = True
+                    db.session.add(new)
+                db.session.commit()
+
+        # fill form
+        division_form.division_load()
+        # process form for set properly default choice from database
+        division_form.process()
+
+        # debug
+        print(request.form)
+
+        return render_template(
+            "division.html", form=division_form, login="username" in session
+        )
+
+    @app.route("/foreign", methods=["GET", "POST"])
+    def foreign() -> Union[Response, str]:
+        if "username" not in session:
+            return redirect(url_for("login"))
+        return redirect("/")
 
 else:
 
