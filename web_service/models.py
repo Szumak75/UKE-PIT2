@@ -15,7 +15,7 @@ from typing import Dict, List, Tuple, Any, TypeVar, Optional
 from crypt import crypt
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey, Integer, Boolean, func, text
+from sqlalchemy import ForeignKey, Integer, Boolean, String, func, text
 from sqlalchemy.orm import Mapped, mapped_column, Query, relationship
 from sqlalchemy.dialects.mysql import (
     BIGINT,
@@ -479,6 +479,8 @@ class Division(db.Model):
     # lms divisions.id
     # did: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     did: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
+    # division identification string
+    ident: Mapped[str] = mapped_column(String(100), nullable=True)
     # main flag
     main: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False, server_default=text("0")

@@ -165,6 +165,8 @@ class TDivisions(LmsBase):
     )
     # lms divisions.id
     did: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    # division identification string
+    ident: Mapped[str] = mapped_column(String(100), nullable=True)
     # main flag
     main: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False, server_default=text("0")

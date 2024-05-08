@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block body_header %}
+Podmioty obce
+{% endblock %}
+
+{% block body_content %}
+<center>
+    {{ form.division_id }}
+    <table>
+        <tr><td colspan="3">Spółka macierzysta</td></tr>
+        <tr><th>Nazwa</th><th>Identyfikator</th><th></th></tr>
+        <tr><td>{{ form.division_label }}</td><td>{{ form.division_ident }}</td><td>{{ form.division_update }}</td></tr>
+    </table>
+</center>
+&nbsp;
+&nbsp;
+<center>
+    <table>
+        <tr><td colspan="4">Lista podmiotów obcych</td></tr>
+        <tr><th>Nazwa</th><th>NIP</th><th>Identyfikator</th><th></th></tr>
+        {% for subfield in form.division %}
+            <tr><td>{{ subfield.name }}</td><td>{{ subfield.tin }}</td><td>{{ subfield.ident }}</td><td>{{ subfield.remove }}</td></tr>
+        {% endfor %}
+        <tr><td colspan="3"></td><td>{{ form.foreign_add }}</td></tr>
+    </table>
+    
+</center>
+{% endblock %}

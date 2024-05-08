@@ -36,6 +36,7 @@ from flask_wtf.file import FileField, FileRequired, FileAllowed
 from werkzeug import Response
 from werkzeug.utils import secure_filename
 
+from wtforms import HiddenField
 from wtforms.fields import (
     StringField,
     PasswordField,
@@ -44,6 +45,8 @@ from wtforms.fields import (
     SelectField,
     RadioField,
     BooleanField,
+    Label,
+    FormField,
 )
 from wtforms.validators import DataRequired
 
@@ -198,8 +201,48 @@ class DivisionForm(FlaskForm):
         self.division.choices = out
 
 
+class ForeignItemForm(FlaskForm):
+
+    name = StringField(label="Nazwa podmiotu")
+    # NIP
+    tin = StringField(label="NIP")
+    ident = StringField(label="Identyfikator")
+    remove = SubmitField(label="Usuń")
+
+
 class ForeignForm(FlaskForm):
-    pass
+
+    # for main division
+    division_id = HiddenField(render_kw={})
+    division_label = Label(field_id="div_name", text="")
+    division_ident = StringField(label="Identyfikator", render_kw={})
+    division_update = SubmitField(label="Aktualizuj", render_kw={})
+
+    # for foreign companies
+    foreign = FieldList(FormField(ForeignItemForm))
+    foreign_add = SubmitField(label="Dodaj")
+
+    def disabled(self) -> None:
+        self.division_ident.render_kw["disabled"] = "disabled"
+        self.division_update.render_kw["disabled"] = "disabled"
+
+    def division_load(self) -> None:
+        """Load division form."""
+        row = models.Division.query.filter(models.Division.main == True).first()
+        if row:
+            id = row.did
+            ident = row.ident if row.ident is not None else ""
+
+            row2 = models.LmsDivision.query.filter(models.LmsDivision.id == id).first()
+
+            if row2:
+                self.division_id.data = str(id)
+                self.division_ident.data = ident
+                self.division_label.text = row2.name
+            else:
+                self.disabled()
+        else:
+            self.disabled()
 
 
 if not conf.errors:
@@ -269,7 +312,7 @@ if not conf.errors:
             node_form.connection_load(nid)
 
         # debug
-        print(request.form.keys())
+        # print(request.form.keys())
         # for x in node_form.nodes.iter_choices():
         #     print(x)
 
@@ -325,7 +368,13 @@ if not conf.errors:
     def foreign() -> Union[Response, str]:
         if "username" not in session:
             return redirect(url_for("login"))
-        return redirect("/")
+
+        foreign_form = ForeignForm()
+        foreign_form.division_load()
+
+        return render_template(
+            "foreign.html", form=foreign_form, login="username" in session
+        )
 
 else:
 
