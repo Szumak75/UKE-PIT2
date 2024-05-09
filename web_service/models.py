@@ -454,6 +454,19 @@ class NodeAssignment(db.Model):
         return out
 
     @classmethod
+    def get_all(cls) -> List[Tuple[int, str]]:
+        out = []
+        rows: List[Router] = (
+            Router.query.join(NodeAssignment, Router.id == NodeAssignment.rid)
+            .order_by(Router.router_id)
+            .all()
+        )
+        if rows:
+            for item in rows:
+                out.append((item.id, str(Address(item.router_id))))
+        return out
+
+    @classmethod
     def new(cls, node_id: str, router_id: str) -> "NodeAssignment":
         """Create new NodeAssignment object."""
         obj = NodeAssignment()

@@ -127,6 +127,7 @@ class LoginForm(FlaskForm):
 
 
 class NodesForm(FlaskForm):
+    from web_service import models
 
     select_size: int = 40
 
@@ -165,6 +166,8 @@ class NodesForm(FlaskForm):
         },
     )
 
+    show_all = BooleanField("Pokaż wszystko: ", render_kw={"onclick": "nodeAllClick()"})
+
     def nodes_load(self) -> None:
         self.nodes.choices = models.LmsNetNode.get_all_list()  # type: ignore
 
@@ -178,8 +181,12 @@ class NodesForm(FlaskForm):
             return None
         self.connections.choices = models.NodeAssignment.get_routers_list(id)  # type: ignore
 
+    def connection_load_all(self) -> None:
+        self.connections.choices = models.NodeAssignment.get_all()  # type: ignore
+
 
 class DivisionForm(FlaskForm):
+    from web_service import models
 
     division = RadioField(
         "Lista firm",
@@ -211,6 +218,8 @@ class ForeignItemForm(FlaskForm):
 
 
 class ForeignForm(FlaskForm):
+    """ForeignForm class."""
+
     from web_service import models
 
     # for main division
@@ -264,7 +273,7 @@ if not conf.errors:
     def login() -> Union[Response, str]:
         if "username" in session:
             return redirect("/")
-        form = LoginForm()
+        form: LoginForm = LoginForm()
         if form.validate_on_submit():
             if (
                 form.login.data
@@ -287,7 +296,7 @@ if not conf.errors:
         if "username" not in session:
             return redirect(url_for("login"))
 
-        node_form = NodesForm()
+        node_form: NodesForm = NodesForm()
 
         # check selected node
         nid: Optional[str] = None
@@ -302,7 +311,7 @@ if not conf.errors:
                 db.session.add(na)
                 db.session.commit()
 
-        if nid and "connections" in request.form:
+        if "connections" in request.form:
             rid: Optional[str] = request.form.get("connections", default=None)
             print(f"to remove: {rid}")
             if rid:
@@ -314,11 +323,14 @@ if not conf.errors:
         # fill select lists
         node_form.nodes_load()
         node_form.routers_load()
-        if nid and nid.isnumeric():
-            node_form.connection_load(nid)
+        if "show_all" in request.form:
+            node_form.connection_load_all()
+        else:
+            if nid and nid.isnumeric():
+                node_form.connection_load(nid)
 
         # debug
-        # print(request.form.keys())
+        print(request.form.keys())
         # for x in node_form.nodes.iter_choices():
         #     print(x)
 
@@ -333,7 +345,7 @@ if not conf.errors:
         if "username" not in session:
             return redirect(url_for("login"))
 
-        division_form = DivisionForm()
+        division_form: DivisionForm = DivisionForm()
 
         # submit
         # if request.method=='POST' and division_form.validate()
@@ -375,7 +387,7 @@ if not conf.errors:
         if "username" not in session:
             return redirect(url_for("login"))
 
-        foreign_form = ForeignForm()
+        foreign_form: ForeignForm = ForeignForm()
 
         # debug
         if request.method == "POST" and foreign_form.validate_on_submit():

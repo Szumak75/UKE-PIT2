@@ -6,9 +6,9 @@ Routery w węzłach
 
 {% block body_content %}
 <center>
-    <form name="net_node" method="post">
-        <table>
-            <tr>
+    <table>
+        <tr>
+            <form name="net_node" method="post">
                 <td class="VaT">
                     <!-- Nodes -->
                     <div>{{ form.nodes.label }}</div>
@@ -24,15 +24,23 @@ Routery w węzłach
                     <div>{{ form.connections.label }}</div>
                     {{ form.connections }}
                 </td>
-            </tr>
-        </table>
-    </form>
+            </form>
+        </tr>
+        <tr>
+            <form name="net_node_all" method="post">
+                <td colspan="2"></td>
+                <td>{{ form.show_all.label }}{{ form.show_all }}</td>
+            </form>
+        </tr>
+    </table>
     <script type="text/javascript">
         const node_select = document.getElementById("nodes");
         const router_select=document.getElementById("routers");
         const conn_select=document.getElementById("connections");
+        const show_all=document.getElementById('show_all');
+        
 
-        if (node_select.selectedIndex == -1) {
+        if (node_select.selectedIndex == -1 && !show_all.checked) {
             router_select.disabled = true;
             conn_select.disabled = true;
         } else {
@@ -48,6 +56,10 @@ Routery w węzłach
         function nodeClick()
         {
             document.net_node.submit();
+        };
+        function nodeAllClick()
+        {
+            document.net_node_all.submit();
         };
     </script>
 </center>
