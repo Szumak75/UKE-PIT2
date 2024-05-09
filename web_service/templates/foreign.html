@@ -6,12 +6,15 @@ Podmioty obce
 
 {% block body_content %}
 <center>
-    {{ form.division_id }}
-    <table>
-        <tr><td colspan="3">Spółka macierzysta</td></tr>
-        <tr><th>Nazwa</th><th>Identyfikator</th><th></th></tr>
-        <tr><td>{{ form.division_label }}</td><td>{{ form.division_ident }}</td><td>{{ form.division_update }}</td></tr>
-    </table>
+    <form name="set_division_ident" method="post">
+        {{ form.csrf_token }}
+        {{ form.division_id }}
+        <table>
+            <tr><td colspan="3">Spółka macierzysta</td></tr>
+            <tr><th>Nazwa</th><th>Identyfikator</th><th></th></tr>
+            <tr><td>{{ form.division_label }}</td><td>{{ form.division_ident }}</td><td>{{ form.division_update }}</td></tr>
+        </table>
+    </form>
 </center>
 &nbsp;
 &nbsp;

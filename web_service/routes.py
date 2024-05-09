@@ -211,11 +211,14 @@ class ForeignItemForm(FlaskForm):
 
 
 class ForeignForm(FlaskForm):
+    from web_service import models
 
     # for main division
     division_id = HiddenField(render_kw={})
     division_label = Label(field_id="div_name", text="")
-    division_ident = StringField(label="Identyfikator", render_kw={})
+    division_ident = StringField(
+        label="Identyfikator", render_kw={}, validators=[DataRequired()]
+    )
     division_update = SubmitField(label="Aktualizuj", render_kw={})
 
     # for foreign companies
@@ -243,6 +246,9 @@ class ForeignForm(FlaskForm):
                 self.disabled()
         else:
             self.disabled()
+
+    def division_for_set_ident(self, id: str) -> Optional[models.Division]:
+        return models.Division.query.filter(models.Division.did == int(id)).first()
 
 
 if not conf.errors:
@@ -358,7 +364,7 @@ if not conf.errors:
         division_form.process()
 
         # debug
-        print(request.form)
+        # print(request.form)
 
         return render_template(
             "division.html", form=division_form, login="username" in session
@@ -370,6 +376,21 @@ if not conf.errors:
             return redirect(url_for("login"))
 
         foreign_form = ForeignForm()
+
+        # debug
+        if request.method == "POST" and foreign_form.validate_on_submit():
+            # print(request.form)
+            id = request.form.get("division_id")
+            ident = request.form.get("division_ident")
+            if id is not None and ident is not None:
+                ident = ident.upper().strip().replace(" ", "_")
+                row = foreign_form.division_for_set_ident(id)
+                if row:
+                    row.ident = ident
+                    db.session.commit()
+            else:
+                print(f"some errors: id='{id}', ident='{ident}'")
+
         foreign_form.division_load()
 
         return render_template(
