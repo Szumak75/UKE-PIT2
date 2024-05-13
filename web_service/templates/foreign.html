@@ -22,11 +22,16 @@ Podmioty obce
     <table>
         <tr><td colspan="4">Lista podmiotów obcych</td></tr>
         <tr><th>Nazwa</th><th>NIP</th><th>Identyfikator</th><th></th></tr>
-        {% for subfield in form.division %}
-            <tr><td>{{ subfield.name }}</td><td>{{ subfield.tin }}</td><td>{{ subfield.ident }}</td><td>{{ subfield.remove }}</td></tr>
+        {% for subfield in form.foreign %}
+            <tr><td>{{ subfield.foreign_name }}</td><td>{{ subfield.foreign_tin }}</td><td>{{ subfield.foreign_ident }}</td><td>{{ subfield.foreign_id }}{{ subfield.foreign_remove }}</td></tr>
         {% endfor %}
-        <tr><td colspan="3"></td><td>{{ form.foreign_add }}</td></tr>
     </table>
-    
+</center>
+&nbsp;
+&nbsp;
+<center>
+    <form name="foreign_add" method="post">
+        {{ form.foreign_add }}
+    </form>
 </center>
 {% endblock %}

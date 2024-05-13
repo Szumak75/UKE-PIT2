@@ -513,4 +513,32 @@ class Division(db.Model):
         return cls.query.all()
 
 
+class Foreign(db.Model):
+    """Mapping class for foreign."""
+
+    __tablename__: str = "uke_pit_foreign"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    tin: Mapped[str] = mapped_column(String(10), nullable=False)
+    # foreign identification string
+    ident: Mapped[str] = mapped_column(String(100), nullable=False)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"name='{self.name}',"
+            f"tin='{self.tin}',"
+            f"ident='{self.ident}'"
+            ")"
+        )
+
+    @classmethod
+    def all(cls) -> List["Foreign"]:
+        return cls.query.all()
+
+
 # #[EOF]#######################################################################

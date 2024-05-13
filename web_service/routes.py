@@ -53,7 +53,7 @@ from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import URL
 from sqlalchemy.util import immutabledict
-from sqlalchemy import func, text
+from sqlalchemy import func, text, or_
 
 from logging.config import dictConfig
 
@@ -208,13 +208,23 @@ class DivisionForm(FlaskForm):
         self.division.choices = out
 
 
-class ForeignItemForm(FlaskForm):
+class ForeignAddForm(FlaskForm):
 
-    name = StringField(label="Nazwa podmiotu")
+    name = StringField(label="Nazwa podmiotu", validators=[DataRequired()])
     # NIP
-    tin = StringField(label="NIP")
-    ident = StringField(label="Identyfikator")
-    remove = SubmitField(label="Usuń")
+    tin = StringField(label="NIP", validators=[DataRequired()])
+    ident = StringField(label="Identyfikator", validators=[DataRequired()])
+    add = SubmitField(label="Dodaj")
+
+
+class ForeignListItemForm(FlaskForm):
+    """Class for displaying list of foreign divisions."""
+
+    foreign_name = Label(field_id="name", text="")
+    foreign_tin = Label(field_id="tin", text="")
+    foreign_ident = Label(field_id="ident", text="")
+    foreign_id = HiddenField()
+    foreign_remove = SubmitField(label="Usuń")
 
 
 class ForeignForm(FlaskForm):
@@ -231,8 +241,8 @@ class ForeignForm(FlaskForm):
     division_update = SubmitField(label="Aktualizuj", render_kw={})
 
     # for foreign companies
-    foreign = FieldList(FormField(ForeignItemForm))
-    foreign_add = SubmitField(label="Dodaj")
+    foreign = FieldList(FormField(ForeignListItemForm))
+    foreign_add = FormField(ForeignAddForm)
 
     def disabled(self) -> None:
         self.division_ident.render_kw["disabled"] = "disabled"
@@ -255,6 +265,18 @@ class ForeignForm(FlaskForm):
                 self.disabled()
         else:
             self.disabled()
+
+    def foreign_load(self) -> None:
+        """Load foreign list form."""
+        rows = models.Foreign.all()
+        if rows:
+            for item in rows:
+                obj: ForeignListItemForm = ForeignListItemForm()
+                obj.foreign_id.data = str(item.id)
+                obj.foreign_name.text = item.name
+                obj.foreign_ident.text = item.ident
+                obj.foreign_tin.text = item.tin
+                self.foreign.append_entry(obj)
 
     def division_for_set_ident(self, id: str) -> Optional[models.Division]:
         return models.Division.query.filter(models.Division.did == int(id)).first()
@@ -390,8 +412,10 @@ if not conf.errors:
         foreign_form: ForeignForm = ForeignForm()
 
         # debug
-        if request.method == "POST" and foreign_form.validate_on_submit():
-            # print(request.form)
+        # print(request.form)
+        # if request.method == "POST" and foreign_form.validate_on_submit():
+        if request.method == "POST" and "division_update" in request.form:
+            print(request.form)
             id = request.form.get("division_id")
             ident = request.form.get("division_ident")
             if id is not None and ident is not None:
@@ -402,8 +426,42 @@ if not conf.errors:
                     db.session.commit()
             else:
                 print(f"some errors: id='{id}', ident='{ident}'")
+        elif request.method == "POST" and "foreign_add-add" in request.form:
+            print(request.form)
+            # print(foreign_form.foreign_add.data)
+            name = request.form.get("foreign_add-name", "")
+            tin = request.form.get("foreign_add-tin", "")
+            ident = request.form.get("foreign_add-ident", "")
+            if name and tin and ident:
+                rows = (
+                    db.session.query(models.Foreign)
+                    .filter(
+                        or_(
+                            models.Foreign.ident == ident,
+                            models.Foreign.tin == tin,
+                            models.Foreign.name == name,
+                        )
+                    )
+                    .all()
+                )
+                if not rows:
+                    row = models.Foreign()
+                    row.name = name
+                    row.tin = tin
+                    row.ident = ident
+                    db.session.add(row)
+                    db.session.commit()
+
+                    # clear form
+                    foreign_form.foreign_add.data["name"] = ""
+                    foreign_form.foreign_add.data["tin"] = ""
+                    foreign_form.foreign_add.data["ident"] = ""
+                    foreign_form.process()
+                else:
+                    flash("Wprowadzone dane nie są unikatowe.")
 
         foreign_form.division_load()
+        foreign_form.foreign_load()
 
         return render_template(
             "foreign.html", form=foreign_form, login="username" in session
