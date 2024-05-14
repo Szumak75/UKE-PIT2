@@ -517,7 +517,7 @@ if not conf.errors:
 
         if request.method == "POST":
             nid = request.form.get("nodes", default=None)
-            print(f"nid: {nid}")
+            # print(f"nid: {nid}")
             if nid and nid.isnumeric():
                 rows = (
                     db.session.query(models.Customer)
