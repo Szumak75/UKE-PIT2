@@ -7,6 +7,7 @@
   Purpose: Flask main service.
 """
 
+from copy import deepcopy
 from crypt import methods
 from ctypes.wintypes import SIZE
 import os, secrets, tempfile
@@ -31,12 +32,11 @@ from flask import (
     abort,
     jsonify,
 )
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, Form
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from werkzeug import Response
 from werkzeug.utils import secure_filename
 
-from wtforms import HiddenField
 from wtforms.fields import (
     StringField,
     PasswordField,
@@ -47,6 +47,7 @@ from wtforms.fields import (
     BooleanField,
     Label,
     FormField,
+    HiddenField,
 )
 from wtforms.validators import DataRequired
 
@@ -217,12 +218,12 @@ class ForeignAddForm(FlaskForm):
     add = SubmitField(label="Dodaj")
 
 
-class ForeignListItemForm(FlaskForm):
+class ForeignListItemForm(Form):
     """Class for displaying list of foreign divisions."""
 
-    foreign_name = Label(field_id="name", text="")
-    foreign_tin = Label(field_id="tin", text="")
-    foreign_ident = Label(field_id="ident", text="")
+    foreign_name: str = ""
+    foreign_tin: str = ""
+    foreign_ident: str = ""
     foreign_id = HiddenField()
     foreign_remove = SubmitField(label="Usuń")
 
@@ -258,7 +259,7 @@ class ForeignForm(FlaskForm):
             row2 = models.LmsDivision.query.filter(models.LmsDivision.id == id).first()
 
             if row2:
-                self.division_id.data = str(id)
+                self.division_id.render_kw["value"] = f"{id}"
                 self.division_ident.data = ident
                 self.division_label.text = row2.name
             else:
@@ -271,12 +272,20 @@ class ForeignForm(FlaskForm):
         rows = models.Foreign.all()
         if rows:
             for item in rows:
-                obj: ForeignListItemForm = ForeignListItemForm()
-                obj.foreign_id.data = str(item.id)
-                obj.foreign_name.text = item.name
-                obj.foreign_ident.text = item.ident
-                obj.foreign_tin.text = item.tin
-                self.foreign.append_entry(obj)
+                # print(item.id)
+                # obj: ForeignListItemForm = deepcopy(ForeignListItemForm())
+                # obj.foreign_id.render_kw["value"] = f"{item.id}"
+                # obj.foreign_name.text = item.name
+                # obj.foreign_name.field_id = f"{obj.foreign_name.field_id}-{item.id}"
+                # obj.foreign_ident.text = item.ident
+                # obj.foreign_tin.text = item.tin
+                # self.foreign.append_entry(obj)
+                self.foreign.append_entry()
+                self.foreign.entries[-1].foreign_id.render_kw = {}
+                self.foreign.entries[-1].foreign_id.render_kw["value"] = f"{item.id}"
+                self.foreign.entries[-1].foreign_name = item.name  # type: ignore
+                self.foreign.entries[-1].foreign_ident = item.ident  # type: ignore
+                self.foreign.entries[-1].foreign_tin = item.tin  # type: ignore
 
     def division_for_set_ident(self, id: str) -> Optional[models.Division]:
         return models.Division.query.filter(models.Division.did == int(id)).first()
@@ -404,6 +413,24 @@ if not conf.errors:
             "division.html", form=division_form, login="username" in session
         )
 
+    @app.route("/foreign_remove", methods=["POST"])
+    def foreign_remove() -> Response:
+        if "username" not in session:
+            return redirect(url_for("login"))
+
+        if request.method == "POST":
+            print(request.form)
+            id: str = ""
+            for key in request.form.keys():
+                if key.endswith("foreign_id"):
+                    id = request.form.get(key, "")
+            if id:
+                row = models.Foreign.get_id(id)
+                if row:
+                    db.session.delete(row)
+                    db.session.commit()
+        return redirect(url_for("foreign"))
+
     @app.route("/foreign", methods=["GET", "POST"])
     def foreign() -> Union[Response, str]:
         if "username" not in session:
@@ -412,7 +439,7 @@ if not conf.errors:
         foreign_form: ForeignForm = ForeignForm()
 
         # debug
-        # print(request.form)
+        print(request.form)
         # if request.method == "POST" and foreign_form.validate_on_submit():
         if request.method == "POST" and "division_update" in request.form:
             print(request.form)

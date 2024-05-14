@@ -540,5 +540,9 @@ class Foreign(db.Model):
     def all(cls) -> List["Foreign"]:
         return cls.query.all()
 
+    @classmethod
+    def get_id(cls, id: str) -> Optional["Foreign"]:
+        return cls.query.filter(cls.id == int(id)).first()
+
 
 # #[EOF]#######################################################################
