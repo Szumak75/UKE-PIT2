@@ -545,4 +545,30 @@ class Foreign(db.Model):
         return cls.query.filter(cls.id == int(id)).first()
 
 
+class Customer(db.Model):
+    """Mapping class for customers data."""
+
+    __tablename__: str = "uke_pit_customers"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    # router record id
+    rid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(18), nullable=False, index=True)
+    ip: Mapped[int] = mapped_column(Integer, nullable=False)
+    last_update: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"rid='{self.rid}',"
+            f"name='{self.name}',"
+            f"ip='{Address(self.ip)}',"
+            f"last_update='{self.last_update}'"
+            ")"
+        )
+
+
 # #[EOF]#######################################################################

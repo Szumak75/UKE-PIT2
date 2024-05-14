@@ -15,11 +15,12 @@ import os, secrets, tempfile
 from functools import wraps
 from pathlib import Path
 from turtle import onclick
-from typing import Optional, Union, List, Any
+from typing import Optional, Union, List, Any, Tuple
 
 from jsktoolbox.datetool import DateTime
 from jsktoolbox.stringtool.crypto import SimpleCrypto
 from jsktoolbox.logstool.logs import LoggerEngine, LoggerClient, LoggerQueue
+from jsktoolbox.netaddresstool.ipv4 import Address
 
 from flask import (
     Flask,
@@ -272,14 +273,6 @@ class ForeignForm(FlaskForm):
         rows = models.Foreign.all()
         if rows:
             for item in rows:
-                # print(item.id)
-                # obj: ForeignListItemForm = deepcopy(ForeignListItemForm())
-                # obj.foreign_id.render_kw["value"] = f"{item.id}"
-                # obj.foreign_name.text = item.name
-                # obj.foreign_name.field_id = f"{obj.foreign_name.field_id}-{item.id}"
-                # obj.foreign_ident.text = item.ident
-                # obj.foreign_tin.text = item.tin
-                # self.foreign.append_entry(obj)
                 self.foreign.append_entry()
                 self.foreign.entries[-1].foreign_id.render_kw = {}
                 self.foreign.entries[-1].foreign_id.render_kw["value"] = f"{item.id}"
@@ -289,6 +282,27 @@ class ForeignForm(FlaskForm):
 
     def division_for_set_ident(self, id: str) -> Optional[models.Division]:
         return models.Division.query.filter(models.Division.did == int(id)).first()
+
+
+class CustomersForm(FlaskForm):
+    from web_service import models
+
+    select_size: int = NodesForm.select_size
+
+    nodes = SelectField(
+        label="Węzły: ",
+        coerce=int,
+        description="Lista węzłów.",
+        choices=[],
+        render_kw={
+            "class": "Width80",
+            "size": select_size,
+            "onclick": "nodeClick()",
+        },
+    )
+
+    def nodes_load(self) -> None:
+        self.nodes.choices = models.LmsNetNode.get_all_list()  # type: ignore
 
 
 if not conf.errors:
@@ -331,10 +345,10 @@ if not conf.errors:
 
         # check selected node
         nid: Optional[str] = None
-        if "nodes" in request.form:
+        if request.method == "POST" and "nodes" in request.form:
             nid = request.form.get("nodes", default=None)
 
-        if "routers" in request.form:
+        if request.method == "POST" and "routers" in request.form:
             rid: Optional[str] = request.form.get("routers", default=None)
             if nid and nid.isnumeric() and rid and rid.isnumeric():
                 print(f"node id: {nid}, router id: {rid}")
@@ -342,7 +356,7 @@ if not conf.errors:
                 db.session.add(na)
                 db.session.commit()
 
-        if "connections" in request.form:
+        if request.method == "POST" and "connections" in request.form:
             rid: Optional[str] = request.form.get("connections", default=None)
             print(f"to remove: {rid}")
             if rid:
@@ -354,14 +368,14 @@ if not conf.errors:
         # fill select lists
         node_form.nodes_load()
         node_form.routers_load()
-        if "show_all" in request.form:
+        if request.method == "POST" and "show_all" in request.form:
             node_form.connection_load_all()
         else:
             if nid and nid.isnumeric():
                 node_form.connection_load(nid)
 
         # debug
-        print(request.form.keys())
+        # print(request.form.keys())
         # for x in node_form.nodes.iter_choices():
         #     print(x)
 
@@ -380,7 +394,7 @@ if not conf.errors:
 
         # submit
         # if request.method=='POST' and division_form.validate()
-        if "division" in request.form:
+        if request.method == "POST" and "division" in request.form:
             did: Optional[str] = request.form.get("division", default=None)
             if did:
                 # set choice
@@ -419,7 +433,7 @@ if not conf.errors:
             return redirect(url_for("login"))
 
         if request.method == "POST":
-            print(request.form)
+            # print(request.form)
             id: str = ""
             for key in request.form.keys():
                 if key.endswith("foreign_id"):
@@ -454,8 +468,7 @@ if not conf.errors:
             else:
                 print(f"some errors: id='{id}', ident='{ident}'")
         elif request.method == "POST" and "foreign_add-add" in request.form:
-            print(request.form)
-            # print(foreign_form.foreign_add.data)
+            # print(request.form)
             name = request.form.get("foreign_add-name", "")
             tin = request.form.get("foreign_add-tin", "")
             ident = request.form.get("foreign_add-ident", "")
@@ -492,6 +505,55 @@ if not conf.errors:
 
         return render_template(
             "foreign.html", form=foreign_form, login="username" in session
+        )
+
+    @app.route("/customers", methods=["GET", "POST"])
+    def customers() -> Union[Response, str]:
+        if "username" not in session:
+            return redirect(url_for("login"))
+
+        customers_form: CustomersForm = CustomersForm()
+        data_list: List[Tuple] = []
+
+        if request.method == "POST":
+            nid = request.form.get("nodes", default=None)
+            print(f"nid: {nid}")
+            if nid and nid.isnumeric():
+                rows = (
+                    db.session.query(models.Customer)
+                    .join(models.Router, models.Customer.rid == models.Router.id)
+                    .join(
+                        models.NodeAssignment,
+                        models.NodeAssignment.rid == models.Router.id,
+                    )
+                    .filter(models.NodeAssignment.nid == int(nid))
+                    .order_by(models.Customer.ip)
+                    .all()
+                )
+                if rows:
+                    for item in rows:
+                        data_list.append((item.name, str(Address(item.ip))))
+
+        customers_form.nodes_load()
+
+        return render_template(
+            "customers.html",
+            form=customers_form,
+            data=data_list,
+            data_count=len(data_list),
+            login="username" in session,
+        )
+
+    @app.route("/transmission", methods=["GET", "POST"])
+    def transmission() -> Union[Response, str]:
+        if "username" not in session:
+            return redirect(url_for("login"))
+
+        if request.method == "POST":
+            pass
+
+        return render_template(
+            "transmission.html", form=None, login="username" in session
         )
 
 else:
