@@ -284,7 +284,7 @@ class ForeignForm(FlaskForm):
         return models.Division.query.filter(models.Division.did == int(id)).first()
 
 
-class CustomersForm(FlaskForm):
+class NodesSelectForm(FlaskForm):
     from web_service import models
 
     select_size: int = NodesForm.select_size
@@ -512,7 +512,7 @@ if not conf.errors:
         if "username" not in session:
             return redirect(url_for("login"))
 
-        customers_form: CustomersForm = CustomersForm()
+        nodes_form: NodesSelectForm = NodesSelectForm()
         data_list: List[Tuple] = []
 
         if request.method == "POST":
@@ -534,11 +534,11 @@ if not conf.errors:
                     for item in rows:
                         data_list.append((item.name, str(Address(item.ip))))
 
-        customers_form.nodes_load()
+        nodes_form.nodes_load()
 
         return render_template(
             "customers.html",
-            form=customers_form,
+            form=nodes_form,
             data=data_list,
             data_count=len(data_list),
             login="username" in session,
@@ -549,11 +549,33 @@ if not conf.errors:
         if "username" not in session:
             return redirect(url_for("login"))
 
+        nodes_form: NodesSelectForm = NodesSelectForm()
+        data_list: List[Tuple] = []
+
         if request.method == "POST":
-            pass
+            nid = request.form.get("nodes", default=None)
+            # print(f"nid: {nid}")
+            if nid and nid.isnumeric():
+                # rows = (
+                #     db.session.query(models.Customer)
+                #     .join(models.Router, models.Customer.rid == models.Router.id)
+                #     .join(
+                #         models.NodeAssignment,
+                #         models.NodeAssignment.rid == models.Router.id,
+                #     )
+                #     .filter(models.NodeAssignment.nid == int(nid))
+                #     .order_by(models.Customer.ip)
+                #     .all()
+                # )
+                # if rows:
+                #     for item in rows:
+                #         data_list.append((item.name, str(Address(item.ip))))
+                pass
+
+        nodes_form.nodes_load()
 
         return render_template(
-            "transmission.html", form=None, login="username" in session
+            "transmission.html", form=nodes_form, login="username" in session
         )
 
 else:

@@ -5,4 +5,24 @@ Transmisje międzywęzłowe
 {% endblock %}
 
 {% block body_content %}
+<center>
+    <table>
+        <tr>
+            <td class="VaT">
+                <form name="net_node" method="POST">
+                    <!-- Nodes -->
+                    <div>{{ form.nodes.label }}</div>
+                    {{ form.nodes }}
+                </form>
+            </td>
+            <td class="VaT"></td>
+        </tr>
+    </table>
+    <script type="text/javascript">
+        function nodeClick()
+        {
+            document.net_node.submit();
+        };
+    </script>
+</center>
 {% endblock %}

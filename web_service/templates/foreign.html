@@ -6,7 +6,7 @@ Podmioty obce
 
 {% block body_content %}
 <center>
-    <form name="set_division_ident" method="post">
+    <form name="set_division_ident" method="POST">
         {{ form.csrf_token }}
         {{ form.division_id }}
         <table>
@@ -36,7 +36,7 @@ Podmioty obce
 &nbsp;
 &nbsp;
 <center>
-    <form name="foreign_add" method="post">
+    <form name="foreign_add" method="POST">
         {{ form.foreign_add }}
     </form>
 </center>
