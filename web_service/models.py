@@ -417,6 +417,33 @@ class Router(db.Model):
         return out
 
 
+class Connection(db.Model):
+    """Mapping class for inter routers connection."""
+
+    __tablename__: str = "uke_pit_connections"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    rid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    vlan_id: Mapped[int] = mapped_column(
+        Integer, nullable=False, index=True, default=1, server_default=text("1")
+    )
+    network: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    last_update: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"rid='{self.rid}',"
+            f"vlan_id='{self.vlan_id}',"
+            f"network='{Address(self.network)}',"
+            f"last_update='{self.last_update}'"
+            ")"
+        )
+
+
 class NodeAssignment(db.Model):
     """Mapping class for assigning routers to nodes."""
 

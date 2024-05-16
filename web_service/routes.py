@@ -55,7 +55,7 @@ from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import URL
 from sqlalchemy.util import immutabledict
-from sqlalchemy import func, text, or_
+from sqlalchemy import func, text, or_, and_
 
 from logging.config import dictConfig
 
@@ -556,21 +556,24 @@ if not conf.errors:
             nid = request.form.get("nodes", default=None)
             # print(f"nid: {nid}")
             if nid and nid.isnumeric():
-                # rows = (
-                #     db.session.query(models.Customer)
-                #     .join(models.Router, models.Customer.rid == models.Router.id)
-                #     .join(
-                #         models.NodeAssignment,
-                #         models.NodeAssignment.rid == models.Router.id,
-                #     )
-                #     .filter(models.NodeAssignment.nid == int(nid))
-                #     .order_by(models.Customer.ip)
-                #     .all()
-                # )
-                # if rows:
-                #     for item in rows:
-                #         data_list.append((item.name, str(Address(item.ip))))
-                pass
+
+                rows = (
+                    db.session.query(
+                        models.LmsNetNode, models.Router, models.Connection
+                    )
+                    .join(
+                        models.NodeAssignment,
+                        models.NodeAssignment.rid == models.Router.id,
+                    )
+                    .join(
+                        models.LmsNetNode,
+                        models.NodeAssignment.nid == models.LmsNetNode.id,
+                    )
+                    .filter(models.NodeAssignment.nid == nid)
+                    .join(models.Connection, models.Connection.rid == models.Router.id)
+                    .all()
+                )
+                print(rows)
 
         nodes_form.nodes_load()
 
