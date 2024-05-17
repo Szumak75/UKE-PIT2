@@ -230,7 +230,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
                     inf: str = item["interface"]
                 if "network" in item:
                     network: Network = item["network"]
-                if "vlan-id" in item:
+                if "vlan-id" in item and item["vlan-id"]:
                     vid: int = item["vlan-id"]
                 else:
                     vid = 1
@@ -332,14 +332,21 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
                 .first()
             )
             if row:
+                self.logs.message_debug = (
+                    f"found router in database: {Address(row.router_id)}"
+                )
                 row.last_update = runtime
             else:
+                self.logs.message_debug = f"add router to database: {data.router_id}"
                 row = TRouter()
                 row.router_id = int(data.router_id)
                 row.last_update = runtime
                 session.add(row)
 
             session.commit()
+            self.logs.message_debug = (
+                f"record id for router {Address(row.router_id)}: {row.id}"
+            )
         return row.id
 
     def __check_config(self) -> bool:

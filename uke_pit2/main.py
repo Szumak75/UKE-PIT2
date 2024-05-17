@@ -44,8 +44,11 @@ class _Keys(object, metaclass=ReadOnlyClass):
     SET_DB_PASS: str = "__set_db_pass__"
     SET_IP: str = "__set_ip__"
     SET_PASS: str = "__set_pass__"
-    START_IP: str = "start_ip"
     SET_STOP: str = "__set_stop__"
+    SET_TEST: str = "__set_test__"
+    START_IP: str = "start_ip"
+    TEST_RANGE: str = "__test_routers_range__"
+    TEST_START_IP: str = "__test_start_ip__"
 
 
 class _ModuleConf(BModuleConfig):
@@ -144,6 +147,10 @@ class SpiderApp(BaseApp):
         count_limit: int = 0
         comms_queue: Queue = Queue()
 
+        # TESTS
+        if self.tests:
+            count_limit = self._get_data(key=_Keys.TEST_RANGE)  # type: ignore
+
         # main procedure
         if (
             self.configured
@@ -151,6 +158,13 @@ class SpiderApp(BaseApp):
             and self.module_conf.start_ip
             and self.conf.module_conf
         ):
+            # start ip
+            start_ip: Address = Address("127.0.0.1")
+            if self.tests:
+                start_ip = self._get_data(key=_Keys.TEST_START_IP)  # type: ignore
+            else:
+                start_ip = self.module_conf.start_ip
+
             # set up database processor
             db_proc: DbProcessor = DbProcessor(
                 self.logs.logs_queue, comms_queue, self.conf.debug
@@ -166,14 +180,14 @@ class SpiderApp(BaseApp):
             db_proc.start()
 
             # starting data
-            ips.append(self.module_conf.start_ip)
+            ips.append(start_ip)
             passwords: List[str] = self.__password_decryptor(
                 self.module_conf.router_passwords
             )
             th_proc.append(
                 Processor(
                     self.logs.logs_queue,
-                    self.module_conf.start_ip,
+                    start_ip,
                     passwords,
                     self.conf.debug,
                 )
@@ -281,6 +295,7 @@ class SpiderApp(BaseApp):
         parser.configure_argument(
             "p", "dbpassword", "set user password for lms database connection."
         )
+        parser.configure_argument("T", "test", "for developer tests.")
 
         # command line parsing
         parser.parse_arguments()
@@ -320,6 +335,18 @@ class SpiderApp(BaseApp):
                 else:
                     self._data[_Keys.SET_DB_PASS] = password
                     break
+
+        if parser.get_option("test") is not None:
+            # set test flag
+            self.tests = True
+            # set starting address
+            self._set_data(
+                key=_Keys.TEST_START_IP,
+                set_default_type=Address,
+                value=Address("10.1.0.166"),
+            )
+            # set test range
+            self._set_data(key=_Keys.TEST_RANGE, set_default_type=int, value=1)
 
     def __password_decryptor(self, passwords: List[str]) -> List[str]:
         """Decrypt configured passwords."""
@@ -595,6 +622,17 @@ class SpiderApp(BaseApp):
     def stop(self, flag: bool) -> None:
         """Sets STOP flag."""
         self._set_data(key=_Keys.SET_STOP, value=flag)
+
+    @property
+    def tests(self) -> bool:
+        """Returns tests flag."""
+        return self._get_data(
+            key=_Keys.SET_TEST, set_default_type=bool, default_value=False
+        )  # type: ignore
+
+    @tests.setter
+    def tests(self, flag: bool) -> None:
+        self._set_data(key=_Keys.SET_TEST, set_default_type=bool, value=flag)
 
 
 class UkeApp(BaseApp):
