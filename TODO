@@ -3,3 +3,87 @@ $ pip install --config-settings="--build-option=build_ext" --config-settings="--
 
 [flask test run]
 $ flask -A web_service.routes run
+
+[select routers connected to router]
+SELECT R2.*,C1.* FROM uke_pit_routers AS R1 
+JOIN uke_pit_connections AS C1 ON C1.rid=R1.id
+JOIN uke_pit_connections AS C2 ON C1.network=C2.network
+JOIN uke_pit_routers AS R2 ON C2.rid=R2.id
+WHERE R1.router_id=167837862 AND C1.rid!=C2.rid;
+
+[TODO]
+
+class TRouter(DeclarativeBase):
+
+    __tablename__: str = "routers"
+
+    id: Mapped[int] = mapped_column(primary_key=True, nullable=False, autoincrement=True)
+    router_id: Mapped[int] = mapped_column(Integer, unique=True, nullable=False, index=True)
+
+class TConnection(DeclarativeBase):
+
+    __tablename__: str = "connections"
+
+    id: Mapped[int] = mapped_column(primary_key=True, nullable=False, autoincrement=True)
+    rid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    network: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+
+table: `routers`
+
++----+-----------+
+| id | router_id |
++----+-----------+
+|  1 | 167837862 |
+|  2 | 167837910 |
+|  3 | 167837714 |
++----+-----------+
+
+table: `connections`
+
++----+-----+-----------+
+| id | rid | network   |
++----+-----+-----------+
+|  1 |   1 | 167772300 |
+|  2 |   2 | 167772300 |
+|  3 |   1 | 167772324 |
+|  4 |   3 | 167772324 |
++----+-----+-----------+
+
+[SQL]
+SELECT R2.* FROM routers AS R1 
+JOIN connections AS C1 ON C1.rid=R1.id
+JOIN connections AS C2 ON C1.network=C2.network
+JOIN routers AS R2 ON C2.rid=R2.id
+WHERE R1.router_id=167837862 AND C1.rid!=C2.rid;
+
+[ORM]
+
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy.orm import aliased
+from sqlalchemy.orm import joinedload
+from sqlalchemy import and_
+
+# Tworzenie sesji
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Tworzenie aliasów dla tabel
+R1 = aliased(TRouter)
+R2 = aliased(TRouter)
+C1 = aliased(TConnection)
+C2 = aliased(TConnection)
+
+# Zapytanie ORM
+query = session.query(R2).\
+    join(C1, C1.rid == R1.id).\
+    join(C2, C1.network == C2.network).\
+    join(R2, C2.rid == R2.id).\
+    filter(and_(R1.router_id == 167837862, C1.rid != C2.rid))
+
+# Wykonanie zapytania i pobranie wyników
+results = query.all()
+
+# Wyświetlenie wyników
+for result in results:
+    print(result)

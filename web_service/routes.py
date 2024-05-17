@@ -56,6 +56,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import URL
 from sqlalchemy.util import immutabledict
 from sqlalchemy import func, text, or_, and_
+from sqlalchemy.orm import aliased
 
 from logging.config import dictConfig
 
@@ -557,20 +558,37 @@ if not conf.errors:
             # print(f"nid: {nid}")
             if nid and nid.isnumeric():
 
+                NN = aliased(models.LmsNetNode)
+                NA1 = aliased(models.NodeAssignment)
+                NA2 = aliased(models.NodeAssignment)
+                R1 = aliased(models.Router)
+                R2 = aliased(models.Router)
+                C1 = aliased(models.Connection)
+                C2 = aliased(models.Connection)
+
                 rows = (
-                    db.session.query(
-                        models.LmsNetNode, models.Router, models.Connection
-                    )
-                    .join(
-                        models.NodeAssignment,
-                        models.NodeAssignment.rid == models.Router.id,
-                    )
-                    .join(
-                        models.LmsNetNode,
-                        models.NodeAssignment.nid == models.LmsNetNode.id,
-                    )
-                    .filter(models.NodeAssignment.nid == nid)
-                    .join(models.Connection, models.Connection.rid == models.Router.id)
+                    # db.session.query(
+                    #     models.LmsNetNode, models.Router, models.Connection
+                    # )
+                    # .join(
+                    #     models.NodeAssignment,
+                    #     models.NodeAssignment.rid == models.Router.id,
+                    # )
+                    # .join(
+                    #     models.LmsNetNode,
+                    #     models.NodeAssignment.nid == models.LmsNetNode.id,
+                    # )
+                    # .filter(models.NodeAssignment.nid == nid)
+                    # .join(models.Connection, models.Connection.rid == models.Router.id)
+                    # .all()
+                    db.session.query(NN, R1, R2)
+                    .join(NA1, NA1.rid == R1.id)
+                    .join(C1, C1.rid == R1.id)
+                    .join(C2, C1.network == C2.network)
+                    .join(R2, C2.rid == R2.id)
+                    .join(NA2, NA2.rid == R2.id)
+                    .join(NN, NN.id == NA2.nid)
+                    .filter(and_(NA1.nid == nid, C1.rid != C2.rid))
                     .all()
                 )
                 print(rows)

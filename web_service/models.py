@@ -15,8 +15,8 @@ from typing import Dict, List, Tuple, Any, TypeVar, Optional
 from crypt import crypt
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey, Integer, Boolean, String, func, text
-from sqlalchemy.orm import Mapped, mapped_column, Query, relationship
+from sqlalchemy import ForeignKey, Integer, Boolean, String, func, text, and_
+from sqlalchemy.orm import Mapped, mapped_column, Query, relationship, aliased
 from sqlalchemy.dialects.mysql import (
     BIGINT,
     BINARY,
