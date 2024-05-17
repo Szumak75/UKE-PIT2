@@ -116,8 +116,8 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
         conf.database = self.db_database  # type: ignore
         conf.user = self.db_username  # type: ignore
         conf.password = self.db_password  # type: ignore
-        # self.logs.message_debug = f"{conf}"
-        self.database = Database(self.logs.logs_queue, conf, self._debug)
+        self.database = Database(self.logs.logs_queue, conf, self._debug, self.verbose)
+
         # create connection
         if not self.database.create_connection():
             self.logs.message_critical = "connection to database error."

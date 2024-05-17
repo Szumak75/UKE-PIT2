@@ -19,7 +19,7 @@ from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.netaddresstool.ipv4 import Address
 from jsktoolbox.logstool.logs import LoggerQueue, LoggerClient, BData
 
-from uke_pit2.base import BDebug, BLogs, LmsBase
+from uke_pit2.base import BDebug, BLogs, BVerbose, LmsBase
 
 
 class DbConfigKeys(object, metaclass=ReadOnlyClass):
@@ -99,7 +99,7 @@ class DbConfig(BData):
         self._set_data(DbConfigKeys.PASS, value=value)
 
 
-class Database(BDebug, BLogs):
+class Database(BDebug, BVerbose, BLogs):
     """LMS Database class."""
 
     def __init__(
@@ -107,6 +107,7 @@ class Database(BDebug, BLogs):
         logger_queue: LoggerQueue,
         config_obj: DbConfig,
         debug: bool = False,
+        verbose: bool = False,
     ) -> None:
         """Database constructor.
 
@@ -114,10 +115,12 @@ class Database(BDebug, BLogs):
         - logger_queue [LoggerQueue] - logger queue for logs subsystem communication.
         - config_obj [DbConfig] - config options for database communication.
         - debug [bool] - debugging flag, default: False.
+        - verbose [bool] - verbose debugging flag.
         """
         self._set_data(_Keys.CONF, set_default_type=DbConfig, value=config_obj)
         self.logs = LoggerClient(logger_queue, self._c_name)
         self.debug = debug
+        self.verbose = verbose
         self._set_data(_Keys.DB_POLL, set_default_type=Optional[Engine], value=None)
 
         # self.logs.message_debug = f"from args: {config_obj}"
@@ -138,7 +141,8 @@ class Database(BDebug, BLogs):
                 if connection is not None:
                     LmsBase.metadata.create_all(engine)
                 if self.debug:
-                    self.logs.message_debug = f"add connection to server: {self._get_data(_Keys.CONF).host} with backend: pymysql"  # type: ignore
+                    if self.verbose:
+                        self.logs.message_debug = f"add connection to server: {self._get_data(_Keys.CONF).host} with backend: pymysql"  # type: ignore
                     self._set_data(_Keys.DB_POLL, value=engine)
         except Exception as ex:
             self.logs.message_critical = f"connection to server: {self._get_data(_Keys.CONF).host} with backend: pymyslq error: {ex}"  # type: ignore
