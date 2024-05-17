@@ -30,7 +30,7 @@ from jsktoolbox.logstool.formatters import LogFormatterNull, LogFormatterDateTim
 from jsktoolbox.libs.system import Env
 from jsktoolbox.stringtool.crypto import SimpleCrypto
 
-from uke_pit2.base import BaseApp, BModuleConfig
+from uke_pit2.base import BVerbose, BaseApp, BModuleConfig
 from uke_pit2.conf import Config
 from uke_pit2.processor import DbProcessor, Processor
 from uke_pit2.rb import RBData
@@ -72,7 +72,7 @@ class _ModuleConf(BModuleConfig):
         return var
 
 
-class SpiderApp(BaseApp):
+class SpiderApp(BaseApp, BVerbose):
     """Spider main class."""
 
     def __init__(self) -> None:
@@ -642,18 +642,6 @@ class SpiderApp(BaseApp):
     def tests(self, flag: bool) -> None:
         """Sets tests flag."""
         self._set_data(key=_Keys.SET_TEST, set_default_type=bool, value=flag)
-
-    @property
-    def verbose(self) -> bool:
-        """Returns verbose flag."""
-        return self._get_data(
-            key=_Keys.VERBOSE, set_default_type=bool, default_value=False
-        )  # type: ignore
-
-    @verbose.setter
-    def verbose(self, flag: bool) -> None:
-        """Sets verbose flag."""
-        self._set_data(key=_Keys.VERBOSE, set_default_type=bool, value=flag)
 
 
 class UkeApp(BaseApp):

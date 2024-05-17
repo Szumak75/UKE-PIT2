@@ -8,6 +8,7 @@
 """
 
 from operator import and_
+from tabnanny import verbose
 import time
 
 from typing import Optional, List
@@ -28,7 +29,7 @@ from jsktoolbox.devices.mikrotik.routerboard import RouterBoard
 from jsktoolbox.datetool import Timestamp
 
 
-from uke_pit2.base import BLogs
+from uke_pit2.base import BLogs, BVerbose
 from uke_pit2.db_models.spider import (
     TConnection,
     TCustomer,
@@ -57,10 +58,9 @@ class _Keys(object, metaclass=ReadOnlyClass):
     PASS: str = "__passwords_list__"
     QUEUE: str = "__comms_queue__"
     RUNTIME: str = "__runtime__"
-    VERBOSE: str = "__verbose__"
 
 
-class DbProcessor(Thread, ThBaseObject, BLogs):
+class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
     """Database Processor class for router board object."""
 
     def __init__(
@@ -433,20 +433,8 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
         """Sets Database object."""
         self._set_data(key=_Keys.DATABASE, set_default_type=Database, value=database)
 
-    @property
-    def verbose(self) -> bool:
-        """Returns verbose flag."""
-        return self._get_data(
-            key=_Keys.VERBOSE, set_default_type=bool, default_value=False
-        )  # type: ignore
 
-    @verbose.setter
-    def verbose(self, flag: bool) -> None:
-        """Sets verbose flag."""
-        self._set_data(key=_Keys.VERBOSE, set_default_type=bool, value=flag)
-
-
-class Processor(Thread, ThBaseObject, BLogs):
+class Processor(Thread, ThBaseObject, BLogs, BVerbose):
     """Processor class for router board object."""
 
     def __init__(
@@ -510,7 +498,6 @@ class Processor(Thread, ThBaseObject, BLogs):
                     if conn.connect() and conn.is_alive:
                         if self._debug:
                             self.logs.message_debug = f"connected"
-                            # self.logs.message_debug = f"The password is: '{passwd}'"
                         self.api_handler = conn
                         break
                 except Exception as e:
@@ -556,6 +543,7 @@ class Processor(Thread, ThBaseObject, BLogs):
                 connector=self.api_handler,
                 qlog=self.logs.logs_queue,
                 debug=True if self._debug else False,
+                verbose=True if self.verbose else False,
             )
 
             # check system version
@@ -563,6 +551,7 @@ class Processor(Thread, ThBaseObject, BLogs):
                 logger_queue=self.logs.logs_queue,
                 rb_handler=rb,
                 debug=True if self._debug else False,
+                verbose=True if self.verbose else False,
             )
 
             collector: Optional[IRouterBoardCollector] = csv.get_collector()
@@ -573,21 +562,6 @@ class Processor(Thread, ThBaseObject, BLogs):
                 # self.logs.message_debug = f"{collector.get_data()}"
                 self._data[_Keys.DATA] = collector.get_data()
                 # collector.dump()  # type: ignore
-
-            # tests
-            # rbq = RBQuery()
-            # rbq.add_attrib("current-firmware")
-            # out: Optional[Element] = rb.element("/system/routerboard/", auto_load=True)
-            # if out:
-            #     self.logs.message_debug = f"{out.search(rbq.query)}"
-            #     self.logs.message_debug = f"{out.attrib}"
-
-            # rbq = RBQuery()
-            # rbq.add_attrib("interface", "routerid")
-            # rbq.add_attrib("network", str(self.ip))
-            # out: Optional[Element] = rb.element("/ip/address/", auto_load=True)
-            # if out:
-            #     self.logs.message_debug = f"{out.search(rbq.query)}"
 
     def router_data(self) -> Optional[RBData]:
         """Returns collected Router Board data."""
@@ -640,18 +614,6 @@ class Processor(Thread, ThBaseObject, BLogs):
         if self._stop_event:
             return self._stop_event.is_set()
         return False
-
-    @property
-    def verbose(self) -> bool:
-        """Returns verbose flag."""
-        return self._get_data(
-            key=_Keys.VERBOSE, set_default_type=bool, default_value=False
-        )  # type: ignore
-
-    @verbose.setter
-    def verbose(self, flag: bool) -> None:
-        """Sets verbose flag."""
-        self._set_data(key=_Keys.VERBOSE, set_default_type=bool, value=flag)
 
 
 # #[EOF]#######################################################################

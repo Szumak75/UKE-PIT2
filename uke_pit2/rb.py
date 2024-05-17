@@ -20,7 +20,7 @@ from jsktoolbox.devices.mikrotik.routerboard import RouterBoard
 from jsktoolbox.devices.mikrotik.elements.libs.search import RBQuery
 from jsktoolbox.devices.mikrotik.base import Element
 
-from uke_pit2.base import BLogs, BDebug, BRouterBoard
+from uke_pit2.base import BLogs, BDebug, BVerbose, BRouterBoard
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -82,17 +82,22 @@ class IRouterBoardCollector(ABC):
         """Returns collected data."""
 
 
-class RouterBoardVersion(BLogs, BDebug, BRouterBoard):
+class RouterBoardVersion(BLogs, BDebug, BVerbose, BRouterBoard):
     """ROS Version checker class."""
 
     def __init__(
-        self, logger_queue: LoggerQueue, rb_handler: RouterBoard, debug: bool = False
+        self,
+        logger_queue: LoggerQueue,
+        rb_handler: RouterBoard,
+        debug: bool = False,
+        verbose: bool = False,
     ) -> None:
         """Collector constructor."""
 
         self.logs = LoggerClient(logger_queue, self._c_name)
         self.rb = rb_handler
         self.debug = debug
+        self.verbose = verbose
 
     def get_collector(self) -> Optional[IRouterBoardCollector]:
         """Returns collector proper for rb version."""
@@ -104,7 +109,8 @@ class RouterBoardVersion(BLogs, BDebug, BRouterBoard):
             if out:
                 rbq = RBQuery()
                 rbq.add_attrib("current-firmware")
-                self.logs.message_debug = f"{out.search(rbq.query)}"
+                if self.debug and self.verbose:
+                    self.logs.message_debug = f"{out.search(rbq.query)}"
                 search_query: Optional[Union[List[Any], Dict[Any, Any]]] = out.search(
                     rbq.query
                 )
@@ -114,7 +120,8 @@ class RouterBoardVersion(BLogs, BDebug, BRouterBoard):
                     and "current-firmware" in search_query
                 ):
                     ver = search_query["current-firmware"]
-                    self.logs.message_debug = f"The version is: {ver}"
+                    if self.debug:
+                        self.logs.message_debug = f"The version is: {ver}"
 
                     if re.match(r"^6\.", ver):
                         if self.logs.logs_queue:

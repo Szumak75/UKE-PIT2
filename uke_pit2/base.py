@@ -32,8 +32,9 @@ class _Keys(object, metaclass=ReadOnlyClass):
     DEBUG: str = "__debug__"
     LOGGER_CLIENT: str = "__logger_client__"
     PROC_LOGS: str = "__logger_processor__"
-    SECTION: str = "__config_section__"
     RB: str = "__rbh__"
+    SECTION: str = "__config_section__"
+    VERBOSE: str = "__verbose__"
 
 
 class BConfigSection(BData):
@@ -110,6 +111,22 @@ class BDebug(BData):
     def debug(self, flag: bool) -> None:
         """Sets debug flag."""
         self._set_data(key=_Keys.DEBUG, value=flag)
+
+
+class BVerbose(BData):
+    """Base class for verbose debugging property."""
+
+    @property
+    def verbose(self) -> bool:
+        """Returns debug flag."""
+        return self._get_data(
+            key=_Keys.VERBOSE, set_default_type=bool, default_value=False
+        )  # type: ignore
+
+    @verbose.setter
+    def verbose(self, flag: bool) -> None:
+        """Sets debug flag."""
+        self._set_data(key=_Keys.VERBOSE, set_default_type=bool, value=flag)
 
 
 class BLogs(BData):
