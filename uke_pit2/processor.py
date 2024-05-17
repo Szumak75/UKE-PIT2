@@ -57,6 +57,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
     PASS: str = "__passwords_list__"
     QUEUE: str = "__comms_queue__"
     RUNTIME: str = "__runtime__"
+    VERBOSE: str = "__verbose__"
 
 
 class DbProcessor(Thread, ThBaseObject, BLogs):
@@ -67,6 +68,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
         logger_queue: LoggerQueue,
         comms_queue: Queue,
         debug: bool = False,
+        verbose: bool = False,
     ) -> None:
         """Processor constructor.
 
@@ -74,6 +76,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
         - logger_queue [LoggerQueue] - logger queue for communication.
         - comms_queue [Queue] - communication queue.
         - debug [bool] - debug flag.
+        - verbose [bool] - verbose flag.
         """
         # init thread
         Thread.__init__(self, name=f"{self._c_name}")
@@ -81,6 +84,8 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
         self.sleep_period = 0.2
         # debug
         self._debug = debug
+        # verbose
+        self.verbose = verbose
         # logger
         self.logs = LoggerClient(logger_queue, f"{self._c_name}")
         # communication queue
@@ -332,21 +337,26 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
                 .first()
             )
             if row:
-                self.logs.message_debug = (
-                    f"found router in database: {Address(row.router_id)}"
-                )
+                if self.verbose:
+                    self.logs.message_debug = (
+                        f"found router in database: {Address(row.router_id)}"
+                    )
                 row.last_update = runtime
             else:
-                self.logs.message_debug = f"add router to database: {data.router_id}"
+                if self.verbose:
+                    self.logs.message_debug = (
+                        f"add router to database: {data.router_id}"
+                    )
                 row = TRouter()
                 row.router_id = int(data.router_id)
                 row.last_update = runtime
                 session.add(row)
 
             session.commit()
-            self.logs.message_debug = (
-                f"record id for router {Address(row.router_id)}: {row.id}"
-            )
+            if self.verbose:
+                self.logs.message_debug = (
+                    f"record id for router {Address(row.router_id)}: {row.id}"
+                )
         return row.id
 
     def __check_config(self) -> bool:
@@ -423,6 +433,18 @@ class DbProcessor(Thread, ThBaseObject, BLogs):
         """Sets Database object."""
         self._set_data(key=_Keys.DATABASE, set_default_type=Database, value=database)
 
+    @property
+    def verbose(self) -> bool:
+        """Returns verbose flag."""
+        return self._get_data(
+            key=_Keys.VERBOSE, set_default_type=bool, default_value=False
+        )  # type: ignore
+
+    @verbose.setter
+    def verbose(self, flag: bool) -> None:
+        """Sets verbose flag."""
+        self._set_data(key=_Keys.VERBOSE, set_default_type=bool, value=flag)
+
 
 class Processor(Thread, ThBaseObject, BLogs):
     """Processor class for router board object."""
@@ -433,6 +455,7 @@ class Processor(Thread, ThBaseObject, BLogs):
         ip: Address,
         passwords: List[str],
         debug: bool = False,
+        verbose: bool = False,
     ) -> None:
         """Processor constructor.
 
@@ -441,6 +464,7 @@ class Processor(Thread, ThBaseObject, BLogs):
         - ip [Address] - router ip address.
         - passwords [List[str]] - list of router passwords
         - debug [bool] - debug flag.
+        - verbose [bool] - verbose flag for debugging.
         """
         # init thread
         Thread.__init__(self, name=f"{self._c_name} [{ip}]")
@@ -452,6 +476,8 @@ class Processor(Thread, ThBaseObject, BLogs):
         self.__passwords = passwords
         # debug
         self._debug = debug
+        # verbose
+        self.verbose = verbose
         # logger
         self.logs = LoggerClient(logger_queue, f"{self._c_name} {ip}")
         # data container
@@ -614,6 +640,18 @@ class Processor(Thread, ThBaseObject, BLogs):
         if self._stop_event:
             return self._stop_event.is_set()
         return False
+
+    @property
+    def verbose(self) -> bool:
+        """Returns verbose flag."""
+        return self._get_data(
+            key=_Keys.VERBOSE, set_default_type=bool, default_value=False
+        )  # type: ignore
+
+    @verbose.setter
+    def verbose(self, flag: bool) -> None:
+        """Sets verbose flag."""
+        self._set_data(key=_Keys.VERBOSE, set_default_type=bool, value=flag)
 
 
 # #[EOF]#######################################################################

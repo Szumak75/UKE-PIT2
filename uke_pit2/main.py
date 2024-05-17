@@ -49,6 +49,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
     START_IP: str = "start_ip"
     TEST_RANGE: str = "__test_routers_range__"
     TEST_START_IP: str = "__test_start_ip__"
+    VERBOSE: str = "__verbose__"
 
 
 class _ModuleConf(BModuleConfig):
@@ -167,7 +168,7 @@ class SpiderApp(BaseApp):
 
             # set up database processor
             db_proc: DbProcessor = DbProcessor(
-                self.logs.logs_queue, comms_queue, self.conf.debug
+                self.logs.logs_queue, comms_queue, self.conf.debug, self.verbose
             )
             db_proc.db_host = self.conf.module_conf.lms_host
             db_proc.db_port = self.conf.module_conf.lms_port
@@ -190,6 +191,7 @@ class SpiderApp(BaseApp):
                     start_ip,
                     passwords,
                     self.conf.debug,
+                    self.verbose,
                 )
             )
 
@@ -225,6 +227,7 @@ class SpiderApp(BaseApp):
                                             ip,
                                             passwords,
                                             self.conf.debug,
+                                            self.verbose,
                                         )
                                     )
 
@@ -296,6 +299,7 @@ class SpiderApp(BaseApp):
             "p", "dbpassword", "set user password for lms database connection."
         )
         parser.configure_argument("T", "test", "for developer tests.")
+        parser.configure_argument("v", "verbose", "verbose flag for debugging.")
 
         # command line parsing
         parser.parse_arguments()
@@ -347,6 +351,10 @@ class SpiderApp(BaseApp):
             )
             # set test range
             self._set_data(key=_Keys.TEST_RANGE, set_default_type=int, value=1)
+
+        if parser.get_option("verbose") is not None:
+            # set verbose flag
+            self.verbose = True
 
     def __password_decryptor(self, passwords: List[str]) -> List[str]:
         """Decrypt configured passwords."""
@@ -632,7 +640,20 @@ class SpiderApp(BaseApp):
 
     @tests.setter
     def tests(self, flag: bool) -> None:
+        """Sets tests flag."""
         self._set_data(key=_Keys.SET_TEST, set_default_type=bool, value=flag)
+
+    @property
+    def verbose(self) -> bool:
+        """Returns verbose flag."""
+        return self._get_data(
+            key=_Keys.VERBOSE, set_default_type=bool, default_value=False
+        )  # type: ignore
+
+    @verbose.setter
+    def verbose(self, flag: bool) -> None:
+        """Sets verbose flag."""
+        self._set_data(key=_Keys.VERBOSE, set_default_type=bool, value=flag)
 
 
 class UkeApp(BaseApp):
