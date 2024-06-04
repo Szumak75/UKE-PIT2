@@ -588,10 +588,18 @@ if not conf.errors:
                     .join(R2, C2.rid == R2.id)
                     .join(NA2, NA2.rid == R2.id)
                     .join(NN, NN.id == NA2.nid)
-                    .filter(and_(NA1.nid == nid, C1.rid != C2.rid))
+                    .filter(and_(NA1.nid == nid, C1.rid != C2.rid, NN.id != nid))
+                    .order_by(NN.id)
                     .all()
                 )
-                print(rows)
+                print("-[START]-----------------")
+                for v1, v2, v3 in rows:
+                    print(f"node: {v1}")
+                    print(f"router 1: {v2}")
+                    print(f"router 2: {v3}")
+                    print("-------------------------")
+                print("-[STOP]------------------")
+                # print(rows)
 
         nodes_form.nodes_load()
 
