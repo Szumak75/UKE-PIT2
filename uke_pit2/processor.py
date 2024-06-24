@@ -276,10 +276,19 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
             oldest_update: int = runtime - 60 * 60 * 24 * 7
             rows = (
                 session.query(TRouter, TNodeAssignment, TConnection, TCustomer)
-                .filter(
+                .outerjoin(
+                    TConnection,
                     TConnection.rid == TRouter.id,
+                )
+                .outerjoin(
+                    TNodeAssignment,
                     TNodeAssignment.rid == TRouter.id,
+                )
+                .outerjoin(
+                    TCustomer,
                     TCustomer.rid == TRouter.id,
+                )
+                .filter(
                     TRouter.last_update < oldest_update,
                 )
                 .all()
