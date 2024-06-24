@@ -36,6 +36,7 @@ from uke_pit2.db_models.spider import (
     TCustomer,
     TInterface,
     TInterfaceName,
+    TNodeAssignment,
     TRouter,
 )
 from uke_pit2.db_models.update import TLastUpdate
@@ -273,10 +274,13 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
         if runtime and session:
             # update filter - one week limit
             oldest_update: int = runtime - 60 * 60 * 24 * 7
-            rows: List[Row[Tuple[TRouter, TConnection]]] = (
-                session.query(TRouter, TConnection)
+            rows = (
+                session.query(TRouter, TNodeAssignment, TConnection, TCustomer)
                 .filter(
-                    TConnection.rid == TRouter.id, TRouter.last_update < oldest_update
+                    TConnection.rid == TRouter.id,
+                    TNodeAssignment.rid == TRouter.id,
+                    TCustomer.rid == TRouter.id,
+                    TRouter.last_update < oldest_update,
                 )
                 .all()
             )
@@ -285,7 +289,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
                 count = 0
                 r_count = 0
                 c_count = 0
-                for router, connection in rows:
+                for router, assignment, connection, customer in rows:
                     count += 1
 
                     if router:
@@ -294,6 +298,10 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
                     if connection:
                         c_count += 1
                         session.delete(connection)
+                    if assignment:
+                        session.delete(assignment)
+                    if customer:
+                        session.delete(customer)
                 session.commit()
                 self.logs.message_info = f"purge {count} records: {r_count} routers and {c_count} connections."
 
