@@ -174,6 +174,8 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
                 continue
 
         # clean up
+        self.__purge_customers(session=session)
+        self.__purge_connections(session=session)
         self.__purge_updates(session=session)
 
         session.close()
@@ -199,7 +201,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
     def __purge_updates(self, session: Session) -> None:
         """Purge updates counter base."""
         if session:
-            rows = (
+            rows: List[TLastUpdate] = (
                 session.query(TLastUpdate)
                 .outerjoin(TRouter, TLastUpdate.last_update == TRouter.last_update)
                 .outerjoin(
@@ -215,6 +217,40 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
                     TCustomer.id == None,
                     TInterface.id == None,
                 )
+                .all()
+            )
+
+            if rows:
+                for item in rows:
+                    session.delete(item)
+                session.commit()
+
+    def __purge_customers(self, session: Session) -> None:
+        """Purge old inactive customers."""
+        runtime: Optional[int] = self._get_data(_Keys.RUNTIME)
+        if runtime and session:
+            # update filter - one month limit
+            oldest_update: int = runtime - 60 * 60 * 24 * 30
+            rows: List[TCustomer] = (
+                session.query(TCustomer)
+                .filter(TCustomer.last_update < oldest_update)
+                .all()
+            )
+
+            if rows:
+                for item in rows:
+                    session.delete(item)
+                session.commit()
+
+    def __purge_connections(self, session: Session) -> None:
+        """Purge old connections."""
+        runtime: Optional[int] = self._get_data(_Keys.RUNTIME)
+        if runtime and session:
+            # update filter - one week limit
+            oldest_update: int = runtime - 60 * 60 * 24 * 7
+            rows: List[TConnection] = (
+                session.query(TConnection)
+                .filter(TConnection.last_update < oldest_update)
                 .all()
             )
 
