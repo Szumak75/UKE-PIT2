@@ -177,6 +177,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
         # clean up
         self.__purge_customers(session=session)
         self.__purge_connections(session=session)
+        self.__purge_routers(session=session)
         self.__purge_updates(session=session)
 
         session.close()
