@@ -11,12 +11,13 @@ from operator import and_
 from tabnanny import verbose
 import time
 
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from threading import Event, Thread
 from inspect import currentframe
 from queue import Queue, Empty
 
 from sqlalchemy import delete
+from sqlalchemy.engine.row import Row
 from sqlalchemy.orm import Session
 
 from jsktoolbox.attribtool import ReadOnlyClass
@@ -238,9 +239,12 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
             )
 
             if rows:
+                count = 0
                 for item in rows:
+                    count += 1
                     session.delete(item)
                 session.commit()
+                self.logs.message_info = f"purge {count} customers."
 
     def __purge_connections(self, session: Session) -> None:
         """Purge old connections."""
@@ -255,9 +259,42 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
             )
 
             if rows:
+                count = 0
                 for item in rows:
+                    count += 1
                     session.delete(item)
                 session.commit()
+                self.logs.message_info = f"purge {count} connections."
+
+    def __purge_routers(self, session: Session) -> None:
+        """Purge old routers."""
+        runtime: Optional[int] = self._get_data(_Keys.RUNTIME)
+        if runtime and session:
+            # update filter - one week limit
+            oldest_update: int = runtime - 60 * 60 * 24 * 7
+            rows: List[Row[Tuple[TRouter, TConnection]]] = (
+                session.query(TRouter, TConnection)
+                .filter(
+                    TConnection.rid == TRouter.id, TRouter.last_update < oldest_update
+                )
+                .all()
+            )
+
+            if rows:
+                count = 0
+                r_count = 0
+                c_count = 0
+                for router, connection in rows:
+                    count += 1
+
+                    if router:
+                        r_count += 1
+                        session.delete(router)
+                    if connection:
+                        c_count += 1
+                        session.delete(connection)
+                session.commit()
+                self.logs.message_info = f"purge {count} records: {r_count} routers and {c_count} connections."
 
     def __update_router_connections(
         self, session: Session, data: RBData, router_record_id: int
