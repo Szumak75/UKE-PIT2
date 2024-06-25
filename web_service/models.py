@@ -598,4 +598,48 @@ class Customer(db.Model):
         )
 
 
+class InterfaceName(db.Model):
+    """Mapping class for network interface name."""
+
+    __tablename__: str = "uke_pit_if_name"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    name: Mapped[str] = mapped_column(String(30), nullable=False, index=True)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(" f"id='{self.id}'," f"name='{self.name}'" ")"
+        )
+
+
+class Interface(db.Model):
+    """Mapping class for connection interface."""
+
+    __tablename__: str = "uke_pit_if"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    # connection id
+    cid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    # interface name id
+    # if_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    if_id: Mapped[int] = mapped_column(ForeignKey("uke_pit_if_name.id"))
+    if_name: Mapped["InterfaceName"] = relationship()
+    last_update: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"cid='{self.cid}',"
+            f"if_id='{self.if_id}',"
+            f"if_name='{self.if_name}',"
+            f"last_update='{self.last_update}',"
+            ")"
+        )
+
+
 # #[EOF]#######################################################################

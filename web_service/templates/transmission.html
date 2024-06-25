@@ -15,7 +15,24 @@ Transmisje międzywęzłowe
                     {{ form.nodes }}
                 </form>
             </td>
-            <td class="VaT"></td>
+            <td class="VaT">
+                {% if keys %}
+                <table>
+                    {% for key in keys %}
+                    <tr><th colspan="5">{{ key }}</th></tr>
+                        {% for item in data[key] %}
+                        <tr>
+                            <td>{{ item.rid1 }}</td>
+                            <td>{{ item.if1 }}</td>
+                            <td><-></td>
+                            <td>{{ item.if2 }}</td>
+                            <td>{{ item.rid2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </table>
+                {% endif %}
+            </td>
         </tr>
     </table>
     <script type="text/javascript">

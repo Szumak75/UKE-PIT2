@@ -21,6 +21,9 @@ from jsktoolbox.datetool import DateTime
 from jsktoolbox.stringtool.crypto import SimpleCrypto
 from jsktoolbox.logstool.logs import LoggerEngine, LoggerClient, LoggerQueue
 from jsktoolbox.netaddresstool.ipv4 import Address
+from jsktoolbox.libs.base_data import BData
+from jsktoolbox.attribtool import ReadOnlyClass
+
 
 from flask import (
     Flask,
@@ -306,6 +309,76 @@ class NodesSelectForm(FlaskForm):
         self.nodes.choices = models.LmsNetNode.get_all_list()  # type: ignore
 
 
+class TransData(BData):
+    """TransData container class."""
+
+    from web_service import models
+
+    class Keys(metaclass=ReadOnlyClass):
+        """Internal keys definition class."""
+
+        IPR1: str = "__ip1__"
+        IPR2: str = "__ip2__"
+        IFN1: str = "__ifn1__"
+        IFN2: str = "__ifn2__"
+        CON_ID: str = "__con_id__"
+
+    def __init__(
+        self,
+        r1: models.Router,
+        if1: models.Interface,
+        r2: models.Router,
+        if2: models.Interface,
+        conn: models.Connection,
+    ) -> None:
+        """Sets data from args."""
+        self._set_data(
+            key=TransData.Keys.IPR1,
+            value=str(Address(r1.router_id)),
+            set_default_type=str,
+        )
+        self._set_data(
+            key=TransData.Keys.IPR2,
+            value=str(Address(r2.router_id)),
+            set_default_type=str,
+        )
+        self._set_data(
+            key=TransData.Keys.IFN1,
+            value=if1.if_name.name,
+            set_default_type=str,
+        )
+        self._set_data(
+            key=TransData.Keys.IFN2,
+            value=if2.if_name.name,
+            set_default_type=str,
+        )
+        self._set_data(
+            key=TransData.Keys.CON_ID,
+            value=conn.network,
+            set_default_type=int,
+        )
+
+    @property
+    def rid1(self) -> str:
+        return self._get_data(key=TransData.Keys.IPR1, default_value="")  # type: ignore
+
+    @property
+    def rid2(self) -> str:
+        return self._get_data(key=TransData.Keys.IPR2, default_value="")  # type: ignore
+
+    @property
+    def if1(self) -> str:
+        return self._get_data(key=TransData.Keys.IFN1, default_value="")  # type: ignore
+
+    @property
+    def if2(self) -> str:
+        return self._get_data(key=TransData.Keys.IFN2, default_value="")  # type: ignore
+
+    @property
+    def cid(self) -> str:
+        return self._get_data(key=TransData.Keys.CON_ID, default_value=0)  # type: ignore
+
+
 if not conf.errors:
     from web_service import models
 
@@ -552,6 +625,7 @@ if not conf.errors:
 
         nodes_form: NodesSelectForm = NodesSelectForm()
         data_list: List[Tuple] = []
+        data_dict = {}
 
         if request.method == "POST":
             nid = request.form.get("nodes", default=None)
@@ -565,26 +639,18 @@ if not conf.errors:
                 R2 = aliased(models.Router)
                 C1 = aliased(models.Connection)
                 C2 = aliased(models.Connection)
+                IF1 = aliased(models.Interface)
+                IF2 = aliased(models.Interface)
+                # IFN1=aliased()
+                # IFN2=aliased()
 
                 rows = (
-                    # db.session.query(
-                    #     models.LmsNetNode, models.Router, models.Connection
-                    # )
-                    # .join(
-                    #     models.NodeAssignment,
-                    #     models.NodeAssignment.rid == models.Router.id,
-                    # )
-                    # .join(
-                    #     models.LmsNetNode,
-                    #     models.NodeAssignment.nid == models.LmsNetNode.id,
-                    # )
-                    # .filter(models.NodeAssignment.nid == nid)
-                    # .join(models.Connection, models.Connection.rid == models.Router.id)
-                    # .all()
-                    db.session.query(NN, R1, R2)
+                    db.session.query(NN, R1, IF1, R2, IF2, C1)
                     .join(NA1, NA1.rid == R1.id)
                     .join(C1, C1.rid == R1.id)
+                    .join(IF1, IF1.cid == C1.id)
                     .join(C2, C1.network == C2.network)
+                    .join(IF2, IF2.cid == C2.id)
                     .join(R2, C2.rid == R2.id)
                     .join(NA2, NA2.rid == R2.id)
                     .join(NN, NN.id == NA2.nid)
@@ -593,18 +659,26 @@ if not conf.errors:
                     .all()
                 )
                 print("-[START]-----------------")
-                for v1, v2, v3 in rows:
+                for v1, v2, v3, v4, v5, v6 in rows:
+                    if v1.name not in data_dict:
+                        data_dict[v1.name] = []
+                    data_dict[v1.name].append(TransData(v2, v3, v4, v5, v6))
                     print(f"node: {v1}")
-                    print(f"router 1: {v2}")
-                    print(f"router 2: {v3}")
+                    print(f"router 1: {v2}->{v3}")
+                    print(f"router 2: {v4}->{v5}")
+                    print(f"connection: {v6}")
                     print("-------------------------")
                 print("-[STOP]------------------")
-                # print(rows)
+                # print(data_dict)
 
         nodes_form.nodes_load()
 
         return render_template(
-            "transmission.html", form=nodes_form, login="username" in session
+            "transmission.html",
+            form=nodes_form,
+            keys=data_dict.keys(),
+            data=data_dict,
+            login="username" in session,
         )
 
 else:
