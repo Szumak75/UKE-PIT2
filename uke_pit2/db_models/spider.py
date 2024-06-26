@@ -222,9 +222,7 @@ class TFlow(LmsBase):
     medium: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, server_default=text("0")
     )
-    desc: Mapped[str] = mapped_column(
-        String(30), nullable=False, default="", server_default=text("")
-    )
+    desc: Mapped[str] = mapped_column(String(30), nullable=True)
 
     def __repr__(self) -> str:
         return (
