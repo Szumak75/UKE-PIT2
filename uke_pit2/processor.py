@@ -38,6 +38,7 @@ from uke_pit2.db_models.spider import (
     TInterfaceName,
     TNodeAssignment,
     TRouter,
+    TFlow,
 )
 from uke_pit2.db_models.update import TLastUpdate
 from uke_pit2.network import Pinger
@@ -254,17 +255,21 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
         if runtime and session:
             # update filter - one week limit
             oldest_update: int = runtime - 60 * 60 * 24 * 7
-            rows: List[TConnection] = (
-                session.query(TConnection)
+            rows = (
+                session.query(TConnection, TFlow)
+                .outerjoin(TFlow, TFlow.network == TConnection.network)
                 .filter(TConnection.last_update < oldest_update)
                 .all()
             )
 
             if rows:
                 count = 0
-                for item in rows:
+                for connection, flow in rows:
                     count += 1
-                    session.delete(item)
+                    if connection:
+                        session.delete(connection)
+                    if flow:
+                        session.delete(flow)
                 session.commit()
                 self.logs.message_info = f"purge {count} connections."
 
@@ -275,7 +280,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
             # update filter - one week limit
             oldest_update: int = runtime - 60 * 60 * 24 * 7
             rows = (
-                session.query(TRouter, TNodeAssignment, TConnection, TCustomer)
+                session.query(TRouter, TNodeAssignment, TConnection, TCustomer, TFlow)
                 .outerjoin(
                     TConnection,
                     TConnection.rid == TRouter.id,
@@ -288,6 +293,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
                     TCustomer,
                     TCustomer.rid == TRouter.id,
                 )
+                .outerjoin(TFlow, TFlow.network == TConnection.network)
                 .filter(
                     TRouter.last_update < oldest_update,
                 )
@@ -298,7 +304,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
                 count = 0
                 r_count = 0
                 c_count = 0
-                for router, assignment, connection, customer in rows:
+                for router, assignment, connection, customer, flow in rows:
                     count += 1
 
                     if router:
@@ -311,6 +317,8 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
                         session.delete(assignment)
                     if customer:
                         session.delete(customer)
+                    if flow:
+                        session.delete(flow)
                 session.commit()
                 self.logs.message_info = f"purge {count} records: {r_count} routers and {c_count} connections."
 
