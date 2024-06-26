@@ -126,7 +126,7 @@ class TInterface(LmsBase):
             f"{self.__class__.__name__}("
             f"id='{self.id}',"
             f"cid='{self.cid}',"
-            f"if_id='{self.if_id}'"
+            f"if_id='{self.if_id}',"
             f"last_update='{self.last_update}',"
             ")"
         )
@@ -202,6 +202,37 @@ class TForeign(LmsBase):
             f"name='{self.name}',"
             f"tin='{self.tin}',"
             f"ident='{self.ident}'"
+            ")"
+        )
+
+
+class TFlow(LmsBase):
+    """Mapping class for connection flow definitions."""
+
+    __tablename__: str = "uke_pit_flow"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    foreign_id: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
+    network: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    speed: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=100, server_default=text("100")
+    )
+    medium: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default=text("0")
+    )
+    desc: Mapped[str] = mapped_column(
+        String(30), nullable=False, default="", server_default=text("")
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"network='{self.network}',"
+            f"medium='{self.medium}',"
+            f"desc='{self.desc}'"
             ")"
         )
 
