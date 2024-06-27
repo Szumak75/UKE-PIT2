@@ -29,6 +29,7 @@ Transmisje międzywęzłowe
                             <td>{{ item.rid2 }}</td>
                         </tr>
                         {% endfor %}
+                    <tr><td colspan="5"><form name="net_connections" method="POST"><input type="hidden" name="connection_list" value="{{ key }}"/><input type="submit"/></form></td></tr>
                     {% endfor %}
                 </table>
                 {% endif %}

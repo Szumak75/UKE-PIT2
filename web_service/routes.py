@@ -669,7 +669,15 @@ if not conf.errors:
                     print(f"connection: {v6}")
                     print("-------------------------")
                 print("-[STOP]------------------")
-                # print(data_dict)
+
+                # store session connections list
+                for key in data_dict.keys():
+                    cid_list = []
+                    for item in data_dict[key]:
+                        cid_list.append(item.cid)
+                    if cid_list:
+                        session[f"connections_{key}"] = cid_list
+                # print(session.get("connections_W1", []))
 
         nodes_form.nodes_load()
 
