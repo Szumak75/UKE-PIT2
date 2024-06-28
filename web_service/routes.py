@@ -626,6 +626,7 @@ if not conf.errors:
         nodes_form: NodesSelectForm = NodesSelectForm()
         data_list: List[Tuple] = []
         data_dict = {}
+        nid = None
 
         if request.method == "POST":
             nid = request.form.get("nodes", default=None)
@@ -686,6 +687,7 @@ if not conf.errors:
             form=nodes_form,
             keys=data_dict.keys(),
             data=data_dict,
+            nid=nid,
             login="username" in session,
         )
 
