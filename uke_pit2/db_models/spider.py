@@ -214,13 +214,21 @@ class TFlow(LmsBase):
     id: Mapped[int] = mapped_column(
         primary_key=True, nullable=False, autoincrement=True
     )
-    foreign_id: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
+    foreign_id: Mapped[int] = mapped_column(
+        Integer, nullable=True, index=True, default=0, server_default=text("0")
+    )
     network: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    node1_id: Mapped[int] = mapped_column(
+        Integer, nullable=False, index=True, default=0, server_default=text("0")
+    )
+    node2_id: Mapped[int] = mapped_column(
+        Integer, nullable=False, index=True, default=0, server_default=text("0")
+    )
     speed: Mapped[int] = mapped_column(
         Integer, nullable=False, default=100, server_default=text("100")
     )
-    medium: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0, server_default=text("0")
+    medium_id: Mapped[int] = mapped_column(
+        Integer, nullable=False, index=True, default=0, server_default=text("0")
     )
     desc: Mapped[str] = mapped_column(String(30), nullable=True)
 
@@ -228,10 +236,28 @@ class TFlow(LmsBase):
         return (
             f"{self.__class__.__name__}("
             f"id='{self.id}',"
-            f"network='{self.network}',"
-            f"medium='{self.medium}',"
+            f"foreign_id='{self.foreign_id}',"
+            f"node1_id='{self.node1_id}',"
+            f"node2_id='{self.node2_id}',"
+            f"medium_id='{self.medium_id}',"
             f"desc='{self.desc}'"
             ")"
+        )
+
+
+class TMedium(LmsBase):
+    """Mapping class for medium dictionary."""
+
+    __tablename__: str = "uke_pit_media"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    name: Mapped[str] = mapped_column(String(50))
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(" f"id='{self.id}'," f"name='{self.name}'" ")"
         )
 
 
