@@ -217,7 +217,6 @@ class TFlow(LmsBase):
     foreign_id: Mapped[int] = mapped_column(
         Integer, nullable=True, index=True, default=0, server_default=text("0")
     )
-    network: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     node1_id: Mapped[int] = mapped_column(
         Integer, nullable=False, index=True, default=0, server_default=text("0")
     )

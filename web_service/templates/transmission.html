@@ -32,6 +32,8 @@ Transmisje międzywęzłowe
                     <tr><td colspan="5"><form name="net_connections" method="POST">
                         <input type="hidden" name="connection_list" value="{{ key }}"/>
                         <input type="hidden" name="nodes" value="{{ nid }}"/>
+                        <input type="hidden" name="node1_id" value="{{ data[key][0].node1_id }}"/>
+                        <input type="hidden" name="node2_id" value="{{ data[key][0].node2_id }}"/>
                         <input type="submit"/>
                     </form></td></tr>
                     {% endfor %}

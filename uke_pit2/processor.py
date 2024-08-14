@@ -252,26 +252,26 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
     def __purge_connections(self, session: Session) -> None:
         """Purge old connections."""
         runtime: Optional[int] = self._get_data(_Keys.RUNTIME)
-        if runtime and session:
-            # update filter - one week limit
-            oldest_update: int = runtime - 60 * 60 * 24 * 7
-            rows = (
-                session.query(TConnection, TFlow)
-                .outerjoin(TFlow, TFlow.network == TConnection.network)
-                .filter(TConnection.last_update < oldest_update)
-                .all()
-            )
+        # if runtime and session:
+        #     # update filter - one week limit
+        #     oldest_update: int = runtime - 60 * 60 * 24 * 7
+        #     rows = (
+        #         session.query(TConnection, TFlow)
+        #         .outerjoin(TFlow, TFlow.network == TConnection.network)
+        #         .filter(TConnection.last_update < oldest_update)
+        #         .all()
+        #     )
 
-            if rows:
-                count = 0
-                for connection, flow in rows:
-                    count += 1
-                    if connection:
-                        session.delete(connection)
-                    if flow:
-                        session.delete(flow)
-                session.commit()
-                self.logs.message_info = f"purge {count} connections."
+        #     if rows:
+        #         count = 0
+        #         for connection, flow in rows:
+        #             count += 1
+        #             if connection:
+        #                 session.delete(connection)
+        #             if flow:
+        #                 session.delete(flow)
+        #         session.commit()
+        #         self.logs.message_info = f"purge {count} connections."
 
     def __purge_routers(self, session: Session) -> None:
         """Purge old routers."""
@@ -280,7 +280,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
             # update filter - one week limit
             oldest_update: int = runtime - 60 * 60 * 24 * 7
             rows = (
-                session.query(TRouter, TNodeAssignment, TConnection, TCustomer, TFlow)
+                session.query(TRouter, TNodeAssignment, TConnection, TCustomer)
                 .outerjoin(
                     TConnection,
                     TConnection.rid == TRouter.id,
@@ -293,7 +293,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
                     TCustomer,
                     TCustomer.rid == TRouter.id,
                 )
-                .outerjoin(TFlow, TFlow.network == TConnection.network)
+                # .outerjoin(TFlow, TFlow.network == TConnection.network)
                 .filter(
                     TRouter.last_update < oldest_update,
                 )
@@ -304,7 +304,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
                 count = 0
                 r_count = 0
                 c_count = 0
-                for router, assignment, connection, customer, flow in rows:
+                for router, assignment, connection, customer in rows:
                     count += 1
 
                     if router:
@@ -317,8 +317,8 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
                         session.delete(assignment)
                     if customer:
                         session.delete(customer)
-                    if flow:
-                        session.delete(flow)
+                    # if flow:
+                    #     session.delete(flow)
                 session.commit()
                 self.logs.message_info = f"purge {count} records: {r_count} routers and {c_count} connections."
 

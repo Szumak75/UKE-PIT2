@@ -10,6 +10,7 @@
 from copy import deepcopy
 from crypt import methods
 from ctypes.wintypes import SIZE
+from importlib import metadata
 import os, secrets, tempfile
 
 from functools import wraps
@@ -309,6 +310,44 @@ class NodesSelectForm(FlaskForm):
         self.nodes.choices = models.LmsNetNode.get_all_list()  # type: ignore
 
 
+class FlowsData(BData):
+    """FlowsData container class."""
+
+    from web_service import models
+
+    class Keys(metaclass=ReadOnlyClass):
+        """Internal keys definition class."""
+
+        ID: str = "__id__"
+        FID: str = "__fid__"
+        NID1: str = "__nid1__"
+        NID2: str = "__nid2__"
+        SPEED: str = "__speed__"
+        MID: str = "__mid__"
+        DESC: str = "__desc__"
+
+    def __init__(self, flow: models.Flow) -> None:
+        self._set_data(key=FlowsData.Keys.ID, value=str(flow.id), set_default_type=str)
+        self._set_data(
+            key=FlowsData.Keys.FID, value=str(flow.foreign_id), set_default_type=str
+        )
+        self._set_data(
+            key=FlowsData.Keys.MID, value=str(flow.medium_id), set_default_type=str
+        )
+        self._set_data(
+            key=FlowsData.Keys.NID1, value=str(flow.node1_id), set_default_type=str
+        )
+        self._set_data(
+            key=FlowsData.Keys.NID2, value=str(flow.node2_id), set_default_type=str
+        )
+        self._set_data(
+            key=FlowsData.Keys.SPEED, value=str(flow.speed), set_default_type=str
+        )
+        self._set_data(
+            key=FlowsData.Keys.DESC, value=str(flow.desc), set_default_type=str
+        )
+
+
 class TransData(BData):
     """TransData container class."""
 
@@ -322,9 +361,13 @@ class TransData(BData):
         IFN1: str = "__ifn1__"
         IFN2: str = "__ifn2__"
         CON_ID: str = "__con_id__"
+        N1ID: str = "__node1_id__"
+        N2ID: str = "__node2_id__"
 
     def __init__(
         self,
+        n1: str,
+        n2: str,
         r1: models.Router,
         if1: models.Interface,
         r2: models.Router,
@@ -357,6 +400,12 @@ class TransData(BData):
             value=conn.network,
             set_default_type=int,
         )
+        if int(n1) < int(n2):
+            self._set_data(key=TransData.Keys.N1ID, value=n1, set_default_type=str)
+            self._set_data(key=TransData.Keys.N2ID, value=n2, set_default_type=str)
+        else:
+            self._set_data(key=TransData.Keys.N1ID, value=n2, set_default_type=str)
+            self._set_data(key=TransData.Keys.N2ID, value=n1, set_default_type=str)
 
     @property
     def rid1(self) -> str:
@@ -377,6 +426,14 @@ class TransData(BData):
     @property
     def cid(self) -> str:
         return self._get_data(key=TransData.Keys.CON_ID, default_value=0)  # type: ignore
+
+    @property
+    def node1_id(self) -> str:
+        return self._get_data(key=TransData.Keys.N1ID, default_value=0)  # type: ignore
+
+    @property
+    def node2_id(self) -> str:
+        return self._get_data(key=TransData.Keys.N2ID, default_value=0)  # type: ignore
 
 
 if not conf.errors:
@@ -626,6 +683,9 @@ if not conf.errors:
         nodes_form: NodesSelectForm = NodesSelectForm()
         data_list: List[Tuple] = []
         data_dict = {}
+        flows_dict = {}
+        foreign_dict = {}
+        media_dict = {}
         nid = None
 
         if request.method == "POST":
@@ -642,8 +702,23 @@ if not conf.errors:
                 C2 = aliased(models.Connection)
                 IF1 = aliased(models.Interface)
                 IF2 = aliased(models.Interface)
+                Flow = aliased(models.Flow)
+                Medium = aliased(models.Medium)
+                Foreign = aliased(models.Foreign)
                 # IFN1=aliased()
                 # IFN2=aliased()
+
+                # create dicts
+                medium = db.session.query(Medium).all()
+                if medium:
+                    for item in medium:
+                        media_dict[str(item.id)] = item.name
+
+                foreign = db.session.query(Foreign).all()
+                foreign_dict[0] = ""
+                if foreign:
+                    for item in foreign:
+                        foreign_dict[str(item.id)] = item.ident
 
                 rows = (
                     db.session.query(NN, R1, IF1, R2, IF2, C1)
@@ -659,11 +734,28 @@ if not conf.errors:
                     .order_by(NN.id)
                     .all()
                 )
+
                 print("-[START]-----------------")
                 for v1, v2, v3, v4, v5, v6 in rows:
+                    if int(nid) < v1.id:
+                        n1 = int(nid)
+                        n2 = int(v1.id)
+                    else:
+                        n2 = int(nid)
+                        n1 = int(v1.id)
                     if v1.name not in data_dict:
                         data_dict[v1.name] = []
-                    data_dict[v1.name].append(TransData(v2, v3, v4, v5, v6))
+                    data_dict[v1.name].append(
+                        TransData(str(n1), str(n2), v2, v3, v4, v5, v6)
+                    )
+                    flow = (
+                        db.session.query(Flow)
+                        .filter(Flow.node1_id == n1, Flow.node2_id == n2)
+                        .first()
+                    )
+                    if flow:
+                        flows_dict[f"{n1}-{n2}"] = FlowsData(flow)
+
                     print(f"node: {v1}")
                     print(f"router 1: {v2}->{v3}")
                     print(f"router 2: {v4}->{v5}")
