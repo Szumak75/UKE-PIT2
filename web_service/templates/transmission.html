@@ -32,8 +32,46 @@ Transmisje międzywęzłowe
                     <tr><td colspan="5"><form name="net_connections" method="POST">
                         <input type="hidden" name="connection_list" value="{{ key }}"/>
                         <input type="hidden" name="nodes" value="{{ nid }}"/>
-                        <input type="hidden" name="node1_id" value="{{ data[key][0].node1_id }}"/>
-                        <input type="hidden" name="node2_id" value="{{ data[key][0].node2_id }}"/>
+                        <input type="hidden" name="nid1" value="{{ data[key][0].node1_id }}"/>
+                        <input type="hidden" name="nid2" value="{{ data[key][0].node2_id }}"/>
+                        {% set flow_key = [data[key][0].node1_id, data[key][0].node2_id]|join('-') %}
+                        <input type="hidden" name="flow_key" value="{{ flow_key }}"/>
+                        {% if flow_key in flows %}
+                        <input type="number" name="speed" value="{{ flows[flow_key].speed }}"/> [MBps]
+                        <select class="Width120" name="media">
+                            {% for m_key, m_item in media.items() %}
+                            {% if m_key == flows[flow_key].mid %}
+                            <option value="{{ m_key }}" selected>{{ m_item }}</option>
+                            {% else %}
+                            <option value="{{ m_key }}">{{ m_item }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        <select class="Width80" name="foreign">
+                            {% for f_key, f_item in foreign.items() %}
+                            {% if f_key == flows[flow_key].fid %}
+                            <option value="{{ f_key }}" selected>{{ f_item }}</option>
+                            {% else %}
+                            <option value="{{ f_key }}">{{ f_item }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="desc" value="{{ flows[flow_key].desc }}"/>
+                        {% else %}
+                        <input type="number" name="speed" value=""/> [MBps]
+                        <select class="Width120" name="media">
+                            {% for m_key, m_item in media.items() %}
+                            <option value="{{ m_key }}">{{ m_item }}</option>
+                            {% endfor %}
+                        </select>
+                        <select class="Width80" name="foreign">
+                            {% for f_key, f_item in foreign.items() %}
+                            <option value="{{ f_key }}">{{ f_item }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="desc" value=""/>
+                        {% endif %}
+
                         <input type="submit"/>
                     </form></td></tr>
                     {% endfor %}

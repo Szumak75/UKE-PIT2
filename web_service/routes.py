@@ -347,6 +347,38 @@ class FlowsData(BData):
             key=FlowsData.Keys.DESC, value=str(flow.desc), set_default_type=str
         )
 
+    @property
+    def id(self) -> str:
+        return self._get_data(key=FlowsData.Keys.ID)  # type: ignore
+
+    @property
+    def nid1(self) -> str:
+        return self._get_data(key=FlowsData.Keys.NID1)  # type: ignore
+
+    @property
+    def nid2(self) -> str:
+        return self._get_data(key=FlowsData.Keys.NID2)  # type: ignore
+
+    @property
+    def key(self) -> str:
+        return f"{self._get_data(key=FlowsData.Keys.NID1)}-{self._get_data(key=FlowsData.Keys.NID2)}"  # type: ignore
+
+    @property
+    def fid(self) -> str:
+        return self._get_data(key=FlowsData.Keys.FID)  # type: ignore
+
+    @property
+    def mid(self) -> str:
+        return self._get_data(key=FlowsData.Keys.MID)  # type: ignore
+
+    @property
+    def speed(self) -> str:
+        return self._get_data(key=FlowsData.Keys.SPEED)  # type: ignore
+
+    @property
+    def desc(self) -> str:
+        return self._get_data(key=FlowsData.Keys.DESC)  # type: ignore
+
 
 class TransData(BData):
     """TransData container class."""
@@ -689,6 +721,61 @@ if not conf.errors:
         nid = None
 
         if request.method == "POST":
+            print(request.form.keys())
+            if "connection_list" in request.form.keys():
+                # submit flow
+                # print(
+                #     f"connection_list:{request.form.get('connection_list', default=None)}"
+                # )
+                # print(f"nodes:{request.form.get('nodes', default=None)}")
+                # print(f"flow_key:{request.form.get('flow_key', default=None)}")
+                # print(f"nid1:{request.form.get('nid1', default=None)}")
+                # print(f"nid2:{request.form.get('nid2', default=None)}")
+                # print(f"speed:{request.form.get('speed', default=None)}")
+                # print(f"media:{request.form.get('media', default=None)}")
+                # print(f"foreign:{request.form.get('foreign', default=None)}")
+                # print(f"desc:{request.form.get('desc', default=None)}")
+                fid = request.form.get("foreign", default="0")
+                mid = request.form.get("media", default="0")
+                nid1 = request.form.get("nid1", default=None)
+                nid2 = request.form.get("nid2", default=None)
+                speed = request.form.get("speed", default=50)
+                desc = request.form.get("desc", default="")
+                if speed and nid1 and nid2:
+                    row = (
+                        db.session.query(models.Flow)
+                        .filter(
+                            models.Flow.node1_id == nid1, models.Flow.node2_id == nid2
+                        )
+                        .first()
+                    )
+                    if row:
+                        test = False
+                        if row.foreign_id != int(fid):
+                            test = True
+                            row.foreign_id = int(fid)
+                        if row.medium_id != int(mid):
+                            test = True
+                            row.medium_id = int(mid)
+                        if row.speed != int(speed):
+                            test = True
+                            row.speed = int(speed)
+                        if row.desc != desc:
+                            test = True
+                            row.desc = desc
+                        if test:
+                            db.session.commit()
+                    else:
+                        row = models.Flow()
+                        row.foreign_id = int(fid)
+                        row.medium_id = int(mid)
+                        row.node1_id = int(nid1)
+                        row.node2_id = int(nid2)
+                        row.speed = int(speed)
+                        row.desc = desc
+                        db.session.add(row)
+                        db.session.commit()
+
             nid = request.form.get("nodes", default=None)
             # print(f"nid: {nid}")
             if nid and nid.isnumeric():
@@ -710,15 +797,19 @@ if not conf.errors:
 
                 # create dicts
                 medium = db.session.query(Medium).all()
+                media_dict[0] = ""
                 if medium:
                     for item in medium:
                         media_dict[str(item.id)] = item.name
 
                 foreign = db.session.query(Foreign).all()
-                foreign_dict[0] = ""
+                foreign_dict[0] = "Własne"
                 if foreign:
                     for item in foreign:
                         foreign_dict[str(item.id)] = item.ident
+
+                print(media_dict)
+                print(foreign_dict)
 
                 rows = (
                     db.session.query(NN, R1, IF1, R2, IF2, C1)
@@ -780,6 +871,9 @@ if not conf.errors:
             keys=data_dict.keys(),
             data=data_dict,
             nid=nid,
+            flows=flows_dict,
+            media=media_dict,
+            foreign=foreign_dict,
             login="username" in session,
         )
 

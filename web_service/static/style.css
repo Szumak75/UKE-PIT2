@@ -15,6 +15,7 @@ th, td              { text-align: left; padding: 2px; white-space: nowrap; overf
 tr                  { height: auto; }
 tr.tools            { height: 30px; }
 tr:nth-child(even)  { background-color: #dfd5bd; }
+SELECT,
 INPUT[type='text'],
 INPUT[type='email'],
 INPUT[type='search'],
