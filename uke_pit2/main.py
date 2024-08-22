@@ -826,7 +826,7 @@ class UkeApp(BaseApp, BVerbose):
                         self.logs.message_critical = f"Cannot create '{_Keys.CONF_DIR}': '{self.module_conf.output_dir}'"
                 elif pc.is_file:
                     configured = False
-                    self.logs.message_critical = f"'{_Keys.CONF_DIR}' is e file."
+                    self.logs.message_critical = f"'{_Keys.CONF_DIR}' is a file."
             else:
                 configured = False
 
