@@ -15,7 +15,7 @@ from typing import Optional, List
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.raisetool import Raise
-from jsktoolbox.libs.system import CommandLineParser
+from jsktoolbox.libs.system import CommandLineParser, PathChecker
 from jsktoolbox.netaddresstool.ipv4 import Address
 from jsktoolbox.logstool.logs import (
     LoggerEngine,
@@ -645,9 +645,6 @@ class UkeApp(BaseApp, BVerbose):
         thl.logger_client = self.logs
         self.logs_processor = thl
 
-        # check command line
-        self.__init_command_line()
-
         # add config handler
         if self.conf is None:
             self.conf = Config(logger_queue=log_queue, app_name="uke-pit2")
@@ -669,6 +666,9 @@ class UkeApp(BaseApp, BVerbose):
         # signal handling
         signal.signal(signal.SIGTERM, self.__sig_exit)
         signal.signal(signal.SIGINT, self.__sig_exit)
+
+        # check command line
+        self.__init_command_line()
 
         # init section config
         self.__check_config_section()
@@ -764,9 +764,33 @@ class UkeApp(BaseApp, BVerbose):
             self.tests = True
         if parser.get_option("output_dir") is not None:
             # set new output dir for reports
-            out = parser.get_option("output_dir")
+            out: Optional[str] = parser.get_option("output_dir")
             if out:
-                print(out)
+                if len(out) < 2:
+                    self.logs.message_critical = f"'output_dir': '{out}' is too short."
+                    self.stop = True
+                elif out[0] != "/":
+                    self.logs.message_critical = (
+                        f"'output_dir' must be an absolute path."
+                    )
+                    self.stop = True
+                else:
+                    dir = PathChecker(out)
+                    # self.logs.message_notice = f"{dir}"
+                    if dir.exists and dir.is_file:
+                        self.logs.message_critical = (
+                            f"'output_dir' exists and is a file."
+                        )
+                        self.stop = True
+                    elif dir.is_dir or not dir.exists:
+                        if dir.dirname and self.conf and self.conf.app_name:
+                            self._set_data(
+                                key=_Keys.OUTPUT_DIR,
+                                value=os.path.join(dir.dirname, self.conf.app_name),
+                                set_default_type=str,
+                            )
+                            self.logs.message_debug = f"'output_dir' is set to: {self._get_data(key=_Keys.OUTPUT_DIR)}"
+
             else:
                 self.logs.message_critical = f"'output_dir' is required."
                 self.stop = True

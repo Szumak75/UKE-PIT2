@@ -27,6 +27,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
 
     COMMAND_LINE_OPTS: str = "__clo__"
     CONF: str = "__config__"
+    CONFIGURED: str = "__conf_ok__"
     CONFIG_FILE: str = "__config_file__"
     CONFIG_HANDLER: str = "__cfh__"
     DEBUG: str = "__debug__"
@@ -34,11 +35,9 @@ class _Keys(object, metaclass=ReadOnlyClass):
     PROC_LOGS: str = "__logger_processor__"
     RB: str = "__rbh__"
     SECTION: str = "__config_section__"
-    VERBOSE: str = "__verbose__"
-
-    CONFIGURED: str = "__conf_ok__"
     SET_STOP: str = "__set_stop__"
     SET_TEST: str = "__set_test__"
+    VERBOSE: str = "__verbose__"
 
 
 class BConfigSection(BData):
