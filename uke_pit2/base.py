@@ -36,6 +36,10 @@ class _Keys(object, metaclass=ReadOnlyClass):
     SECTION: str = "__config_section__"
     VERBOSE: str = "__verbose__"
 
+    CONFIGURED: str = "__conf_ok__"
+    SET_STOP: str = "__set_stop__"
+    SET_TEST: str = "__set_test__"
+
 
 class BConfigSection(BData):
     """Base class for Config Section."""
@@ -165,6 +169,40 @@ class BaseApp(BLogs, BConfigSection):
     """Main app base class."""
 
     from uke_pit2.conf import Config
+
+    @property
+    def configured(self) -> bool:
+        """Returns configured flag."""
+        return self._get_data(key=_Keys.CONFIGURED, set_default_type=bool, default_value=False)  # type: ignore
+
+    @configured.setter
+    def configured(self, flag: bool) -> None:
+        """Sets configured flag."""
+        self._set_data(key=_Keys.CONFIGURED, value=flag)
+
+    @property
+    def stop(self) -> bool:
+        """Returns STOP flag."""
+        return self._get_data(
+            key=_Keys.SET_STOP, set_default_type=bool, default_value=False
+        )  # type: ignore
+
+    @stop.setter
+    def stop(self, flag: bool) -> None:
+        """Sets STOP flag."""
+        self._set_data(key=_Keys.SET_STOP, value=flag)
+
+    @property
+    def tests(self) -> bool:
+        """Returns tests flag."""
+        return self._get_data(
+            key=_Keys.SET_TEST, set_default_type=bool, default_value=False
+        )  # type: ignore
+
+    @tests.setter
+    def tests(self, flag: bool) -> None:
+        """Sets tests flag."""
+        self._set_data(key=_Keys.SET_TEST, set_default_type=bool, value=flag)
 
     @property
     def conf(self) -> Optional[Config]:

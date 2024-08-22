@@ -39,14 +39,11 @@ from uke_pit2.rb import RBData
 class _Keys(object, metaclass=ReadOnlyClass):
     """Internal _Keys container class."""
 
-    CONFIGURED: str = "__conf_ok__"
     OUTPUT_DIR: str = "__output_dir__"
     PASSWORDS: str = "router_passwords"
     SET_DB_PASS: str = "__set_db_pass__"
     SET_IP: str = "__set_ip__"
     SET_PASS: str = "__set_pass__"
-    SET_STOP: str = "__set_stop__"
-    SET_TEST: str = "__set_test__"
     START_IP: str = "start_ip"
     TEST_RANGE: str = "__test_routers_range__"
     TEST_START_IP: str = "__test_start_ip__"
@@ -618,40 +615,6 @@ class SpiderApp(BaseApp, BVerbose):
         """Sets ModuleConf object."""
         self._set_data(key=_ModuleConf.Keys.MODCONF, value=value)
 
-    @property
-    def configured(self) -> bool:
-        """Returns configured flag."""
-        return self._get_data(key=_Keys.CONFIGURED, set_default_type=bool, default_value=False)  # type: ignore
-
-    @configured.setter
-    def configured(self, flag: bool) -> None:
-        """Sets configured flag."""
-        self._set_data(key=_Keys.CONFIGURED, value=flag)
-
-    @property
-    def stop(self) -> bool:
-        """Returns STOP flag."""
-        return self._get_data(
-            key=_Keys.SET_STOP, set_default_type=bool, default_value=False
-        )  # type: ignore
-
-    @stop.setter
-    def stop(self, flag: bool) -> None:
-        """Sets STOP flag."""
-        self._set_data(key=_Keys.SET_STOP, value=flag)
-
-    @property
-    def tests(self) -> bool:
-        """Returns tests flag."""
-        return self._get_data(
-            key=_Keys.SET_TEST, set_default_type=bool, default_value=False
-        )  # type: ignore
-
-    @tests.setter
-    def tests(self, flag: bool) -> None:
-        """Sets tests flag."""
-        self._set_data(key=_Keys.SET_TEST, set_default_type=bool, value=flag)
-
 
 class UkeApp(BaseApp, BVerbose):
     """UKE PIT generator main class."""
@@ -716,6 +679,44 @@ class UkeApp(BaseApp, BVerbose):
         """Start application."""
         if not self.conf:
             return None
+
+        # logger processor
+        self.logs_processor.start()
+
+        # data
+
+        # TESTS
+        if self.tests:
+            pass
+
+        # main procedure
+        if (
+            self.configured
+            and self.logs.logs_queue
+            and self.module_conf.start_ip
+            and self.conf.module_conf
+            and not self.stop
+        ):
+            # start
+            self.logs.message_info = "starting procedure"
+
+            # if self.stop:
+            #     # TERM or INT signal was set
+            #     break
+
+            # end
+            self.logs.message_info = "procedure is complete"
+
+        # exit
+        time.sleep(1)
+
+        # logger processor
+        self.logs_processor.stop()
+        while not self.logs_processor.is_stopped:
+            self.logs_processor.join()
+            time.sleep(0.1)
+
+        sys.exit(0)
 
     def __sig_exit(self, signum: int, frame) -> None:
         """Received TERM|INT signal."""
@@ -844,6 +845,16 @@ class UkeApp(BaseApp, BVerbose):
                 formatter=LogFormatterNull(),
             ),
         )
+
+    @property
+    def module_conf(self) -> _ModuleConf:
+        """Return module conf object."""
+        return self._get_data(key=_ModuleConf.Keys.MODCONF, set_default_type=_ModuleConf)  # type: ignore
+
+    @module_conf.setter
+    def module_conf(self, value: _ModuleConf) -> None:
+        """Sets ModuleConf object."""
+        self._set_data(key=_ModuleConf.Keys.MODCONF, value=value)
 
 
 # #[EOF]#######################################################################
