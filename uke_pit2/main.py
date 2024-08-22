@@ -39,6 +39,7 @@ from uke_pit2.rb import RBData
 class _Keys(object, metaclass=ReadOnlyClass):
     """Internal _Keys container class."""
 
+    CONF_DIR: str = "output_dir"
     OUTPUT_DIR: str = "__output_dir__"
     PASSWORDS: str = "router_passwords"
     SET_DB_PASS: str = "__set_db_pass__"
@@ -72,7 +73,7 @@ class _ModuleConf(BModuleConfig):
     @property
     def output_dir(self) -> Optional[str]:
         """Returns output dir string for reports."""
-        var: Optional[str] = self._get(_Keys.OUTPUT_DIR)
+        var: Optional[str] = self._get(_Keys.CONF_DIR)
         if not var:
             return None
         return var
@@ -734,6 +735,109 @@ class UkeApp(BaseApp, BVerbose):
                 currentframe(),
             )
 
+        if self.conf.cfh.has_section(self.section):
+            self.logs.message_debug = f"Found section: [{self.section}]"
+        else:
+            self.logs.message_debug = f"Section: [{self.section}] not found..."
+            self.logs.message_debug = "...creating a default module configuration"
+            # create section
+            self.conf.cfh.set(self.section, desc="The generator configuration section")
+            dir = os.path.join(
+                Env.home,
+                "Reports",
+                f"{self.conf.app_name}/" if self.conf and self.conf.app_name else "",
+            )
+            if dir[-1] != "/":
+                dir = f"{dir}/"
+            self.conf.cfh.set(
+                self.section,
+                varname=_Keys.CONF_DIR,
+                value=dir,
+                desc="[str] output directory path for reports.",
+            )
+            if not self.conf.save():
+                raise Raise.error(
+                    "Configuration file writing error.",
+                    OSError,
+                    self._c_name,
+                    currentframe(),
+                )
+            self.conf.reload()
+
+        # check command line updates
+        if self._get_data(key=_Keys.OUTPUT_DIR, default_value=None):
+            self.conf.cfh.set(
+                section=self.section,
+                varname=_Keys.CONF_DIR,
+                value=self._get_data(key=_Keys.OUTPUT_DIR),
+            )
+            if not self.conf.save():
+                raise Raise.error(
+                    "Configuration file writing error.",
+                    OSError,
+                    self._c_name,
+                    currentframe(),
+                )
+            self.conf.reload()
+
+        # set module conf
+        self.module_conf = _ModuleConf(self.conf.cfh, self.section)
+
+        # check configuration
+        configured: bool = True
+        if not self.module_conf.output_dir:
+            self.logs.message_alert = f"'{_Keys.CONF_DIR}' is not set."
+            configured = False
+        else:
+            dir = self.module_conf.output_dir
+            if dir:
+                if len(dir) < 3:
+                    configured = False
+                    self.logs.message_critical = f"'{_Keys.CONF_DIR}' is too short."
+                elif dir[0] != "/":
+                    configured = False
+                    self.logs.message_critical = (
+                        f"'{_Keys.CONF_DIR}' must be an absolute path."
+                    )
+                elif dir[-1] != "/":
+                    dir = f"{dir}/"
+                    self.conf.cfh.set(
+                        self.section,
+                        varname=_Keys.CONF_DIR,
+                        value=dir,
+                        desc="[str] output directory path for reports.",
+                    )
+                    if not self.conf.save():
+                        raise Raise.error(
+                            "Configuration file writing error.",
+                            OSError,
+                            self._c_name,
+                            currentframe(),
+                        )
+                    self.conf.reload()
+        if configured:
+            if self.module_conf.output_dir:
+                # check directory
+                pc = PathChecker(self.module_conf.output_dir)
+                # self.logs.message_info = f"{pc}"
+                if not pc.exists:
+                    if not pc.create():
+                        configured = False
+                        self.logs.message_critical = f"Cannot create '{_Keys.CONF_DIR}': '{self.module_conf.output_dir}'"
+                elif pc.is_file:
+                    configured = False
+                    self.logs.message_critical = f"'{_Keys.CONF_DIR}' is e file."
+            else:
+                configured = False
+
+        self.configured = configured
+
+        if not configured:
+            self.logs.message_critical = (
+                f"module [{self.section}] is not configured properly."
+            )
+            self.logs.message_critical = "use command line options"
+
     def __init_command_line(self) -> None:
         """Initialize command line."""
         parser = CommandLineParser()
@@ -766,7 +870,7 @@ class UkeApp(BaseApp, BVerbose):
             # set new output dir for reports
             out: Optional[str] = parser.get_option("output_dir")
             if out:
-                if len(out) < 2:
+                if len(out) < 3:
                     self.logs.message_critical = f"'output_dir': '{out}' is too short."
                     self.stop = True
                 elif out[0] != "/":
@@ -775,6 +879,8 @@ class UkeApp(BaseApp, BVerbose):
                     )
                     self.stop = True
                 else:
+                    if out[-1] != "/":
+                        out = f"{out}/"
                     dir = PathChecker(out)
                     # self.logs.message_notice = f"{dir}"
                     if dir.exists and dir.is_file:
@@ -782,11 +888,13 @@ class UkeApp(BaseApp, BVerbose):
                             f"'output_dir' exists and is a file."
                         )
                         self.stop = True
-                    elif dir.is_dir or not dir.exists:
+                    elif not dir.exists or dir.is_dir:
                         if dir.dirname and self.conf and self.conf.app_name:
                             self._set_data(
                                 key=_Keys.OUTPUT_DIR,
-                                value=os.path.join(dir.dirname, self.conf.app_name),
+                                value=os.path.join(
+                                    dir.dirname, f"{self.conf.app_name}/"
+                                ),
                                 set_default_type=str,
                             )
                             self.logs.message_debug = f"'output_dir' is set to: {self._get_data(key=_Keys.OUTPUT_DIR)}"
