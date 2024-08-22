@@ -40,6 +40,7 @@ class _Keys(object, metaclass=ReadOnlyClass):
     """Internal _Keys container class."""
 
     CONFIGURED: str = "__conf_ok__"
+    OUTPUT_DIR: str = "__output_dir__"
     PASSWORDS: str = "router_passwords"
     SET_DB_PASS: str = "__set_db_pass__"
     SET_IP: str = "__set_ip__"
@@ -69,6 +70,14 @@ class _ModuleConf(BModuleConfig):
         var: List[str] = self._get(_Keys.PASSWORDS)
         if not var or isinstance(var, List) and len(var) == 1 and len(f"{var[0]}") == 0:
             return []
+        return var
+
+    @property
+    def output_dir(self) -> Optional[str]:
+        """Returns output dir string for reports."""
+        var: Optional[str] = self._get(_Keys.OUTPUT_DIR)
+        if not var:
+            return None
         return var
 
 
@@ -644,21 +653,101 @@ class SpiderApp(BaseApp, BVerbose):
         self._set_data(key=_Keys.SET_TEST, set_default_type=bool, value=flag)
 
 
-class UkeApp(BaseApp):
+class UkeApp(BaseApp, BVerbose):
     """UKE PIT generator main class."""
 
     def __init__(self) -> None:
         """UKE generator constructor."""
 
+        # set config section name
+        self.section = self._c_name
+
+        # logging subsystem
+        log_engine = LoggerEngine()
+        log_queue: Optional[LoggerQueue] = log_engine.logs_queue
+        if not log_queue:
+            log_queue = LoggerQueue()
+            log_engine.logs_queue = log_queue
+
+        # logger levels
+        self.__init_log_levels(log_engine)
+
+        # logger client
+        self.logs = LoggerClient()
+
+        # logger processor
+        thl = ThLoggerProcessor()
+        thl.sleep_period = 0.2
+        thl.logger_engine = log_engine
+        thl.logger_client = self.logs
+        self.logs_processor = thl
+
         # check command line
         self.__init_command_line()
+
+        # add config handler
+        if self.conf is None:
+            self.conf = Config(logger_queue=log_queue, app_name="uke-pit2")
+
+        # set configuration filename
+        self.conf.config_file = os.path.join(
+            Env.home, f".{self.conf.section}", "config"
+        )
+
+        # config file
+        if not self.conf.load():
+            self.logs.message_critical = "cannot load config file"
+            # TODO: print logs
+            sys.exit(1)
+
+        # update debug
+        self.logs_processor._debug = self.conf.debug
+
+        # signal handling
+        signal.signal(signal.SIGTERM, self.__sig_exit)
+        signal.signal(signal.SIGINT, self.__sig_exit)
+
+        # init section config
+        self.__check_config_section()
+
+        # check single run options
+
+    def run(self) -> None:
+        """Start application."""
+        if not self.conf:
+            return None
+
+    def __sig_exit(self, signum: int, frame) -> None:
+        """Received TERM|INT signal."""
+        if self.conf and self.conf.debug:
+            self.logs.message_debug = "TERM or INT signal received."
+        self.stop = True
+
+    def __check_config_section(self) -> None:
+        """Check config option for section."""
+        if not self.conf or not self.conf.cfh or not self.section:
+            raise Raise.error(
+                "Configuration initialization error.",
+                RuntimeError,
+                self._c_name,
+                currentframe(),
+            )
 
     def __init_command_line(self) -> None:
         """Initialize command line."""
         parser = CommandLineParser()
 
         # configuration for arguments
-        parser.configure_argument("h", "help", "this information")
+        parser.configure_argument("h", "help", "this information.")
+        parser.configure_argument(
+            "o",
+            "output_dir",
+            "modify output dir for reports.",
+            has_value=True,
+            example_value="/tmp/Reports",
+        )
+        parser.configure_argument("T", "test", "for developer tests.")
+        parser.configure_argument("v", "verbose", "verbose flag for debugging.")
 
         # command line parsing
         parser.parse_arguments()
@@ -666,6 +755,20 @@ class UkeApp(BaseApp):
         # check
         if parser.get_option("help") is not None:
             self._help(parser.dump())
+        if parser.get_option("verbose") is not None:
+            # set verbose flag
+            self.verbose = True
+        if parser.get_option("test") is not None:
+            # set test flag
+            self.tests = True
+        if parser.get_option("output_dir") is not None:
+            # set new output dir for reports
+            out = parser.get_option("output_dir")
+            if out:
+                print(out)
+            else:
+                self.logs.message_critical = f"'output_dir' is required."
+                self.stop = True
 
     def __init_log_levels(self, engine: LoggerEngine) -> None:
         """Set logging levels configuration for LoggerEngine."""
