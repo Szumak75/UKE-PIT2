@@ -164,6 +164,10 @@ class BRouterBoard(BData):
         self._set_data(key=_Keys.RB, value=value)
 
 
+class BReportGenerator(BLogs, BVerbose, BDebug):
+    """Base class for reports generator class."""
+
+
 class BaseApp(BLogs, BConfigSection):
     """Main app base class."""
 
