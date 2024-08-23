@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="z6_podmioty_obce_2_szablon_20230101" id="z6_podmioty_obce_2_szablon_20230101">
+	<SimpleField name="po01_id_podmiotu_obcego" type="string"></SimpleField>
+	<SimpleField name="po02_nip_pl" type="string"></SimpleField>
+	<SimpleField name="po03_nip_nie_pl" type="string"></SimpleField>
+</Schema>
+<Folder><name>z6_podmioty_obce_2_szablon_20230101</name>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z6_podmioty_obce_2_szablon_20230101">
+		<SimpleData name="po01_id_podmiotu_obcego">POBCY01_DEMO</SimpleData>
+		<SimpleData name="po02_nip_pl">5123456781</SimpleData>
+	</SchemaData></ExtendedData>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z6_podmioty_obce_2_szablon_20230101">
+		<SimpleData name="po01_id_podmiotu_obcego">POBCY02_DEMO</SimpleData>
+		<SimpleData name="po02_nip_pl">5001112221</SimpleData>
+	</SchemaData></ExtendedData>
+  </Placemark>
+</Folder>
+</Document></kml>

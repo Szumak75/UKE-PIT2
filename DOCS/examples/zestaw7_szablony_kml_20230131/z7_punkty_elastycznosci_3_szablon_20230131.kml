@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="z7_punkty_elastycznosci_3_szablon_20230107" id="z7_punkty_elastycznosci_3_szablon_20230107">
+	<SimpleField name="pe01_id_pe" type="string"></SimpleField>
+	<SimpleField name="pe02_typ_pe" type="string"></SimpleField>
+	<SimpleField name="pe03_id_wezla" type="string"></SimpleField>
+	<SimpleField name="pe04_pdu" type="string"></SimpleField>
+	<SimpleField name="pe05_terc" type="string"></SimpleField>
+	<SimpleField name="pe06_simc" type="string"></SimpleField>
+	<SimpleField name="pe07_ulic" type="string"></SimpleField>
+	<SimpleField name="pe08_nr_porzadkowy" type="string"></SimpleField>
+	<SimpleField name="pe09_szerokosc" type="string"></SimpleField>
+	<SimpleField name="pe10_dlugosc" type="string"></SimpleField>
+	<SimpleField name="pe11_medium_transmisyjne" type="string"></SimpleField>
+	<SimpleField name="pe12_technologia_dostepowa" type="string"></SimpleField>
+	<SimpleField name="pe13_mozliwosc_swiadczenia_uslug" type="string"></SimpleField>
+	<SimpleField name="pe14_finansowanie_publ" type="string"></SimpleField>
+	<SimpleField name="pe15_numery_projektow_publ" type="string"></SimpleField>
+</Schema>
+<Folder><name>z7_punkty_elastycznosci_3_szablon_20230107</name>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z7_punkty_elastycznosci_3_szablon_20230107">
+		<SimpleData name="pe01_id_pe">P1001_DEMO</SimpleData>
+		<SimpleData name="pe02_typ_pe">05</SimpleData>
+		<SimpleData name="pe03_id_wezla">WW_ABC1234_DEMO</SimpleData>
+		<SimpleData name="pe04_pdu">Tak</SimpleData>
+		<SimpleData name="pe05_terc">1465011</SimpleData>
+		<SimpleData name="pe06_simc">0918123</SimpleData>
+		<SimpleData name="pe07_ulic">16333</SimpleData>
+		<SimpleData name="pe08_nr_porzadkowy">18</SimpleData>
+		<SimpleData name="pe09_szerokosc">52.25649</SimpleData>
+		<SimpleData name="pe10_dlugosc">20.91719</SimpleData>
+		<SimpleData name="pe11_medium_transmisyjne">światłowodowe</SimpleData>
+		<SimpleData name="pe12_technologia_dostepowa">1 Gigabit Ethernet</SimpleData>
+		<SimpleData name="pe13_mozliwosc_swiadczenia_uslug">01</SimpleData>
+		<SimpleData name="pe14_finansowanie_publ">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.91719,52.25649</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z7_punkty_elastycznosci_3_szablon_20230107">
+		<SimpleData name="pe01_id_pe">P1002_DEMO</SimpleData>
+		<SimpleData name="pe02_typ_pe">06</SimpleData>
+		<SimpleData name="pe03_id_wezla">WW_ABC1234_DEMO</SimpleData>
+		<SimpleData name="pe04_pdu">Tak</SimpleData>
+		<SimpleData name="pe05_terc">1465011</SimpleData>
+		<SimpleData name="pe06_simc">0918123</SimpleData>
+		<SimpleData name="pe07_ulic">17366</SimpleData>
+		<SimpleData name="pe08_nr_porzadkowy">103</SimpleData>
+		<SimpleData name="pe09_szerokosc">52.25638</SimpleData>
+		<SimpleData name="pe10_dlugosc">20.91775</SimpleData>
+		<SimpleData name="pe11_medium_transmisyjne">światłowodowe</SimpleData>
+		<SimpleData name="pe12_technologia_dostepowa">1 Gigabit Ethernet</SimpleData>
+		<SimpleData name="pe13_mozliwosc_swiadczenia_uslug">01</SimpleData>
+		<SimpleData name="pe14_finansowanie_publ">Tak</SimpleData>
+		<SimpleData name="pe15_numery_projektow_publ">12A/2020;13/2021;AW2233/2022</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.91775,52.25638</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z7_punkty_elastycznosci_3_szablon_20230107">
+		<SimpleData name="pe01_id_pe">P1003_DEMO</SimpleData>
+		<SimpleData name="pe02_typ_pe">01</SimpleData>
+		<SimpleData name="pe03_id_wezla">WW_ABC1234_DEMO</SimpleData>
+		<SimpleData name="pe04_pdu">Tak</SimpleData>
+		<SimpleData name="pe05_terc">1465011</SimpleData>
+		<SimpleData name="pe06_simc">0918123</SimpleData>
+		<SimpleData name="pe07_ulic">16333</SimpleData>
+		<SimpleData name="pe08_nr_porzadkowy">20</SimpleData>
+		<SimpleData name="pe09_szerokosc">52.25698</SimpleData>
+		<SimpleData name="pe10_dlugosc">20.91733</SimpleData>
+		<SimpleData name="pe11_medium_transmisyjne">światłowodowe</SimpleData>
+		<SimpleData name="pe12_technologia_dostepowa">1 Gigabit Ethernet</SimpleData>
+		<SimpleData name="pe13_mozliwosc_swiadczenia_uslug">01</SimpleData>
+		<SimpleData name="pe14_finansowanie_publ">Tak</SimpleData>
+		<SimpleData name="pe15_numery_projektow_publ">12A/2020;13/2021;W2233/2022</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.91733,52.25698</coordinates></Point>
+  </Placemark>
+</Folder>
+</Document></kml>

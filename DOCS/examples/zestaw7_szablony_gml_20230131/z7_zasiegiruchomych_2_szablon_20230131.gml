@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ogr:FeatureCollection
+     gml:id="aFeatureCollection"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://ogr.maptools.org/ z6_zasiegiruchomych_2_szablon_20230101.xsd"
+     xmlns:ogr="http://ogr.maptools.org/"
+     xmlns:gml="http://www.opengis.net/gml/3.2">
+  <gml:boundedBy><gml:Null /></gml:boundedBy>
+                                                                                                                                                                                                                                                                                                               
+  <ogr:featureMember>
+    <ogr:z6_zasiegiruchomych_2_szablon_20230101 gml:id="z6_zasiegiruchomych_2_szablon_20230101.0">
+      <ogr:zr01_id_komorki_siatki>100000</ogr:zr01_id_komorki_siatki>
+      <ogr:zr02_technologia_dostepowa_420mhz>CWDM</ogr:zr02_technologia_dostepowa_420mhz>
+      <ogr:zr03_zasieg_zewn_420mhz>3</ogr:zr03_zasieg_zewn_420mhz>
+      <ogr:zr04_zasieg_wewn_420mhz>2</ogr:zr04_zasieg_wewn_420mhz>
+      <ogr:zr05_technologia_dostepowa_700mhz>CWDM</ogr:zr05_technologia_dostepowa_700mhz>
+      <ogr:zr06_zasieg_zewn_700mhz>3</ogr:zr06_zasieg_zewn_700mhz>
+      <ogr:zr07_zasieg_wewn_700mhz>2</ogr:zr07_zasieg_wewn_700mhz>
+      <ogr:zr08_technologia_dostepowa_800mhz>CWDM</ogr:zr08_technologia_dostepowa_800mhz>
+      <ogr:zr09_zasieg_zewn_800mhz>3</ogr:zr09_zasieg_zewn_800mhz>
+      <ogr:zr10_zasieg_wewn_800mhz>2</ogr:zr10_zasieg_wewn_800mhz>
+      <ogr:zr11_technologia_dostepowa_900mhz>CWDM</ogr:zr11_technologia_dostepowa_900mhz>
+      <ogr:zr12_zasieg_zewn_900mhz>3</ogr:zr12_zasieg_zewn_900mhz>
+      <ogr:zr13_zasieg_wewn_900mhz>2</ogr:zr13_zasieg_wewn_900mhz>
+      <ogr:zr14_technologia_dostepowa_1800mhz>CWDM</ogr:zr14_technologia_dostepowa_1800mhz>
+      <ogr:zr15_zasieg_zewn_1800mhz>3</ogr:zr15_zasieg_zewn_1800mhz>
+      <ogr:zr16_zasieg_wewn_1800mhz>2</ogr:zr16_zasieg_wewn_1800mhz>
+      <ogr:zr17_technologia_dostepowa_2100mhz>CWDM</ogr:zr17_technologia_dostepowa_2100mhz>
+      <ogr:zr18_zasieg_zewn_2100mhz>3</ogr:zr18_zasieg_zewn_2100mhz>
+      <ogr:zr19_zasieg_wewn_2100mhz>2</ogr:zr19_zasieg_wewn_2100mhz>
+      <ogr:zr20_technologia_dostepowa_2600mhz>CWDM</ogr:zr20_technologia_dostepowa_2600mhz>
+      <ogr:zr21_zasieg_zewn_2600mhz>3</ogr:zr21_zasieg_zewn_2600mhz>
+      <ogr:zr22_zasieg_wewn_2600mhz>2</ogr:zr22_zasieg_wewn_2600mhz>
+      <ogr:zr23_technologia_dostepowa_3600mhz>CWDM</ogr:zr23_technologia_dostepowa_3600mhz>
+      <ogr:zr24_zasieg_zewn_3600mhz>3</ogr:zr24_zasieg_zewn_3600mhz>
+      <ogr:zr25_zasieg_wewn_3600mhz>2</ogr:zr25_zasieg_wewn_3600mhz>
+      <ogr:zr26_technologia_dostepowa_26000mhz>CWDM</ogr:zr26_technologia_dostepowa_26000mhz>
+      <ogr:zr27_zasieg_zewn_26000mhz>3</ogr:zr27_zasieg_zewn_26000mhz>
+      <ogr:zr28_zasieg_wewn_26000mhz>2</ogr:zr28_zasieg_wewn_26000mhz>
+      <ogr:zr29_max_predkosc_do_uzytkownika>09</ogr:zr29_max_predkosc_do_uzytkownika>
+      <ogr:zr30_max_predkosc_od_uzytkownika>04</ogr:zr30_max_predkosc_od_uzytkownika>
+      <ogr:zr31_szybka_siec_telekom>Tak</ogr:zr31_szybka_siec_telekom>
+    </ogr:z6_zasiegiruchomych_2_szablon_20230101>
+  </ogr:featureMember>
+  <ogr:featureMember>
+    <ogr:z6_zasiegiruchomych_2_szablon_20230101 gml:id="z6_zasiegiruchomych_2_szablon_20230101.1">
+      <ogr:zr01_id_komorki_siatki>100001</ogr:zr01_id_komorki_siatki>
+      <ogr:zr02_technologia_dostepowa_420mhz>CWDM</ogr:zr02_technologia_dostepowa_420mhz>
+      <ogr:zr03_zasieg_zewn_420mhz>3</ogr:zr03_zasieg_zewn_420mhz>
+      <ogr:zr04_zasieg_wewn_420mhz>2</ogr:zr04_zasieg_wewn_420mhz>
+      <ogr:zr05_technologia_dostepowa_700mhz>CWDM</ogr:zr05_technologia_dostepowa_700mhz>
+      <ogr:zr06_zasieg_zewn_700mhz>3</ogr:zr06_zasieg_zewn_700mhz>
+      <ogr:zr07_zasieg_wewn_700mhz>2</ogr:zr07_zasieg_wewn_700mhz>
+      <ogr:zr08_technologia_dostepowa_800mhz>CWDM</ogr:zr08_technologia_dostepowa_800mhz>
+      <ogr:zr09_zasieg_zewn_800mhz>3</ogr:zr09_zasieg_zewn_800mhz>
+      <ogr:zr10_zasieg_wewn_800mhz>2</ogr:zr10_zasieg_wewn_800mhz>
+      <ogr:zr11_technologia_dostepowa_900mhz>CWDM</ogr:zr11_technologia_dostepowa_900mhz>
+      <ogr:zr12_zasieg_zewn_900mhz>3</ogr:zr12_zasieg_zewn_900mhz>
+      <ogr:zr13_zasieg_wewn_900mhz>2</ogr:zr13_zasieg_wewn_900mhz>
+      <ogr:zr14_technologia_dostepowa_1800mhz>CWDM</ogr:zr14_technologia_dostepowa_1800mhz>
+      <ogr:zr15_zasieg_zewn_1800mhz>3</ogr:zr15_zasieg_zewn_1800mhz>
+      <ogr:zr16_zasieg_wewn_1800mhz>2</ogr:zr16_zasieg_wewn_1800mhz>
+      <ogr:zr17_technologia_dostepowa_2100mhz>CWDM</ogr:zr17_technologia_dostepowa_2100mhz>
+      <ogr:zr18_zasieg_zewn_2100mhz>3</ogr:zr18_zasieg_zewn_2100mhz>
+      <ogr:zr19_zasieg_wewn_2100mhz>2</ogr:zr19_zasieg_wewn_2100mhz>
+      <ogr:zr20_technologia_dostepowa_2600mhz>CWDM</ogr:zr20_technologia_dostepowa_2600mhz>
+      <ogr:zr21_zasieg_zewn_2600mhz>3</ogr:zr21_zasieg_zewn_2600mhz>
+      <ogr:zr22_zasieg_wewn_2600mhz>2</ogr:zr22_zasieg_wewn_2600mhz>
+      <ogr:zr23_technologia_dostepowa_3600mhz>CWDM</ogr:zr23_technologia_dostepowa_3600mhz>
+      <ogr:zr24_zasieg_zewn_3600mhz>3</ogr:zr24_zasieg_zewn_3600mhz>
+      <ogr:zr25_zasieg_wewn_3600mhz>2</ogr:zr25_zasieg_wewn_3600mhz>
+      <ogr:zr26_technologia_dostepowa_26000mhz>CWDM</ogr:zr26_technologia_dostepowa_26000mhz>
+      <ogr:zr27_zasieg_zewn_26000mhz>3</ogr:zr27_zasieg_zewn_26000mhz>
+      <ogr:zr28_zasieg_wewn_26000mhz>2</ogr:zr28_zasieg_wewn_26000mhz>
+      <ogr:zr29_max_predkosc_do_uzytkownika>09</ogr:zr29_max_predkosc_do_uzytkownika>
+      <ogr:zr30_max_predkosc_od_uzytkownika>04</ogr:zr30_max_predkosc_od_uzytkownika>
+      <ogr:zr31_szybka_siec_telekom>Nie</ogr:zr31_szybka_siec_telekom>
+    </ogr:z6_zasiegiruchomych_2_szablon_20230101>
+  </ogr:featureMember>
+</ogr:FeatureCollection>

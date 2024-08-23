@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="z7_liniebezprzewodowe_1_szablon_20230107" id="z7_liniebezprzewodowe_1_szablon_20230107">
+	<SimpleField name="lb01_id_lb" type="string"></SimpleField>
+	<SimpleField name="lb02_id_punktu_poczatkowego" type="string"></SimpleField>
+	<SimpleField name="lb03_id_punktu_koncowego" type="string"></SimpleField>
+	<SimpleField name="lb04_medium_transmisyjne" type="string"></SimpleField>
+	<SimpleField name="lb05_nr_pozwolenia_radiowego" type="string"></SimpleField>
+	<SimpleField name="lb06_pasmo_radiowe" type="string"></SimpleField>
+	<SimpleField name="lb07_system_transmisyjny" type="string"></SimpleField>
+	<SimpleField name="lb08_przepustowosc" type="string"></SimpleField>
+	<SimpleField name="lb09_mozliwosc_udostepniania" type="string"></SimpleField>
+</Schema>
+<Folder><name>z7_liniebezprzewodowe_1_szablon_20230107</name>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z7_liniebezprzewodowe_1_szablon_20230107">
+		<SimpleData name="lb01_id_lb">LB001_DEMO</SimpleData>
+		<SimpleData name="lb02_id_punktu_poczatkowego">WW_ABC1234R_DEMO</SimpleData>
+		<SimpleData name="lb03_id_punktu_koncowego">WW_WAR1234R_DEMO</SimpleData>
+		<SimpleData name="lb04_medium_transmisyjne">radiowe na częstotliwości wymagającej uzyskanie pozwolenia radiowego</SimpleData>
+		<SimpleData name="lb05_nr_pozwolenia_radiowego">32/23/2022\P</SimpleData>
+		<SimpleData name="lb07_system_transmisyjny">Radiolinia</SimpleData>
+		<SimpleData name="lb08_przepustowosc">02</SimpleData>
+		<SimpleData name="lb09_mozliwosc_udostepniania">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+  </Placemark>
+</Folder>
+</Document></kml>

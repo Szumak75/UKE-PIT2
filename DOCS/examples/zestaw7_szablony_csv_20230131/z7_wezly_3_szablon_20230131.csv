@@ -1,0 +1,6 @@
+we01_id_wezla,we02_tytul_do_wezla,we03_id_podmiotu_obcego,we04_terc,we05_simc,we06_ulic,we07_nr_porzadkowy,we08_szerokosc,we09_dlugosc,we10_medium_transmisyjne,we11_bsa,we12_technologia_dostepowa,we13_uslugi_transmisji_danych,we14_mozliwosc_zwiekszenia_liczby_interfejsow,we15_finansowanie_publ,we16_numery_projektow_publ,we17_infrastruktura_o_duzym_znaczeniu,we18_typ_interfejsu,we19_udostepnianie_ethernet
+WW_ABC1234_DEMO,Węzeł własny,,1465011,0918123,,,52.25689,20.91701,światłowodowe,Nie,1 Gigabit Ethernet,,Nie,Nie,,Nie,,
+WW_WAR1234_DEMO,Węzeł własny,,1465011,0918123,16333,20a,52.25678,20.91802,światłowodowe,Nie,5 Gigabit Ethernet,,Nie,Nie,,Nie,,
+WW_WAR5678_DEMO,Węzeł własny,,1465011,0918123,16333,9,52.25731,20.915398,światłowodowe,Nie,1 Gigabit Ethernet;EPON,,Nie,Nie,,Nie,,
+WW_ABC1234R_DEMO,Węzeł własny,,1465011,0918123,,,52.25692,20.91600,radiowe,Nie,Radiolinia,,Nie,Nie,,Nie,,
+WW_WAR1234R_DEMO,Węzeł własny,,1465011,0918123,16333,20,52.25700,20.91737,radiowe,Nie,Radiolinia,,Nie,Nie,,Nie,,

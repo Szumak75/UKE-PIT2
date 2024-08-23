@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "z7_podmioty_obce_2_szablon_20230131",
+"features": [
+{ "type": "Feature", "properties": { "fid": 1, "po01_id_podmiotu_obcego": "POBCY01", "po02_nip_pl": "5123456781", "po03_nip_nie_pl": null }, "geometry": null },
+{ "type": "Feature", "properties": { "fid": 2, "po01_id_podmiotu_obcego": "POBCY02", "po02_nip_pl": "5001112221", "po03_nip_nie_pl": null }, "geometry": null }
+]
+}

@@ -1,0 +1,4 @@
+pe01_id_pe,pe02_typ_pe,pe03_id_wezla,pe04_pdu,pe05_terc,pe06_simc,pe07_ulic,pe08_nr_porzadkowy,pe09_szerokosc,pe10_dlugosc,pe11_medium_transmisyjne,pe12_technologia_dostepowa,pe13_mozliwosc_swiadczenia_uslug,pe14_finansowanie_publ,pe15_numery_projektow_publ
+"P1001_DEMO",05,WW_ABC1234_DEMO,Tak,"1465011","0918123","16333","18","52.25649","20.91719",światłowodowe,"1 Gigabit Ethernet",01,"Nie",""
+"P1002_DEMO",06,WW_ABC1234_DEMO,Tak,"1465011","0918123","17366","103","52.25638","20.91775",światłowodowe,"1 Gigabit Ethernet",01,"Tak","12A/2020;13/2021;AW2233/2022"
+"P1003_DEMO",01,WW_ABC1234_DEMO,Tak,"1465011","0918123","16333","20","52.25698","20.91733",światłowodowe,"1 Gigabit Ethernet",01,"Tak","12A/2020;13/2021;W2233/2022"

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="z7_liniekablowe_2_szablon_20230107" id="z7_liniekablowe_2_szablon_20230107">
+	<SimpleField name="lk01_id_lk" type="string"></SimpleField>
+	<SimpleField name="lk02_id_punktu_poczatkowego" type="string"></SimpleField>
+	<SimpleField name="lk04_id_punktu_koncowego" type="string"></SimpleField>
+	<SimpleField name="lk05_medium_transmisyjne" type="string"></SimpleField>
+	<SimpleField name="lk06_rodzaj_linii_kablowej" type="string"></SimpleField>
+	<SimpleField name="lk07_liczba_wlokien" type="string"></SimpleField>
+	<SimpleField name="lk08_liczba_wlokien_wykorzystywanych" type="string"></SimpleField>
+	<SimpleField name="lk09_liczba_wlokien_udostepnienia" type="string"></SimpleField>
+	<SimpleField name="lk10_finansowanie_publ" type="string"></SimpleField>
+	<SimpleField name="lk11_numery_projektow_publ" type="string"></SimpleField>
+	<SimpleField name="lk12_infrastruktura_o_duzym_znaczeniu" type="string"></SimpleField>
+</Schema>
+<Folder><name>z7_liniekablowe_2_szablon_20230107</name>
+  <Placemark>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+	<ExtendedData><SchemaData schemaUrl="#z7_liniekablowe_2_szablon_20230107">
+		<SimpleData name="lk01_id_lk">LK0001_DEMO</SimpleData>
+		<SimpleData name="lk02_id_punktu_poczatkowego">WW_WAR5678_DEMO</SimpleData>
+		<SimpleData name="lk04_id_punktu_koncowego">WW_WAR1234_DEMO</SimpleData>
+		<SimpleData name="lk05_medium_transmisyjne">światłowodowe</SimpleData>
+		<SimpleData name="lk06_rodzaj_linii_kablowej">Linia kablowa umieszczona w kanale technologicznym</SimpleData>
+		<SimpleData name="lk07_liczba_wlokien">256</SimpleData>
+		<SimpleData name="lk08_liczba_wlokien_wykorzystywanych">256</SimpleData>
+		<SimpleData name="lk09_liczba_wlokien_udostepnienia">0</SimpleData>
+		<SimpleData name="lk10_finansowanie_publ">Nie</SimpleData>
+		<SimpleData name="lk12_infrastruktura_o_duzym_znaczeniu">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+      <LineString><coordinates>20.9154,52.25731 20.91549,52.25718 20.91606,52.25764 20.91664,52.25736 20.916851,52.25745 20.91698,52.257025 20.91701,52.25689</coordinates></LineString>
+  </Placemark>
+  <Placemark>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+	<ExtendedData><SchemaData schemaUrl="#z7_liniekablowe_2_szablon_20230107">
+		<SimpleData name="lk01_id_lk">LK0002_DEMO</SimpleData>
+		<SimpleData name="lk02_id_punktu_poczatkowego">WW_ABC1234_DEMO</SimpleData>
+		<SimpleData name="lk04_id_punktu_koncowego">P1003_DEMO</SimpleData>
+		<SimpleData name="lk05_medium_transmisyjne">światłowodowe</SimpleData>
+		<SimpleData name="lk06_rodzaj_linii_kablowej">Linia kablowa umieszczona w kanale technologicznym</SimpleData>
+		<SimpleData name="lk07_liczba_wlokien">1024</SimpleData>
+		<SimpleData name="lk08_liczba_wlokien_wykorzystywanych">1024</SimpleData>
+		<SimpleData name="lk09_liczba_wlokien_udostepnienia">0</SimpleData>
+		<SimpleData name="lk10_finansowanie_publ">Nie</SimpleData>
+		<SimpleData name="lk12_infrastruktura_o_duzym_znaczeniu">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+      <LineString><coordinates>20.91701,52.25689 20.91698,52.25702 20.91713,52.25714 20.91733,52.25698</coordinates></LineString>
+  </Placemark>
+  <Placemark>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+	<ExtendedData><SchemaData schemaUrl="#z7_liniekablowe_2_szablon_20230107">
+		<SimpleData name="lk01_id_lk">LK0003_DEMO</SimpleData>
+		<SimpleData name="lk02_id_punktu_poczatkowego">P1001_DEMO</SimpleData>
+		<SimpleData name="lk04_id_punktu_koncowego">P1002_DEMO</SimpleData>
+		<SimpleData name="lk05_medium_transmisyjne">światłowodowe</SimpleData>
+		<SimpleData name="lk06_rodzaj_linii_kablowej">Linia kablowa podziemna (umieszczona bezpośrednio w ziemi)</SimpleData>
+		<SimpleData name="lk07_liczba_wlokien">32</SimpleData>
+		<SimpleData name="lk08_liczba_wlokien_wykorzystywanych">32</SimpleData>
+		<SimpleData name="lk09_liczba_wlokien_udostepnienia">0</SimpleData>
+		<SimpleData name="lk10_finansowanie_publ">Nie</SimpleData>
+		<SimpleData name="lk12_infrastruktura_o_duzym_znaczeniu">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+      <LineString><coordinates>20.91719,52.25649 20.91727,52.25645 20.91737,52.25653 20.91775,52.25638</coordinates></LineString>
+  </Placemark>
+  <Placemark>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+	<ExtendedData><SchemaData schemaUrl="#z7_liniekablowe_2_szablon_20230107">
+		<SimpleData name="lk01_id_lk">LK0004_DEMO</SimpleData>
+		<SimpleData name="lk02_id_punktu_poczatkowego">WW_ABC1234_DEMO</SimpleData>
+		<SimpleData name="lk04_id_punktu_koncowego">P1001_DEMO</SimpleData>
+		<SimpleData name="lk05_medium_transmisyjne">światłowodowe</SimpleData>
+		<SimpleData name="lk06_rodzaj_linii_kablowej">Linia kablowa umieszczona w kanale technologicznym</SimpleData>
+		<SimpleData name="lk07_liczba_wlokien">1024</SimpleData>
+		<SimpleData name="lk08_liczba_wlokien_wykorzystywanych">1024</SimpleData>
+		<SimpleData name="lk09_liczba_wlokien_udostepnienia">0</SimpleData>
+		<SimpleData name="lk10_finansowanie_publ">Nie</SimpleData>
+		<SimpleData name="lk12_infrastruktura_o_duzym_znaczeniu">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+      <LineString><coordinates>20.91701,52.25689 20.91709,52.25664 20.91703,52.25659 20.91719,52.25649</coordinates></LineString>
+  </Placemark>
+</Folder>
+</Document></kml>

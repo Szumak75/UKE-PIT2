@@ -1,0 +1,9 @@
+DI,Szkolenie OP01,19999,,,
+PO,P1,testowy@example.pl;testowa@example.pl,,www.internet.gov.pl/
+PO,P2,,801000000,www.internet.gov.pl/promocja/zarow
+ZS,Kankowo_GPON,1416052,Kańkowo,0514319,,99999,104,52.716419,22.042077,światłowodowe,GPON,1000,100,rzeczywisty,TAK,NIE,P1
+ZS,Kankowo_NR,1416052,Kańkowo,0514319,,99999,104,52.716419,22.042077,radiowe (FWA),NR SA,300,20,rzeczywisty,TAK,NIE,P1
+ZS,Ochudno,1435032,Ochudno,0518990,,99999,108A,52.666337,21.430116,kablowe parowe miedziane,ADSL,2,2,rzeczywisty,TAK,NIE,P1
+ZS,39329031_Warszawa,1465118,Warszawa,0918123,ul. Szymona Askenazego,00465,7,52.277932,21.054932,kablowe współosiowe miedziane,(EURO)DOCSIS 3.x,1000,100,teoretyczny,TAK,NIE,P2
+ZS,WAR_WARZELNICZA,1465038,Białołęka,0988796,ul. Warzelnicza,23710,7g,52.328204,21.037617,światłowodowe,GPON,1000,100,rzeczywisty,TAK,NIE,P2
+ZS,POD_PALEDZIE,1820032,Grębów,0792290,ul. Tulipanowa,23129,32,50.561478,21.887650,kablowe parowe miedziane,ADSL,10,2,rzeczywisty,TAK,NIE,P1

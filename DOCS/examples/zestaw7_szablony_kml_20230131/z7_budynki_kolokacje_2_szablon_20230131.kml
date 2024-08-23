@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="z6_budynki_kolokacje_2_szablon_20230101" id="z6_budynki_kolokacje_2_szablon_20230101">
+	<SimpleField name="bk01_id_bk" type="string"></SimpleField>
+	<SimpleField name="bk02_terc" type="string"></SimpleField>
+	<SimpleField name="bk03_simc" type="string"></SimpleField>
+	<SimpleField name="bk04_ulic" type="string"></SimpleField>
+	<SimpleField name="bk05_nr_porzadkowy" type="string"></SimpleField>
+	<SimpleField name="bk06_szerokosc" type="string"></SimpleField>
+	<SimpleField name="bk07_dlugosc" type="string"></SimpleField>
+	<SimpleField name="bk08_wylacznie_na_dachu" type="string"></SimpleField>
+</Schema>
+<Folder><name>z6_budynki_kolokacje_2_szablon_20230101</name>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z6_budynki_kolokacje_2_szablon_20230101">
+		<SimpleData name="bk01_id_bk">B001_DEMO</SimpleData>
+		<SimpleData name="bk02_terc">1465011</SimpleData>
+		<SimpleData name="bk03_simc">0918123</SimpleData>
+		<SimpleData name="bk04_ulic">16333</SimpleData>
+		<SimpleData name="bk05_nr_porzadkowy">20a</SimpleData>
+		<SimpleData name="bk06_szerokosc">52.25678</SimpleData>
+		<SimpleData name="bk07_dlugosc">20.91806</SimpleData>
+		<SimpleData name="bk08_wylacznie_na_dachu">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.91806,52.25678</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z6_budynki_kolokacje_2_szablon_20230101">
+		<SimpleData name="bk01_id_bk">B002_DEMO</SimpleData>
+		<SimpleData name="bk02_terc">1465011</SimpleData>
+		<SimpleData name="bk03_simc">0918123</SimpleData>
+		<SimpleData name="bk04_ulic">08333</SimpleData>
+		<SimpleData name="bk05_nr_porzadkowy">4</SimpleData>
+		<SimpleData name="bk06_szerokosc">52.25160</SimpleData>
+		<SimpleData name="bk07_dlugosc">20.91674</SimpleData>
+		<SimpleData name="bk08_wylacznie_na_dachu">Tak</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.91674,52.2516</coordinates></Point>
+  </Placemark>
+</Folder>
+</Document></kml>

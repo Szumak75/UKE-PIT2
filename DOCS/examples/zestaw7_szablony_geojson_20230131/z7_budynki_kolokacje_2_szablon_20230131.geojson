@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "z7_budynki_kolokacje_2_szablon_20230131",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "fid": 1, "bk01_id_bk": "B001_DEMO", "bk02_terc": "1465011", "bk03_simc": "0918123", "bk04_ulic": "16333", "bk05_nr_porzadkowy": "20a", "bk06_szerokosc": "52.25678", "bk07_dlugosc": "20.91806", "bk08_wylacznie_na_dachu": "Nie" }, "geometry": { "type": "Point", "coordinates": [ 20.91806, 52.25678 ] } },
+{ "type": "Feature", "properties": { "fid": 2, "bk01_id_bk": "B002_DEMO", "bk02_terc": "1465011", "bk03_simc": "0918123", "bk04_ulic": "08333", "bk05_nr_porzadkowy": "4", "bk06_szerokosc": "52.25160", "bk07_dlugosc": "20.91674", "bk08_wylacznie_na_dachu": "Tak" }, "geometry": { "type": "Point", "coordinates": [ 20.91674, 52.2516 ] } }
+]
+}

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="z7_wezly_3_szablon_20230131" id="z7_wezly_3_szablon_20230131">
+	<SimpleField name="fid" type="float"></SimpleField>
+	<SimpleField name="we01_id_wezla" type="string"></SimpleField>
+	<SimpleField name="we02_tytul_do_wezla" type="string"></SimpleField>
+	<SimpleField name="we03_id_podmiotu_obcego" type="string"></SimpleField>
+	<SimpleField name="we04_terc" type="string"></SimpleField>
+	<SimpleField name="we05_simc" type="string"></SimpleField>
+	<SimpleField name="we06_ulic" type="string"></SimpleField>
+	<SimpleField name="we07_nr_porzadkowy" type="string"></SimpleField>
+	<SimpleField name="we08_szerokosc" type="string"></SimpleField>
+	<SimpleField name="we09_dlugosc" type="string"></SimpleField>
+	<SimpleField name="we10_medium_transmisyjne" type="string"></SimpleField>
+	<SimpleField name="we11_bsa" type="string"></SimpleField>
+	<SimpleField name="we12_technologia_dostepowa" type="string"></SimpleField>
+	<SimpleField name="we13_uslugi_transmisji_danych" type="string"></SimpleField>
+	<SimpleField name="we14_mozliwosc_zwiekszenia_liczby_interfejsow" type="string"></SimpleField>
+	<SimpleField name="we15_finansowanie_publ" type="string"></SimpleField>
+	<SimpleField name="we16_numery_projektow_publ" type="string"></SimpleField>
+	<SimpleField name="we17_infrastruktura_o_duzym_znaczeniu" type="string"></SimpleField>
+	<SimpleField name="we18_typ_interfejsu" type="string"></SimpleField>
+	<SimpleField name="we19_udostepnianie_ethernet" type="string"></SimpleField>
+</Schema>
+<Folder><name>z7_wezly_3_szablon_20230131</name>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z7_wezly_3_szablon_20230131">
+		<SimpleData name="fid">1</SimpleData>
+		<SimpleData name="we01_id_wezla">WW_ABC1234_DEMO</SimpleData>
+		<SimpleData name="we02_tytul_do_wezla">Węzeł własny</SimpleData>
+		<SimpleData name="we04_terc">1465011</SimpleData>
+		<SimpleData name="we05_simc">0918123</SimpleData>
+		<SimpleData name="we08_szerokosc">52.25689</SimpleData>
+		<SimpleData name="we09_dlugosc">20.91701</SimpleData>
+		<SimpleData name="we10_medium_transmisyjne">światłowodowe</SimpleData>
+		<SimpleData name="we11_bsa">Nie</SimpleData>
+		<SimpleData name="we12_technologia_dostepowa">1 Gigabit Ethernet</SimpleData>
+		<SimpleData name="we14_mozliwosc_zwiekszenia_liczby_interfejsow">Nie</SimpleData>
+		<SimpleData name="we15_finansowanie_publ">Nie</SimpleData>
+		<SimpleData name="we17_infrastruktura_o_duzym_znaczeniu">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.91701,52.25689</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z7_wezly_3_szablon_20230131">
+		<SimpleData name="fid">2</SimpleData>
+		<SimpleData name="we01_id_wezla">WW_WAR1234_DEMO</SimpleData>
+		<SimpleData name="we02_tytul_do_wezla">Węzeł własny</SimpleData>
+		<SimpleData name="we04_terc">1465011</SimpleData>
+		<SimpleData name="we05_simc">0918123</SimpleData>
+		<SimpleData name="we06_ulic">16333</SimpleData>
+		<SimpleData name="we07_nr_porzadkowy">20a</SimpleData>
+		<SimpleData name="we08_szerokosc">52.25678</SimpleData>
+		<SimpleData name="we09_dlugosc">20.91802</SimpleData>
+		<SimpleData name="we10_medium_transmisyjne">światłowodowe</SimpleData>
+		<SimpleData name="we11_bsa">Nie</SimpleData>
+		<SimpleData name="we12_technologia_dostepowa">5 Gigabit Ethernet</SimpleData>
+		<SimpleData name="we14_mozliwosc_zwiekszenia_liczby_interfejsow">Nie</SimpleData>
+		<SimpleData name="we15_finansowanie_publ">Nie</SimpleData>
+		<SimpleData name="we17_infrastruktura_o_duzym_znaczeniu">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.91802,52.25678</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z7_wezly_3_szablon_20230131">
+		<SimpleData name="fid">3</SimpleData>
+		<SimpleData name="we01_id_wezla">WW_WAR5678_DEMO</SimpleData>
+		<SimpleData name="we02_tytul_do_wezla">Węzeł własny</SimpleData>
+		<SimpleData name="we04_terc">1465011</SimpleData>
+		<SimpleData name="we05_simc">0918123</SimpleData>
+		<SimpleData name="we06_ulic">16333</SimpleData>
+		<SimpleData name="we07_nr_porzadkowy">9</SimpleData>
+		<SimpleData name="we08_szerokosc">52.25731</SimpleData>
+		<SimpleData name="we09_dlugosc">20.915398</SimpleData>
+		<SimpleData name="we10_medium_transmisyjne">światłowodowe</SimpleData>
+		<SimpleData name="we11_bsa">Nie</SimpleData>
+		<SimpleData name="we12_technologia_dostepowa">1 Gigabit Ethernet;EPON</SimpleData>
+		<SimpleData name="we14_mozliwosc_zwiekszenia_liczby_interfejsow">Nie</SimpleData>
+		<SimpleData name="we15_finansowanie_publ">Nie</SimpleData>
+		<SimpleData name="we17_infrastruktura_o_duzym_znaczeniu">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.915398,52.25731</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z7_wezly_3_szablon_20230131">
+		<SimpleData name="fid">4</SimpleData>
+		<SimpleData name="we01_id_wezla">WW_ABC1234R_DEMO</SimpleData>
+		<SimpleData name="we02_tytul_do_wezla">Węzeł własny</SimpleData>
+		<SimpleData name="we04_terc">1465011</SimpleData>
+		<SimpleData name="we05_simc">0918123</SimpleData>
+		<SimpleData name="we08_szerokosc">52.25692</SimpleData>
+		<SimpleData name="we09_dlugosc">20.91600</SimpleData>
+		<SimpleData name="we10_medium_transmisyjne">radiowe</SimpleData>
+		<SimpleData name="we11_bsa">Nie</SimpleData>
+		<SimpleData name="we12_technologia_dostepowa">Radiolinia</SimpleData>
+		<SimpleData name="we14_mozliwosc_zwiekszenia_liczby_interfejsow">Nie</SimpleData>
+		<SimpleData name="we15_finansowanie_publ">Nie</SimpleData>
+		<SimpleData name="we17_infrastruktura_o_duzym_znaczeniu">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.916,52.25692</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z7_wezly_3_szablon_20230131">
+		<SimpleData name="fid">5</SimpleData>
+		<SimpleData name="we01_id_wezla">WW_WAR1234R_DEMO</SimpleData>
+		<SimpleData name="we02_tytul_do_wezla">Węzeł własny</SimpleData>
+		<SimpleData name="we04_terc">1465011</SimpleData>
+		<SimpleData name="we05_simc">0918123</SimpleData>
+		<SimpleData name="we06_ulic">16333</SimpleData>
+		<SimpleData name="we07_nr_porzadkowy">20</SimpleData>
+		<SimpleData name="we08_szerokosc">52.25700</SimpleData>
+		<SimpleData name="we09_dlugosc">20.91737</SimpleData>
+		<SimpleData name="we10_medium_transmisyjne">radiowe</SimpleData>
+		<SimpleData name="we11_bsa">Nie</SimpleData>
+		<SimpleData name="we12_technologia_dostepowa">Radiolinia</SimpleData>
+		<SimpleData name="we14_mozliwosc_zwiekszenia_liczby_interfejsow">Nie</SimpleData>
+		<SimpleData name="we15_finansowanie_publ">Nie</SimpleData>
+		<SimpleData name="we17_infrastruktura_o_duzym_znaczeniu">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.91737,52.257</coordinates></Point>
+  </Placemark>
+</Folder>
+</Document></kml>

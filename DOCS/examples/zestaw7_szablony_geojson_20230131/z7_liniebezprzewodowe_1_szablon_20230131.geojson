@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+"name": "z7_liniebezprzewodowe_1_szablon_20230131",
+"features": [
+{ "type": "Feature", "properties": { "fid": 1, "lb01_id_lb": "LB001_DEMO", "lb02_id_punktu_poczatkowego": "WW_ABC1234R_DEMO", "lb03_id_punktu_koncowego": "WW_WAR1234R_DEMO", "lb04_medium_transmisyjne": "radiowe na częstotliwości wymagającej uzyskanie pozwolenia radiowego", "lb05_nr_pozwolenia_radiowego": "32/23/2022\\P", "lb06_pasmo_radiowe": null, "lb07_system_transmisyjny": "Radiolinia", "lb08_przepustowosc": "02", "lb09_mozliwosc_udostepniania": "Nie" }, "geometry": null }
+]
+}

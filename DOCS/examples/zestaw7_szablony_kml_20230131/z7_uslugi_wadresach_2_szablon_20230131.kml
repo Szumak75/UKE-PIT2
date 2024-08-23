@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="z7_uslugi_wadresach_2_szablon_20230107" id="z7_uslugi_wadresach_2_szablon_20230107">
+	<SimpleField name="ua01_id_punktu_adresowego" type="string"></SimpleField>
+	<SimpleField name="ua02_id_pe" type="string"></SimpleField>
+	<SimpleField name="ua03_id_po" type="string"></SimpleField>
+	<SimpleField name="ua04_terc" type="string"></SimpleField>
+	<SimpleField name="ua05_simc" type="string"></SimpleField>
+	<SimpleField name="ua06_ulic" type="string"></SimpleField>
+	<SimpleField name="ua07_nr_porzadkowy" type="string"></SimpleField>
+	<SimpleField name="ua08_szerokosc" type="string"></SimpleField>
+	<SimpleField name="ua09_dlugosc" type="string"></SimpleField>
+	<SimpleField name="ua10_medium_dochodzace_do_pa" type="string"></SimpleField>
+	<SimpleField name="ua11_technologia_dostepowa" type="string"></SimpleField>
+	<SimpleField name="ua12_instalacja_telekom" type="string"></SimpleField>
+	<SimpleField name="ua13_medium_instalacji_budynku" type="string"></SimpleField>
+	<SimpleField name="ua14_technologia_dostepowa" type="string"></SimpleField>
+	<SimpleField name="ua15_identyfikacja_uslugi" type="string"></SimpleField>
+	<SimpleField name="ua16_dostep_stacjonarny" type="string"></SimpleField>
+	<SimpleField name="ua17_dostep_stacjonarny_bezprzewodowy" type="string"></SimpleField>
+	<SimpleField name="ua18_telewizja_cyfrowa" type="string"></SimpleField>
+	<SimpleField name="ua19_radio" type="string"></SimpleField>
+	<SimpleField name="ua20_usluga_telefoniczna" type="string"></SimpleField>
+	<SimpleField name="ua21_predkosc_uslugi_td" type="string"></SimpleField>
+	<SimpleField name="ua22_liczba_uzytkownikow_uslugi_td" type="string"></SimpleField>
+</Schema>
+<Folder><name>z7_uslugi_wadresach_2_szablon_20230107</name>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z7_uslugi_wadresach_2_szablon_20230107">
+		<SimpleData name="ua01_id_punktu_adresowego">AD0001_DEMO</SimpleData>
+		<SimpleData name="ua03_id_po">POBCY02_DEMO</SimpleData>
+		<SimpleData name="ua04_terc">1465011</SimpleData>
+		<SimpleData name="ua05_simc">0918123</SimpleData>
+		<SimpleData name="ua06_ulic">16333</SimpleData>
+		<SimpleData name="ua07_nr_porzadkowy">6</SimpleData>
+		<SimpleData name="ua08_szerokosc">52.25384</SimpleData>
+		<SimpleData name="ua09_dlugosc">20.91427</SimpleData>
+		<SimpleData name="ua10_medium_dochodzace_do_pa">światłowodowe</SimpleData>
+		<SimpleData name="ua11_technologia_dostepowa">1 Gigabit Ethernet</SimpleData>
+		<SimpleData name="ua12_instalacja_telekom">W budynku sprawozdawca posiada instalację telekomunikacyjną budynku</SimpleData>
+		<SimpleData name="ua13_medium_instalacji_budynku">światłowodowe</SimpleData>
+		<SimpleData name="ua14_technologia_dostepowa">1 Gigabit Ethernet</SimpleData>
+		<SimpleData name="ua15_identyfikacja_uslugi">UAS100</SimpleData>
+		<SimpleData name="ua16_dostep_stacjonarny">Tak</SimpleData>
+		<SimpleData name="ua17_dostep_stacjonarny_bezprzewodowy">Nie</SimpleData>
+		<SimpleData name="ua18_telewizja_cyfrowa">Tak</SimpleData>
+		<SimpleData name="ua19_radio">Tak</SimpleData>
+		<SimpleData name="ua20_usluga_telefoniczna">Tak</SimpleData>
+		<SimpleData name="ua21_predkosc_uslugi_td">11</SimpleData>
+		<SimpleData name="ua22_liczba_uzytkownikow_uslugi_td">14</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.91427,52.25384</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z7_uslugi_wadresach_2_szablon_20230107">
+		<SimpleData name="ua01_id_punktu_adresowego">AD0002_DEMO</SimpleData>
+		<SimpleData name="ua02_id_pe">P1001_DEMO</SimpleData>
+		<SimpleData name="ua04_terc">1465011</SimpleData>
+		<SimpleData name="ua05_simc">0918123</SimpleData>
+		<SimpleData name="ua06_ulic">16333</SimpleData>
+		<SimpleData name="ua07_nr_porzadkowy">18</SimpleData>
+		<SimpleData name="ua08_szerokosc">52.25648</SimpleData>
+		<SimpleData name="ua09_dlugosc">20.91721</SimpleData>
+		<SimpleData name="ua10_medium_dochodzace_do_pa">światłowodowe</SimpleData>
+		<SimpleData name="ua11_technologia_dostepowa">1 Gigabit Ethernet</SimpleData>
+		<SimpleData name="ua12_instalacja_telekom">W budynku sprawozdawca posiada instalację telekomunikacyjną budynku</SimpleData>
+		<SimpleData name="ua13_medium_instalacji_budynku">światłowodowe</SimpleData>
+		<SimpleData name="ua14_technologia_dostepowa">1 Gigabit Ethernet</SimpleData>
+		<SimpleData name="ua15_identyfikacja_uslugi">UAS101</SimpleData>
+		<SimpleData name="ua16_dostep_stacjonarny">Tak</SimpleData>
+		<SimpleData name="ua17_dostep_stacjonarny_bezprzewodowy">Nie</SimpleData>
+		<SimpleData name="ua18_telewizja_cyfrowa">Tak</SimpleData>
+		<SimpleData name="ua19_radio">Tak</SimpleData>
+		<SimpleData name="ua20_usluga_telefoniczna">Nie</SimpleData>
+		<SimpleData name="ua21_predkosc_uslugi_td">11</SimpleData>
+		<SimpleData name="ua22_liczba_uzytkownikow_uslugi_td">14</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>20.91721,52.25648</coordinates></Point>
+  </Placemark>
+</Folder>
+</Document></kml>

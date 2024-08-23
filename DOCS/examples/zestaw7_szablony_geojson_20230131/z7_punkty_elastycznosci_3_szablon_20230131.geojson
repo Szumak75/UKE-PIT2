@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "z7_punkty_elastycznosci_3_szablon_20230131",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "fid": 1, "pe01_id_pe": "P1001_DEMO", "pe02_typ_pe": "05", "pe03_id_wezla": "WW_ABC1234_DEMO", "pe04_pdu": "Tak", "pe05_terc": "1465011", "pe06_simc": "0918123", "pe07_ulic": "16333", "pe08_nr_porzadkowy": "18", "pe09_szerokosc": "52.25649", "pe10_dlugosc": "20.91719", "pe11_medium_transmisyjne": "światłowodowe", "pe12_technologia_dostepowa": "1 Gigabit Ethernet", "pe13_mozliwosc_swiadczenia_uslug": "01", "pe14_finansowanie_publ": "Nie", "pe15_numery_projektow_publ": null }, "geometry": { "type": "Point", "coordinates": [ 20.91719, 52.25649 ] } },
+{ "type": "Feature", "properties": { "fid": 2, "pe01_id_pe": "P1002_DEMO", "pe02_typ_pe": "06", "pe03_id_wezla": "WW_ABC1234_DEMO", "pe04_pdu": "Tak", "pe05_terc": "1465011", "pe06_simc": "0918123", "pe07_ulic": "17366", "pe08_nr_porzadkowy": "103", "pe09_szerokosc": "52.25638", "pe10_dlugosc": "20.91775", "pe11_medium_transmisyjne": "światłowodowe", "pe12_technologia_dostepowa": "1 Gigabit Ethernet", "pe13_mozliwosc_swiadczenia_uslug": "01", "pe14_finansowanie_publ": "Tak", "pe15_numery_projektow_publ": "12A/2020;13/2021;AW2233/2022" }, "geometry": { "type": "Point", "coordinates": [ 20.91775, 52.25638 ] } },
+{ "type": "Feature", "properties": { "fid": 3, "pe01_id_pe": "P1003_DEMO", "pe02_typ_pe": "01", "pe03_id_wezla": "WW_ABC1234_DEMO", "pe04_pdu": "Tak", "pe05_terc": "1465011", "pe06_simc": "0918123", "pe07_ulic": "16333", "pe08_nr_porzadkowy": "20", "pe09_szerokosc": "52.25698", "pe10_dlugosc": "20.91733", "pe11_medium_transmisyjne": "światłowodowe", "pe12_technologia_dostepowa": "1 Gigabit Ethernet", "pe13_mozliwosc_swiadczenia_uslug": "01", "pe14_finansowanie_publ": "Tak", "pe15_numery_projektow_publ": "12A/2020;13/2021;W2233/2022" }, "geometry": { "type": "Point", "coordinates": [ 20.91733, 52.25698 ] } }
+]
+}

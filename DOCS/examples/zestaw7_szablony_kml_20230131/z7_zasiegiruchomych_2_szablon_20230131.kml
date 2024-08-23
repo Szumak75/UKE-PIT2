@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="z6_zasiegiruchomych_2_szablon_20230101" id="z6_zasiegiruchomych_2_szablon_20230101">
+	<SimpleField name="zr01_id_komorki_siatki" type="string"></SimpleField>
+	<SimpleField name="zr02_technologia_dostepowa_420mhz" type="string"></SimpleField>
+	<SimpleField name="zr03_zasieg_zewn_420mhz" type="string"></SimpleField>
+	<SimpleField name="zr04_zasieg_wewn_420mhz" type="string"></SimpleField>
+	<SimpleField name="zr05_technologia_dostepowa_700mhz" type="string"></SimpleField>
+	<SimpleField name="zr06_zasieg_zewn_700mhz" type="string"></SimpleField>
+	<SimpleField name="zr07_zasieg_wewn_700mhz" type="string"></SimpleField>
+	<SimpleField name="zr08_technologia_dostepowa_800mhz" type="string"></SimpleField>
+	<SimpleField name="zr09_zasieg_zewn_800mhz" type="string"></SimpleField>
+	<SimpleField name="zr10_zasieg_wewn_800mhz" type="string"></SimpleField>
+	<SimpleField name="zr11_technologia_dostepowa_900mhz" type="string"></SimpleField>
+	<SimpleField name="zr12_zasieg_zewn_900mhz" type="string"></SimpleField>
+	<SimpleField name="zr13_zasieg_wewn_900mhz" type="string"></SimpleField>
+	<SimpleField name="zr14_technologia_dostepowa_1800mhz" type="string"></SimpleField>
+	<SimpleField name="zr15_zasieg_zewn_1800mhz" type="string"></SimpleField>
+	<SimpleField name="zr16_zasieg_wewn_1800mhz" type="string"></SimpleField>
+	<SimpleField name="zr17_technologia_dostepowa_2100mhz" type="string"></SimpleField>
+	<SimpleField name="zr18_zasieg_zewn_2100mhz" type="string"></SimpleField>
+	<SimpleField name="zr19_zasieg_wewn_2100mhz" type="string"></SimpleField>
+	<SimpleField name="zr20_technologia_dostepowa_2600mhz" type="string"></SimpleField>
+	<SimpleField name="zr21_zasieg_zewn_2600mhz" type="string"></SimpleField>
+	<SimpleField name="zr22_zasieg_wewn_2600mhz" type="string"></SimpleField>
+	<SimpleField name="zr23_technologia_dostepowa_3600mhz" type="string"></SimpleField>
+	<SimpleField name="zr24_zasieg_zewn_3600mhz" type="string"></SimpleField>
+	<SimpleField name="zr25_zasieg_wewn_3600mhz" type="string"></SimpleField>
+	<SimpleField name="zr26_technologia_dostepowa_26000mhz" type="string"></SimpleField>
+	<SimpleField name="zr27_zasieg_zewn_26000mhz" type="string"></SimpleField>
+	<SimpleField name="zr28_zasieg_wewn_26000mhz" type="string"></SimpleField>
+	<SimpleField name="zr29_max_predkosc_do_uzytkownika" type="string"></SimpleField>
+	<SimpleField name="zr30_max_predkosc_od_uzytkownika" type="string"></SimpleField>
+	<SimpleField name="zr31_szybka_siec_telekom" type="string"></SimpleField>
+</Schema>
+<Folder><name>z6_zasiegiruchomych_2_szablon_20230101</name>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z6_zasiegiruchomych_2_szablon_20230101">
+		<SimpleData name="zr01_id_komorki_siatki">100000</SimpleData>
+		<SimpleData name="zr02_technologia_dostepowa_420mhz">CWDM</SimpleData>
+		<SimpleData name="zr03_zasieg_zewn_420mhz">3</SimpleData>
+		<SimpleData name="zr04_zasieg_wewn_420mhz">2</SimpleData>
+		<SimpleData name="zr05_technologia_dostepowa_700mhz">CWDM</SimpleData>
+		<SimpleData name="zr06_zasieg_zewn_700mhz">3</SimpleData>
+		<SimpleData name="zr07_zasieg_wewn_700mhz">2</SimpleData>
+		<SimpleData name="zr08_technologia_dostepowa_800mhz">CWDM</SimpleData>
+		<SimpleData name="zr09_zasieg_zewn_800mhz">3</SimpleData>
+		<SimpleData name="zr10_zasieg_wewn_800mhz">2</SimpleData>
+		<SimpleData name="zr11_technologia_dostepowa_900mhz">CWDM</SimpleData>
+		<SimpleData name="zr12_zasieg_zewn_900mhz">3</SimpleData>
+		<SimpleData name="zr13_zasieg_wewn_900mhz">2</SimpleData>
+		<SimpleData name="zr14_technologia_dostepowa_1800mhz">CWDM</SimpleData>
+		<SimpleData name="zr15_zasieg_zewn_1800mhz">3</SimpleData>
+		<SimpleData name="zr16_zasieg_wewn_1800mhz">2</SimpleData>
+		<SimpleData name="zr17_technologia_dostepowa_2100mhz">CWDM</SimpleData>
+		<SimpleData name="zr18_zasieg_zewn_2100mhz">3</SimpleData>
+		<SimpleData name="zr19_zasieg_wewn_2100mhz">2</SimpleData>
+		<SimpleData name="zr20_technologia_dostepowa_2600mhz">CWDM</SimpleData>
+		<SimpleData name="zr21_zasieg_zewn_2600mhz">3</SimpleData>
+		<SimpleData name="zr22_zasieg_wewn_2600mhz">2</SimpleData>
+		<SimpleData name="zr23_technologia_dostepowa_3600mhz">CWDM</SimpleData>
+		<SimpleData name="zr24_zasieg_zewn_3600mhz">3</SimpleData>
+		<SimpleData name="zr25_zasieg_wewn_3600mhz">2</SimpleData>
+		<SimpleData name="zr26_technologia_dostepowa_26000mhz">CWDM</SimpleData>
+		<SimpleData name="zr27_zasieg_zewn_26000mhz">3</SimpleData>
+		<SimpleData name="zr28_zasieg_wewn_26000mhz">2</SimpleData>
+		<SimpleData name="zr29_max_predkosc_do_uzytkownika">09</SimpleData>
+		<SimpleData name="zr30_max_predkosc_od_uzytkownika">04</SimpleData>
+		<SimpleData name="zr31_szybka_siec_telekom">Tak</SimpleData>
+	</SchemaData></ExtendedData>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#z6_zasiegiruchomych_2_szablon_20230101">
+		<SimpleData name="zr01_id_komorki_siatki">100001</SimpleData>
+		<SimpleData name="zr02_technologia_dostepowa_420mhz">CWDM</SimpleData>
+		<SimpleData name="zr03_zasieg_zewn_420mhz">3</SimpleData>
+		<SimpleData name="zr04_zasieg_wewn_420mhz">2</SimpleData>
+		<SimpleData name="zr05_technologia_dostepowa_700mhz">CWDM</SimpleData>
+		<SimpleData name="zr06_zasieg_zewn_700mhz">3</SimpleData>
+		<SimpleData name="zr07_zasieg_wewn_700mhz">2</SimpleData>
+		<SimpleData name="zr08_technologia_dostepowa_800mhz">CWDM</SimpleData>
+		<SimpleData name="zr09_zasieg_zewn_800mhz">3</SimpleData>
+		<SimpleData name="zr10_zasieg_wewn_800mhz">2</SimpleData>
+		<SimpleData name="zr11_technologia_dostepowa_900mhz">CWDM</SimpleData>
+		<SimpleData name="zr12_zasieg_zewn_900mhz">3</SimpleData>
+		<SimpleData name="zr13_zasieg_wewn_900mhz">2</SimpleData>
+		<SimpleData name="zr14_technologia_dostepowa_1800mhz">CWDM</SimpleData>
+		<SimpleData name="zr15_zasieg_zewn_1800mhz">3</SimpleData>
+		<SimpleData name="zr16_zasieg_wewn_1800mhz">2</SimpleData>
+		<SimpleData name="zr17_technologia_dostepowa_2100mhz">CWDM</SimpleData>
+		<SimpleData name="zr18_zasieg_zewn_2100mhz">3</SimpleData>
+		<SimpleData name="zr19_zasieg_wewn_2100mhz">2</SimpleData>
+		<SimpleData name="zr20_technologia_dostepowa_2600mhz">CWDM</SimpleData>
+		<SimpleData name="zr21_zasieg_zewn_2600mhz">3</SimpleData>
+		<SimpleData name="zr22_zasieg_wewn_2600mhz">2</SimpleData>
+		<SimpleData name="zr23_technologia_dostepowa_3600mhz">CWDM</SimpleData>
+		<SimpleData name="zr24_zasieg_zewn_3600mhz">3</SimpleData>
+		<SimpleData name="zr25_zasieg_wewn_3600mhz">2</SimpleData>
+		<SimpleData name="zr26_technologia_dostepowa_26000mhz">CWDM</SimpleData>
+		<SimpleData name="zr27_zasieg_zewn_26000mhz">3</SimpleData>
+		<SimpleData name="zr28_zasieg_wewn_26000mhz">2</SimpleData>
+		<SimpleData name="zr29_max_predkosc_do_uzytkownika">09</SimpleData>
+		<SimpleData name="zr30_max_predkosc_od_uzytkownika">04</SimpleData>
+		<SimpleData name="zr31_szybka_siec_telekom">Nie</SimpleData>
+	</SchemaData></ExtendedData>
+  </Placemark>
+</Folder>
+</Document></kml>
