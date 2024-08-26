@@ -7,10 +7,13 @@
   Purpose: Report generators classes.
 """
 
+from doctest import debug
 from typing import Optional, List, Tuple
 from threading import Event, Thread
 from inspect import currentframe
 from queue import Queue, Empty
+
+from sqlalchemy.orm import Session
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.logstool.logs import (
@@ -22,9 +25,11 @@ from jsktoolbox.libs.base_th import ThBaseObject
 from jsktoolbox.netaddresstool.ipv4 import Address, Network
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.datetool import Timestamp
+from jsktoolbox.stringtool.crypto import SimpleCrypto
 
 from uke_pit2.base import BReportGenerator
 from uke_pit2.conf import Config
+from uke_pit2.db import DbConfig, Database
 
 
 class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
@@ -48,7 +53,61 @@ class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
 
     def run(self) -> None:
         """Start procedure."""
-        self.logs.message_notice = f"stop is set: {self.stop}"
+        self.logs.message_debug = "starting..."
+        t_start = Timestamp.now
+        # ---- #
+        # create database connection
+        self.debug = True
+        self.verbose = True
+        session = self.__db_connection()
+        if session:
+            # get data
+            # end connection
+            session.close()
+        # ---- #
+        t_end = Timestamp.now
+        self.logs.message_debug = f"end after: {t_end-t_start} [s]."
+
+    def __db_connection(self) -> Optional[Session]:
+        """Create db connection and return session object."""
+        if self.__check_db_config():
+            conf = DbConfig()
+            conf.database = self.conf.module_conf.lms_database  # type: ignore
+            conf.host = self.conf.module_conf.lms_host  # type: ignore
+            conf.password = SimpleCrypto.multiple_decrypt(self.conf.module_conf.salt, self.conf.module_conf.lms_password)  # type: ignore
+            conf.port = self.conf.module_conf.lms_port  # type: ignore
+            conf.user = self.conf.module_conf.lms_user  # type: ignore
+            # self.logs.message_debug = f"{conf}, pass: {conf.password}"
+            database = Database(self.logs.logs_queue, conf, self.debug, self.verbose)  # type: ignore
+
+            # create connection
+            if not database.create_connection():
+                self.logs.message_critical = "connection to database error."
+                return None
+
+            # create session
+            session: Optional[Session] = database.session
+            if not session:
+                self.logs.message_debug = "database session error"
+                return None
+            return session
+        else:
+            return None
+
+    def __check_db_config(self) -> bool:
+        """Check if the connection variables are set."""
+        if (
+            self.conf
+            and self.conf.module_conf
+            and self.conf.module_conf.salt
+            and self.conf.module_conf.lms_database
+            and self.conf.module_conf.lms_host
+            and self.conf.module_conf.lms_password
+            and self.conf.module_conf.lms_database
+            and self.conf.module_conf.lms_user
+        ):
+            return True
+        return False
 
 
 # #[EOF]#######################################################################

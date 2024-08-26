@@ -134,6 +134,8 @@ class Database(BDebug, BVerbose, BLogs):
             connect_args={},
             pool_recycle=3600,
             poolclass=QueuePool,
+            echo=self.verbose,
+            echo_pool=self.verbose,
         )
         try:
             with engine.connect() as connection:
@@ -170,8 +172,8 @@ class Database(BDebug, BVerbose, BLogs):
         session = None
         try:
             session = Session(self._get_data(_Keys.DB_POLL))
-            out = session.query(text("SELECT 1"))
-            self.logs.message_info = f"check query: {out}"
+            session.connection()
+            self.logs.message_info = f"session is open"
         except:
             session = None
 
