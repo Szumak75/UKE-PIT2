@@ -30,10 +30,13 @@ from jsktoolbox.logstool.formatters import LogFormatterNull, LogFormatterDateTim
 from jsktoolbox.libs.system import Env
 from jsktoolbox.stringtool.crypto import SimpleCrypto
 
+import uke_pit2
 from uke_pit2.base import BVerbose, BaseApp, BModuleConfig
 from uke_pit2.conf import Config
 from uke_pit2.processor import DbProcessor, Processor
 from uke_pit2.rb import RBData
+
+from uke_pit2.reports.generators import ThReportGenerator
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -694,16 +697,39 @@ class UkeApp(BaseApp, BVerbose):
         if (
             self.configured
             and self.logs.logs_queue
-            and self.module_conf.start_ip
+            and self.logs_processor
+            and self.logs_processor.logger_engine
+            and self.logs_processor.logger_engine.logs_queue
+            and self.module_conf.output_dir
             and self.conf.module_conf
             and not self.stop
         ):
             # start
             self.logs.message_info = "starting procedure"
 
-            # if self.stop:
-            #     # TERM or INT signal was set
-            #     break
+            if self.stop:
+                # TERM or INT signal was set
+                pass
+            else:
+                obj = ThReportGenerator(
+                    logger_queue=self.logs_processor.logger_engine.logs_queue,
+                    config=self.conf,
+                )
+
+                obj.start()
+
+                while not obj.is_stopped:
+                    time.sleep(0.1)
+                    if self.stop:
+                        obj.stop = True
+                    break
+
+                if obj.is_stopped:
+                    obj.join()
+                else:
+                    while not obj.is_stopped:
+                        obj.join()
+                        time.sleep(0.1)
 
             # end
             self.logs.message_info = "procedure is complete"

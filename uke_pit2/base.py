@@ -164,24 +164,8 @@ class BRouterBoard(BData):
         self._set_data(key=_Keys.RB, value=value)
 
 
-class BReportGenerator(BLogs, BVerbose, BDebug):
-    """Base class for reports generator class."""
-
-
-class BaseApp(BLogs, BConfigSection):
-    """Main app base class."""
-
-    from uke_pit2.conf import Config
-
-    @property
-    def configured(self) -> bool:
-        """Returns configured flag."""
-        return self._get_data(key=_Keys.CONFIGURED, set_default_type=bool, default_value=False)  # type: ignore
-
-    @configured.setter
-    def configured(self, flag: bool) -> None:
-        """Sets configured flag."""
-        self._set_data(key=_Keys.CONFIGURED, value=flag)
+class BStop(BData):
+    """Base class for stop method."""
 
     @property
     def stop(self) -> bool:
@@ -195,6 +179,10 @@ class BaseApp(BLogs, BConfigSection):
         """Sets STOP flag."""
         self._set_data(key=_Keys.SET_STOP, value=flag)
 
+
+class BTest(BData):
+    """Base class for test method."""
+
     @property
     def tests(self) -> bool:
         """Returns tests flag."""
@@ -206,6 +194,12 @@ class BaseApp(BLogs, BConfigSection):
     def tests(self, flag: bool) -> None:
         """Sets tests flag."""
         self._set_data(key=_Keys.SET_TEST, set_default_type=bool, value=flag)
+
+
+class BConfig(BData):
+    """Base class for Config."""
+
+    from uke_pit2.conf import Config
 
     @property
     def conf(self) -> Optional[Config]:
@@ -221,6 +215,24 @@ class BaseApp(BLogs, BConfigSection):
         from uke_pit2.conf import Config
 
         self._set_data(key=_Keys.CONF, value=conf_obj)
+
+
+class BReportGenerator(BLogs, BConfig, BStop, BTest, BVerbose, BDebug):
+    """Base class for reports generator class."""
+
+
+class BaseApp(BLogs, BConfig, BConfigSection, BStop, BTest):
+    """Main app base class."""
+
+    @property
+    def configured(self) -> bool:
+        """Returns configured flag."""
+        return self._get_data(key=_Keys.CONFIGURED, set_default_type=bool, default_value=False)  # type: ignore
+
+    @configured.setter
+    def configured(self, flag: bool) -> None:
+        """Sets configured flag."""
+        self._set_data(key=_Keys.CONFIGURED, value=flag)
 
     @property
     def version(self) -> str:
