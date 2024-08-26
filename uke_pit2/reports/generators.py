@@ -7,8 +7,7 @@
   Purpose: Report generators classes.
 """
 
-from doctest import debug
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Any
 from threading import Event, Thread
 from inspect import currentframe
 from queue import Queue, Empty
@@ -30,6 +29,19 @@ from jsktoolbox.stringtool.crypto import SimpleCrypto
 from uke_pit2.base import BReportGenerator
 from uke_pit2.conf import Config
 from uke_pit2.db import DbConfig, Database
+
+from uke_pit2.db_models.spider import (
+    TConnection,
+    TCustomer,
+    TDivisions,
+    TInterface,
+    TInterfaceName,
+    TNodeAssignment,
+    TRouter,
+    TFlow,
+)
+from uke_pit2.db_models.update import TLastUpdate
+from uke_pit2.reports.models import RDivision
 
 
 class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
@@ -62,11 +74,30 @@ class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
         session = self.__db_connection()
         if session:
             # get data
+            out = self.__create_dataset(session)
+            self.logs.message_info = f"{out}"
             # end connection
             session.close()
         # ---- #
         t_end = Timestamp.now
         self.logs.message_debug = f"end after: {t_end-t_start} [s]."
+
+    def __create_dataset(self, session: Session) -> List[RDivision]:
+        """Create list of records."""
+        out = []
+        if self.logs and self.logs.logs_queue:
+            rows = session.query(TDivisions).all()
+            for item in rows:
+                out.append(
+                    RDivision(
+                        session=session,
+                        logger_queue=self.logs.logs_queue,
+                        division=item,
+                        verbose=True,
+                        debug=True,
+                    )
+                )
+        return out
 
     def __db_connection(self) -> Optional[Session]:
         """Create db connection and return session object."""

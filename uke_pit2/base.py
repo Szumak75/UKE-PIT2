@@ -10,8 +10,10 @@
 import sys
 
 from typing import List, Dict, Optional, Any
+from inspect import currentframe
 
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import Session
 
 import uke_pit2
 
@@ -20,6 +22,7 @@ from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.configtool.main import Config as ConfigTool
 from jsktoolbox.logstool.logs import LoggerClient, ThLoggerProcessor
 from jsktoolbox.devices.mikrotik.routerboard import RouterBoard
+from jsktoolbox.raisetool import Raise
 
 
 class _Keys(object, metaclass=ReadOnlyClass):
@@ -219,6 +222,35 @@ class BConfig(BData):
 
 class BReportGenerator(BLogs, BConfig, BStop, BTest, BVerbose, BDebug):
     """Base class for reports generator class."""
+
+
+class BReportObject(BLogs, BVerbose, BDebug):
+    """Base class for Report object."""
+
+    class Keys(object, metaclass=ReadOnlyClass):
+        """Internal keys class."""
+
+        SESSION: str = "__session__"
+
+    @property
+    def session(self) -> Session:
+        """Returns db session."""
+        return self._get_data(
+            key=BReportObject.Keys.SESSION, set_default_type=Session
+        )  # type: ignore
+
+    @session.setter
+    def session(self, session: Session) -> None:
+        if not session:
+            raise Raise.error(
+                "Session type expected, NoneType received.",
+                TypeError,
+                self._c_name,
+                currentframe(),
+            )
+        self._set_data(
+            key=BReportObject.Keys.SESSION, value=session, set_default_type=Session
+        )
 
 
 class BaseApp(BLogs, BConfig, BConfigSection, BStop, BTest):
