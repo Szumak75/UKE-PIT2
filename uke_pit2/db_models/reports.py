@@ -146,4 +146,191 @@ class Division(LmsBase):
         )
 
 
+## Nodes
+class LmsNetNode(LmsBase):
+    __tablename__: str = "netnodes"
+
+    id: Mapped[int] = mapped_column(
+        INTEGER(11), primary_key=True, nullable=False, autoincrement=True
+    )
+    name: Mapped[str] = mapped_column(VARCHAR(255), nullable=False)
+    type: Mapped[int] = mapped_column(TINYINT(4), default=0)
+    # invprojectid: Mapped[int] = mapped_column(INTEGER(11), default=None)
+    status: Mapped[int] = mapped_column(TINYINT(4), default=0)
+    longitude: Mapped[float] = mapped_column(DECIMAL(10, 6), default=None)
+    latitude: Mapped[float] = mapped_column(DECIMAL(10, 6), default=None)
+    ownership: Mapped[int] = mapped_column(TINYINT(1), default=0)
+    # coowner: Mapped[str] = mapped_column(VARCHAR(255), default="")
+    uip: Mapped[int] = mapped_column(TINYINT(1), default=0)
+    miar: Mapped[int] = mapped_column(TINYINT(1), default=0)
+    createtime: Mapped[int] = mapped_column(INTEGER(11), default=None)
+    # lastinspectiontime: Mapped[int] = mapped_column(INTEGER(11), default=None)
+    admcontact: Mapped[str] = mapped_column(TEXT())
+    # divisionid: Mapped[int] = mapped_column(ForeignKey("divisions.id"))
+    # address_id: Mapped[int] = mapped_column(ForeignKey("addresses.id"))
+    info: Mapped[str] = mapped_column(TEXT())
+    # PRIMARY KEY (`id`),
+    # KEY `netnodes_address_id_fkey` (`address_id`),
+    # KEY `invprojectid` (`invprojectid`),
+    # KEY `divisionid` (`divisionid`),
+    # CONSTRAINT `netnodes_address_id_fkey` FOREIGN KEY (`address_id`) REFERENCES `addresses` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+    # address: Mapped["Address"] = relationship("Address")
+    # CONSTRAINT `netnodes_ibfk_1` FOREIGN KEY (`invprojectid`) REFERENCES `invprojects` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+    # CONSTRAINT `netnodes_ibfk_2` FOREIGN KEY (`divisionid`) REFERENCES `divisions` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+    # division: Mapped["Division"] = relationship("Division")
+
+    def __repr__(self) -> str:
+        return (
+            f"NetNode(id='{self.id}', "
+            f"name='{self.name}', "
+            f"type='{self.type}', "
+            # f"invprojectid='{self.invprojectid}', "
+            f"status='{self.status}', "
+            f"longitude='{self.longitude}', "
+            f"latitude='{self.latitude}', "
+            f"ownership='{self.ownership}', "
+            # f"coowner='{self.coowner}', "
+            f"uip='{self.uip}', "
+            f"miar='{self.miar}', "
+            f"createtime='{self.createtime}', "
+            # f"lastinspectiontime='{self.lastinspectiontime}', "
+            f"admcontact='{self.admcontact}', "
+            # f"divisionid='{self.divisionid}', "
+            # f"address_id='{self.address_id}', "
+            f"info='{self.info}', "
+            # f"address='{self.address}', "
+            # f"division='{self.division}'"
+            ")"
+        )
+
+
+class Foreign(LmsBase):
+    """Mapping class for foreign."""
+
+    __table_args__ = {"extend_existing": True}
+    __tablename__: str = "uke_pit_foreign"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    tin: Mapped[str] = mapped_column(String(10), nullable=False)
+    # foreign identification string
+    ident: Mapped[str] = mapped_column(String(100), nullable=False)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"name='{self.name}',"
+            f"tin='{self.tin}',"
+            f"ident='{self.ident}'"
+            ")"
+        )
+
+
+class Router(LmsBase):
+    """Mapping class for routers data."""
+
+    __table_args__ = {"extend_existing": True}
+    __tablename__: str = "uke_pit_routers"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    # router identification IP address as int
+    router_id: Mapped[int] = mapped_column(
+        Integer, unique=True, nullable=False, index=True
+    )
+    last_update: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"router_id='{Address(self.router_id)}',"
+            f"last_update='{self.last_update}'"
+            ")"
+        )
+
+
+class Customer(LmsBase):
+    """Mapping class for customers data."""
+
+    __table_args__ = {"extend_existing": True}
+    __tablename__: str = "uke_pit_customers"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    # router record id
+    rid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(18), nullable=False, index=True)
+    ip: Mapped[int] = mapped_column(Integer, nullable=False)
+    last_update: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"rid='{self.rid}',"
+            f"name='{self.name}',"
+            f"ip='{Address(self.ip)}',"
+            f"last_update='{self.last_update}'"
+            ")"
+        )
+
+
+class Connection(LmsBase):
+    """Mapping class for inter routers connection."""
+
+    __table_args__ = {"extend_existing": True}
+    __tablename__: str = "uke_pit_connections"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    rid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    vlan_id: Mapped[int] = mapped_column(
+        Integer, nullable=False, index=True, default=1, server_default=text("1")
+    )
+    network: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    last_update: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"rid='{self.rid}',"
+            f"vlan_id='{self.vlan_id}',"
+            f"network='{Address(self.network)}',"
+            f"last_update='{self.last_update}'"
+            ")"
+        )
+
+
+class NodeAssignment(LmsBase):
+    """Mapping class for assigning routers to nodes."""
+
+    __table_args__ = {"extend_existing": True}
+    __tablename__: str = "uke_pit_assignment"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False, autoincrement=True
+    )
+    # lms netnode.id
+    nid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    # router.id
+    rid: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"id='{self.id}',"
+            f"nid='{self.nid}',"
+            f"rid='{self.rid}'"
+            ")"
+        )
+
+
 # #[EOF]#######################################################################
