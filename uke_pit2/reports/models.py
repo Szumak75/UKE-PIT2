@@ -12,44 +12,9 @@ from threading import Event, Thread
 from inspect import currentframe
 from queue import Queue, Empty
 
-from sqlalchemy import ForeignKey, Integer, Boolean, String, func, text, and_
+from sqlalchemy import ForeignKey, Integer, Boolean, String, func, text, and_, true
 from sqlalchemy.orm import Mapped, mapped_column, Query, relationship, aliased
 from sqlalchemy.orm import Session
-from sqlalchemy.dialects.mysql import (
-    BIGINT,
-    BINARY,
-    BIT,
-    BLOB,
-    BOOLEAN,
-    CHAR,
-    DATE,
-    DATETIME,
-    DECIMAL,
-    DOUBLE,
-    ENUM,
-    FLOAT,
-    INTEGER,
-    LONGBLOB,
-    LONGTEXT,
-    MEDIUMBLOB,
-    MEDIUMINT,
-    MEDIUMTEXT,
-    NCHAR,
-    NUMERIC,
-    NVARCHAR,
-    REAL,
-    SET,
-    SMALLINT,
-    TEXT,
-    TIME,
-    TIMESTAMP,
-    TINYBLOB,
-    TINYINT,
-    TINYTEXT,
-    VARBINARY,
-    VARCHAR,
-    YEAR,
-)
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.logstool.logs import (
@@ -66,21 +31,7 @@ from jsktoolbox.stringtool.crypto import SimpleCrypto
 
 from uke_pit2.base import BReportObject
 
-from uke_pit2.db_models.spider import (
-    TConnection,
-    TCustomer,
-    TInterface,
-    TInterfaceName,
-    TNodeAssignment,
-    TRouter,
-    TFlow,
-    TDivisions,
-    TForeign,
-    TMedium,
-)
-from uke_pit2.db_models.update import TLastUpdate
-
-# from web_service.models import LmsCustomer, LmsDivision, LmsNetNode, LmsUser
+from uke_pit2.db_models.reports import LmsDivision, Division
 
 
 class RDivision(BReportObject):
@@ -90,12 +41,13 @@ class RDivision(BReportObject):
         """Internal keys class."""
 
         DIVISION: str = "__div__"
+        IDENT: str = "__ident__"
 
     def __init__(
         self,
         session: Session,
         logger_queue: LoggerQueue,
-        division: TDivisions,
+        division: LmsDivision,
         verbose: bool,
         debug: bool,
     ) -> None:
@@ -106,20 +58,66 @@ class RDivision(BReportObject):
         self.verbose = verbose
         self.session = session
         self._set_data(
-            key=RDivision.Keys.DIVISION, value=division, set_default_type=TDivisions
+            key=RDivision.Keys.DIVISION, value=division, set_default_type=LmsDivision
         )
+        # update ident
+        self.__update_ident()
 
-        self.logs.message_notice = f"Created Division: {self.division.ident}"
+        self.logs.message_notice = f"Created Division: {self.shortname}"
 
     def __repr__(self) -> str:
         """Returns string representation."""
         return f"{self._c_name}({self.division})"
 
+    def __update_ident(self) -> None:
+        """Update IDENT if self.main is False."""
+        if not self.main:
+            out = self.session.query(Division).filter(Division.main == True).first()
+            if out:
+                self._set_data(
+                    key=RDivision.Keys.IDENT, value=out.ident, set_default_type=str
+                )
+            else:
+                raise Raise.error(
+                    "Could not find IDENT for main division, please check if database dataset configuration is correct.",
+                    ValueError,
+                    self._c_name,
+                    currentframe(),
+                )
+
     @property
-    def division(self) -> TDivisions:
+    def foreign_ident(self) -> str:
+        """Returns foreign ident string."""
+        return self._get_data(
+            key=RDivision.Keys.IDENT, set_default_type=str, default_value=""
+        )  # type: ignore
+
+    @property
+    def division(self) -> LmsDivision:
         return self._get_data(
             key=RDivision.Keys.DIVISION,
         )  # type: ignore
+
+    @property
+    def main(self) -> bool:
+        """Returns True if division is the main division."""
+        if not self.division:
+            return False
+        return self.division.map.main
+
+    @property
+    def shortname(self) -> str:
+        """Returns division name."""
+        if not self.division:
+            return "ERROR"
+        return (
+            self.division.shortname.upper()
+            .replace(" ", "")
+            .replace(".", "")
+            .replace("SPZOO", "")
+            .replace("AIR-NET", "AIR-NET-")
+            .strip("-")
+        )
 
 
 # #[EOF]#######################################################################

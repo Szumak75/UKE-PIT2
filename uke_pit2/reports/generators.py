@@ -30,17 +30,7 @@ from uke_pit2.base import BReportGenerator
 from uke_pit2.conf import Config
 from uke_pit2.db import DbConfig, Database
 
-from uke_pit2.db_models.spider import (
-    TConnection,
-    TCustomer,
-    TDivisions,
-    TInterface,
-    TInterfaceName,
-    TNodeAssignment,
-    TRouter,
-    TFlow,
-)
-from uke_pit2.db_models.update import TLastUpdate
+from uke_pit2.db_models.reports import LmsDivision
 from uke_pit2.reports.models import RDivision
 
 
@@ -82,11 +72,11 @@ class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
         t_end = Timestamp.now
         self.logs.message_debug = f"end after: {t_end-t_start} [s]."
 
-    def __create_dataset(self, session: Session) -> List[RDivision]:
+    def __create_dataset(self, session: Session) -> List[LmsDivision]:
         """Create list of records."""
         out = []
         if self.logs and self.logs.logs_queue:
-            rows = session.query(TDivisions).all()
+            rows = session.query(LmsDivision).all()
             for item in rows:
                 out.append(
                     RDivision(
