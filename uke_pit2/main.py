@@ -714,6 +714,7 @@ class UkeApp(BaseApp, BVerbose):
                 obj = ThReportGenerator(
                     logger_queue=self.logs_processor.logger_engine.logs_queue,
                     config=self.conf,
+                    report_dir=self.module_conf.output_dir,
                 )
 
                 obj.start()

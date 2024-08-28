@@ -7,6 +7,8 @@
   Purpose: Report generators classes.
 """
 
+import os
+
 from typing import Optional, List, Tuple, Any
 from threading import Event, Thread
 from inspect import currentframe
@@ -37,10 +39,13 @@ from uke_pit2.reports.models import RDivision
 class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
     """Report Generator class."""
 
+    class Keys(object, metaclass=ReadOnlyClass):
+        """Internal keys class."""
+
+        DIR: str = "__output_dir__"
+
     def __init__(
-        self,
-        logger_queue: LoggerQueue,
-        config: Config,
+        self, logger_queue: LoggerQueue, config: Config, report_dir: str
     ) -> None:
         """Constructor."""
         # init thread
@@ -49,6 +54,10 @@ class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
         self.sleep_period = 0.2
         # config
         self.conf = config
+        # report dir
+        self._set_data(
+            key=ThReportGenerator.Keys.DIR, value=report_dir, set_default_type=str
+        )
         # logger
         self.logs = LoggerClient(logger_queue, f"{self._c_name}")
         self.logs.message_debug = f"initializing complete"
@@ -64,15 +73,46 @@ class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
         session = self.__db_connection()
         if session:
             # get data
-            out = self.__create_dataset(session)
-            self.logs.message_info = f"{out}"
+            out_div_list = self.__create_dataset(session)
+            # generate reports
+            for div in out_div_list:
+                # generate foreign entities
+                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-foreign.csv")  # type: ignore
+                self.__writer(file_path=file_path, data=div.generate_foreign())
+                # generate buildings and collocations -
+                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-collocations.csv")  # type: ignore
+                # generate base stations -
+                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-base-stations.csv")  # type: ignore
+                # generate nodes
+                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-nodes.csv")  # type: ignore
+                # generate pe
+                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-points.csv")  # type: ignore
+                # generate cable lines
+                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-cables.csv")  # type: ignore
+                # generate wireless lines
+                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-wireless.csv")  # type: ignore
+                # generate ranges -
+                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-ranges.csv")  # type: ignore
+                # generate services
+                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-services.csv")  # type: ignore
+                # generate sidusis
+                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-sidusis.csv")  # type: ignore
+
+            self.logs.message_info = f"{out_div_list}"
             # end connection
             session.close()
         # ---- #
         t_end = Timestamp.now
         self.logs.message_debug = f"end after: {t_end-t_start} [s]."
 
-    def __create_dataset(self, session: Session) -> List[LmsDivision]:
+    def __writer(self, file_path: str, data: List[str]) -> None:
+        """Reports writer."""
+        with open(file_path, "w") as writer:
+            for line in data:
+                writer.write(f"{line}\n")
+            writer.flush()
+
+    def __create_dataset(self, session: Session) -> List[RDivision]:
         """Create list of records."""
         out = []
         if self.logs and self.logs.logs_queue:

@@ -112,6 +112,7 @@ class RDivision(BReportObject):
         self._set_data(
             key=RDivision.Keys.DIVISION, value=division, set_default_type=LmsDivision
         )
+
         # update ident
         self.__update_ident()
 
@@ -125,9 +126,19 @@ class RDivision(BReportObject):
             f"Created Division: {self.shortname}, FOREIGN: {self.foreign}"
         )
 
+
     def __repr__(self) -> str:
         """Returns string representation."""
         return f"{self._c_name}({self.division})"
+
+    def generate_foreign(self) -> List[str]:
+        """Foreign report generator."""
+        head: str = "po01_id_podmiotu_obcego," "po02_nip_pl," "po03_nip_nie_pl"
+        out: List[str] = []
+        out.append(head)
+        for item in self._get_data(key=RDivision.Keys.FOREIGN):  # type: ignore
+            out.append(f"{item[0]},{item[1]},{item[2]}")
+        return out
 
     def __update_foreign(self) -> None:
         """Update foreign list."""
@@ -135,9 +146,9 @@ class RDivision(BReportObject):
         if self.main:
             rows = self.session.query(Foreign).all()
             for item in rows:
-                out.append([item.ident, item.tin.replace("-", "")])
+                out.append([item.ident, item.tin.replace("-", ""), ""])
         else:
-            out.append([self.foreign_ident, self.ten])
+            out.append([self.foreign_ident, self.ten, ""])
 
         self._set_data(key=RDivision.Keys.FOREIGN, value=out, set_default_type=List)
 
