@@ -345,4 +345,119 @@ class LmsBase(DeclarativeBase):
     """Declarative Base class."""
 
 
+class BTercData(BData):
+    """TercData base class."""
+
+    # TERC: Numeric(7)
+    @property
+    def terc(self) -> str:
+        """Returns TERC string."""
+        return self._get_data(key="TERC", set_default_type=str, default_value="")  # type: ignore
+
+    @terc.setter
+    def terc(self, value: str) -> None:
+        """Set TERC string."""
+        self._set_data(key="TERC", value=value, set_default_type=str)
+
+    # SIMC: Numeric(7)
+    @property
+    def simc(self) -> str:
+        """Return SIMC string."""
+        return self._get_data(key="SIMC", set_default_type=str, default_value="")  # type: ignore
+
+    @simc.setter
+    def simc(self, value: str) -> None:
+        """Set SIMC string."""
+        self._set_data(key="SIMC", value=value, set_default_type=str)
+
+    # ULIC: Optional[Numeric(5)]
+    @property
+    def ulic(self) -> str:
+        """Return ULIC string."""
+        return self._get_data(key="ULIC", set_default_type=str, default_value="")  # type: ignore
+
+    @ulic.setter
+    def ulic(self, value: str) -> None:
+        """Set ULIC string."""
+        self._set_data(key="ULIC", value=value, set_default_type=str)
+
+    # NR: Optional[String(50)]
+    @property
+    def nr(self) -> str:
+        """Return NR string."""
+        return self._get_data(key="NR", set_default_type=str, default_value="")  # type: ignore
+
+    @nr.setter
+    def nr(self, value: str) -> None:
+        """Set NR string."""
+        self._set_data(key="NR", value=value, set_default_type=str)
+
+
+class BGeoData(BData):
+    """GeoData base class."""
+
+    # latitude: Float(7) # szerokość geograficzna
+    @property
+    def latitude(self) -> str:
+        """Return LATITUDE string."""
+        return self._get_data(key="LATITUDE", set_default_type=str, default_value="")  # type: ignore
+
+    @latitude.setter
+    def latitude(self, value: str) -> None:
+        """Set LATITUDE string."""
+        self._set_data(key="LATITUDE", value=value, set_default_type=str)
+
+    # longitude: Float(7) # długość geograficzna
+    @property
+    def longitude(self) -> str:
+        """Return LONGITUDE string."""
+        return self._get_data(key="LONGITUDE", set_default_type=str, default_value="")  # type: ignore
+
+    @longitude.setter
+    def longitude(self, value: str) -> None:
+        """Set LONGITUDE string."""
+        self._set_data(key="LONGITUDE", value=value, set_default_type=str)
+
+
+class BFinancingData(BData):
+    """FinancingData base class."""
+
+    # financing: Dict[Boolean] # finansowanie ze środków publicznych
+    @property
+    def financing(self) -> str:
+        """Return FINANCING string."""
+        return self._get_data(key="FINANCING", set_default_type=str, default_value="")  # type: ignore
+
+    @financing.setter
+    def financing(self, value: str) -> None:
+        """Set FINANCING string."""
+        self._set_data(key="FINANCING", value=value, set_default_type=str)
+
+    # pnrs: Optional[String(250)] # numery projektów dla środków publicznych
+    @property
+    def pnrs(self) -> str:
+        """Return PNRS string."""
+        return self._get_data(key="PNRS", set_default_type=str, default_value="")  # type: ignore
+
+    @pnrs.setter
+    def pnrs(self, value: str) -> None:
+        """Set PNRS string."""
+        self._set_data(key="PNRS", value=value, set_default_type=str)
+
+
+class BMediumData(BData):
+    """MediumData base class."""
+
+    # medium: Dict[String] # medium transmisyjne
+    @property
+    def medium(self) -> str:
+        """Return MEDIUM string."""
+        return self._get_data(key="MEDIUM", set_default_type=str, default_value="")  # type: ignore
+
+    @medium.setter
+    def medium(self, value: str) -> None:
+        """Set MEDIUM string."""
+        self._set_data(key="MEDIUM", value=value, set_default_type=str)
+
+
 # #[EOF]#######################################################################
