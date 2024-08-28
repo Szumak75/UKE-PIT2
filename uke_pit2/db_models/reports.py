@@ -101,7 +101,7 @@ class LmsLocationDistrict(LmsBase):
     # CONSTRAINT `location_districts_ibfk_1` FOREIGN KEY (`stateid`) REFERENCES `location_states` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
     state: Mapped["LmsLocationState"] = relationship("LmsLocationState")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}(id='{self.id}', "
             f"name='{self.name}', "
@@ -303,7 +303,7 @@ class LmsAddress(LmsBase):
                     district: LmsLocationDistrict = borough.district
                     if district.state:
                         state: LmsLocationState = district.state
-                        tmp = f"{state.ident}{district.ident}{borough.ident}{borough.type}"
+                        tmp: str = f"{state.ident}{district.ident}{borough.ident}{borough.type}"
                         if len(tmp) == 7:
                             return tmp
         return None
@@ -313,7 +313,7 @@ class LmsAddress(LmsBase):
         """Return SIMC string."""
         if self.location_city:
             city: LmsLocationCity = self.location_city
-            tmp = f"{city.ident}"
+            tmp: str = f"{city.ident}"
             if len(tmp) == 7:
                 return tmp
         return None
@@ -323,7 +323,7 @@ class LmsAddress(LmsBase):
         """Return ULIC string."""
         if self.location_street:
             street: LmsLocationStreet = self.location_street
-            tmp = f"{street.ident}"
+            tmp: str = f"{street.ident}"
             if len(tmp) == 5:
                 return tmp
         return None
