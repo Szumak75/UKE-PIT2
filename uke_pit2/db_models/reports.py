@@ -52,11 +52,310 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
     YEAR,
 )
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from jsktoolbox.datetool import DateTime
 from jsktoolbox.netaddresstool.ipv4 import Address
 
 from uke_pit2.base import LmsBase
+
+
+class LmsLocationState(LmsBase):
+    __tablename__: str = "location_states"
+
+    # `id` int(11) NOT NULL AUTO_INCREMENT,
+    id: Mapped[int] = mapped_column(
+        INTEGER(11), primary_key=True, nullable=False, autoincrement=True
+    )
+    # `ident` varchar(8) COLLATE utf8_polish_ci NOT NULL,
+    ident: Mapped[str] = mapped_column(VARCHAR(8), nullable=False)
+    # `name` varchar(64) COLLATE utf8_polish_ci NOT NULL,
+    name: Mapped[str] = mapped_column(VARCHAR(64), unique=True, nullable=False)
+    # PRIMARY KEY (`id`),
+    # UNIQUE KEY `name` (`name`)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(id='{self.id}', "
+            f"ident='{self.ident}', "
+            f"name='{self.name}' "
+            ") "
+        )
+
+
+class LmsLocationDistrict(LmsBase):
+    __tablename__: str = "location_districts"
+
+    # `id` int(11) NOT NULL AUTO_INCREMENT,
+    id: Mapped[int] = mapped_column(
+        INTEGER(11), primary_key=True, nullable=False, autoincrement=True
+    )
+    # `name` varchar(64) COLLATE utf8_polish_ci NOT NULL,
+    name: Mapped[str] = mapped_column(VARCHAR(64), nullable=False)
+    # `ident` varchar(8) COLLATE utf8_polish_ci NOT NULL,
+    ident: Mapped[str] = mapped_column(VARCHAR(8), nullable=False)
+    # `stateid` int(11) NOT NULL,
+    stateid: Mapped[int] = mapped_column(ForeignKey("location_states.id"))
+    # PRIMARY KEY (`id`),
+    # UNIQUE KEY `stateid` (`stateid`,`name`),
+    # CONSTRAINT `location_districts_ibfk_1` FOREIGN KEY (`stateid`) REFERENCES `location_states` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+    state: Mapped["LmsLocationState"] = relationship("LmsLocationState")
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}(id='{self.id}', "
+            f"name='{self.name}', "
+            f"ident='{self.ident}', "
+            f"stateid='{self.stateid}', "
+            f"state='{self.state}' "
+            ") "
+        )
+
+
+class LmsLocationBorough(LmsBase):
+    __tablename__: str = "location_boroughs"
+
+    # `id` int(11) NOT NULL AUTO_INCREMENT,
+    id: Mapped[int] = mapped_column(
+        INTEGER(11), primary_key=True, nullable=False, autoincrement=True
+    )
+    # `name` varchar(64) COLLATE utf8_polish_ci NOT NULL,
+    name: Mapped[str] = mapped_column(VARCHAR(64), nullable=False)
+    # `ident` varchar(8) COLLATE utf8_polish_ci NOT NULL,
+    ident: Mapped[str] = mapped_column(VARCHAR(8), nullable=False)
+    # `districtid` int(11) NOT NULL,
+    districtid: Mapped[int] = mapped_column(ForeignKey("location_districts.id"))
+    # `type` smallint(6) NOT NULL,
+    type: Mapped[int] = mapped_column(SMALLINT(6), nullable=False)
+    # PRIMARY KEY (`id`),
+    # UNIQUE KEY `districtid` (`districtid`,`name`,`type`),
+    # CONSTRAINT `location_boroughs_ibfk_1` FOREIGN KEY (`districtid`) REFERENCES `location_districts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+    district: Mapped["LmsLocationDistrict"] = relationship("LmsLocationDistrict")
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(id='{self.id}', "
+            f"name='{self.name}', "
+            f"ident='{self.ident}', "
+            f"districtid='{self.districtid}', "
+            f"type='{self.type}', "
+            f"district='{self.district}' "
+            ") "
+        )
+
+
+class LmsLocationCity(LmsBase):
+    __tablename__: str = "location_cities"
+
+    # `id` int(11) NOT NULL AUTO_INCREMENT,
+    id: Mapped[int] = mapped_column(
+        INTEGER(11), primary_key=True, nullable=False, autoincrement=True
+    )
+    # `ident` varchar(8) COLLATE utf8_polish_ci NOT NULL,
+    ident: Mapped[str] = mapped_column(VARCHAR(8), nullable=False)
+    # `name` varchar(64) COLLATE utf8_polish_ci NOT NULL,
+    name: Mapped[str] = mapped_column(VARCHAR(64), nullable=False)
+    # `cityid` int(11) DEFAULT NULL,
+    cityid: Mapped[int] = mapped_column(INTEGER(11), index=True, default=None)
+    # `boroughid` int(11) DEFAULT NULL,
+    boroughid: Mapped[int] = mapped_column(ForeignKey("location_boroughs.id"))
+    # PRIMARY KEY (`id`),
+    # KEY `cityid` (`cityid`),
+    # KEY `boroughid` (`boroughid`,`name`),
+    # CONSTRAINT `location_cities_ibfk_1` FOREIGN KEY (`boroughid`) REFERENCES `location_boroughs` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+    borough: Mapped["LmsLocationBorough"] = relationship("LmsLocationBorough")
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(id='{self.id}', "
+            f"ident='{self.ident}', "
+            f"name='{self.name}', "
+            f"cityid='{self.cityid}', "
+            f"boroughid='{self.boroughid}', "
+            f"borough='{self.borough}' "
+            ") "
+        )
+
+
+class LmsLocationStreet(LmsBase):
+    __tablename__: str = "location_streets"
+
+    # `id` int(11) NOT NULL AUTO_INCREMENT,
+    id: Mapped[int] = mapped_column(
+        INTEGER(11), primary_key=True, nullable=False, autoincrement=True
+    )
+    # `name` varchar(128) COLLATE utf8_polish_ci NOT NULL,
+    name: Mapped[str] = mapped_column(VARCHAR(128), nullable=False)
+    # `name2` varchar(128) COLLATE utf8_polish_ci DEFAULT NULL,
+    name2: Mapped[str] = mapped_column(VARCHAR(128), default=None)
+    # `ident` varchar(8) COLLATE utf8_polish_ci NOT NULL,
+    ident: Mapped[str] = mapped_column(VARCHAR(8), nullable=False)
+    # `typeid` int(11) DEFAULT NULL,
+    typeid: Mapped[int] = mapped_column(ForeignKey("location_street_types.id"))
+    # `cityid` int(11) NOT NULL,
+    cityid: Mapped[int] = mapped_column(ForeignKey("location_cities.id"))
+    # PRIMARY KEY (`id`),
+    # UNIQUE KEY `cityid` (`cityid`,`name`,`ident`),
+    # KEY `typeid` (`typeid`),
+    # CONSTRAINT `location_streets_ibfk_1` FOREIGN KEY (`typeid`) REFERENCES `location_street_types` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+    street_type: Mapped["LmsLocationStreetType"] = relationship("LmsLocationStreetType")
+    # CONSTRAINT `location_streets_ibfk_2` FOREIGN KEY (`cityid`) REFERENCES `location_cities` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+    city: Mapped["LmsLocationCity"] = relationship("LmsLocationCity")
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(id='{self.id}', "
+            f"name='{self.name}', "
+            f"name2='{self.name2}', "
+            f"ident='{self.ident}', "
+            f"typeid='{self.typeid}', "
+            f"cityid='{self.cityid}', "
+            f"street_type='{self.street_type}', "
+            f"city='{self.city}' "
+            ") "
+        )
+
+
+class LmsLocationStreetType(LmsBase):
+    __tablename__: str = "location_street_types"
+
+    # `id` int(11) NOT NULL AUTO_INCREMENT,
+    id: Mapped[int] = mapped_column(
+        INTEGER(11), primary_key=True, nullable=False, autoincrement=True
+    )
+    # `name` varchar(8) COLLATE utf8_polish_ci NOT NULL,
+    name: Mapped[str] = mapped_column(VARCHAR(8), nullable=False)
+    # PRIMARY KEY (`id`)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(id='{self.id}', " f"name='{self.name}' ) "
+
+
+class LmsCountry(LmsBase):
+    __tablename__: str = "countries"
+
+    # `id` int(11) NOT NULL AUTO_INCREMENT,
+    id: Mapped[int] = mapped_column(
+        INTEGER(11), primary_key=True, nullable=False, autoincrement=True
+    )
+    # `name` varchar(255) COLLATE utf8_polish_ci NOT NULL DEFAULT '',
+    name: Mapped[str] = mapped_column(VARCHAR(255), nullable=False, default="")
+    # PRIMARY KEY (`id`),
+    # UNIQUE KEY `name` (`name`)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(id='{self.id}', " f"name='{self.name}' ) "
+
+
+class LmsAddress(LmsBase):
+    __tablename__: str = "addresses"
+
+    # `id` int(11) NOT NULL AUTO_INCREMENT,
+    id: Mapped[int] = mapped_column(
+        INTEGER(11), primary_key=True, nullable=False, autoincrement=True
+    )
+    # `name` text COLLATE utf8_polish_ci,
+    name: Mapped[str] = mapped_column(TEXT())
+    # `state` varchar(64) COLLATE utf8_polish_ci DEFAULT NULL,
+    state: Mapped[str] = mapped_column(VARCHAR(64), default=None)
+    # `state_id` int(11) DEFAULT NULL,
+    state_id: Mapped[int] = mapped_column(ForeignKey("location_states.id"))
+    # `city` varchar(100) COLLATE utf8_polish_ci DEFAULT NULL,
+    city: Mapped[str] = mapped_column(VARCHAR(100), default=None)
+    # `city_id` int(11) DEFAULT NULL,
+    city_id: Mapped[int] = mapped_column(ForeignKey("location_cities.id"))
+    # `postoffice` varchar(32) COLLATE utf8_polish_ci DEFAULT NULL,
+    postoffice: Mapped[str] = mapped_column(VARCHAR(32), default=None)
+    # `street` varchar(255) COLLATE utf8_polish_ci DEFAULT NULL,
+    street: Mapped[str] = mapped_column(VARCHAR(255), default=None)
+    # `street_id` int(11) DEFAULT NULL,
+    street_id: Mapped[int] = mapped_column(ForeignKey("location_streets.id"))
+    # `zip` varchar(10) COLLATE utf8_polish_ci DEFAULT NULL,
+    zip: Mapped[str] = mapped_column(VARCHAR(10), default=None)
+    # `country_id` int(11) DEFAULT NULL,
+    country_id: Mapped[int] = mapped_column(ForeignKey("countries.id"))
+    # `house` varchar(20) COLLATE utf8_polish_ci DEFAULT NULL,
+    house: Mapped[str] = mapped_column(VARCHAR(20), default=None)
+    # `flat` varchar(20) COLLATE utf8_polish_ci DEFAULT NULL,
+    flat: Mapped[str] = mapped_column(VARCHAR(20), default=None)
+    # PRIMARY KEY (`id`),
+    # KEY `addresses_state_id_fk` (`state_id`),
+    # KEY `addresses_city_id_fk` (`city_id`),
+    # KEY `addresses_street_id_fk` (`street_id`),
+    # KEY `addresses_country_id_fk` (`country_id`),
+    # CONSTRAINT `addresses_city_id_fk` FOREIGN KEY (`city_id`) REFERENCES `location_cities` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+    location_city: Mapped["LmsLocationCity"] = relationship("LmsLocationCity")
+    # CONSTRAINT `addresses_country_id_fk` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+    location_country: Mapped["LmsCountry"] = relationship("LmsCountry")
+    # CONSTRAINT `addresses_state_id_fk` FOREIGN KEY (`state_id`) REFERENCES `location_states` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+    location_state: Mapped["LmsLocationState"] = relationship("LmsLocationState")
+    # CONSTRAINT `addresses_street_id_fk` FOREIGN KEY (`street_id`) REFERENCES `location_streets` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+    location_street: Mapped["LmsLocationStreet"] = relationship("LmsLocationStreet")
+
+    @hybrid_property
+    def terc(self) -> Optional[str]:
+        """Return TERC string."""
+        if self.location_city:
+            city: LmsLocationCity = self.location_city
+            if city.borough:
+                borough: LmsLocationBorough = city.borough
+                if borough.district:
+                    district: LmsLocationDistrict = borough.district
+                    if district.state:
+                        state: LmsLocationState = district.state
+                        tmp = f"{state.ident}{district.ident}{borough.ident}{borough.type}"
+                        if len(tmp) == 7:
+                            return tmp
+        return None
+
+    @hybrid_property
+    def simc(self) -> Optional[str]:
+        """Return SIMC string."""
+        if self.location_city:
+            city: LmsLocationCity = self.location_city
+            tmp = f"{city.ident}"
+            if len(tmp) == 7:
+                return tmp
+        return None
+
+    @hybrid_property
+    def ulic(self) -> Optional[str]:
+        """Return ULIC string."""
+        if self.location_street:
+            street: LmsLocationStreet = self.location_street
+            tmp = f"{street.ident}"
+            if len(tmp) == 5:
+                return tmp
+        return None
+
+    @hybrid_property
+    def nr(self) -> Optional[str]:
+        """Return NR string."""
+        if self.house and str(self.house).lower() != "b/n":
+            return self.house
+        return None
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(id='{self.id}', "
+            f"name='{self.name}', "
+            f"state='{self.state}', "
+            f"state_id='{self.state_id}', "
+            f"city='{self.city}', "
+            f"city_id='{self.city_id}', "
+            f"postoffice='{self.postoffice}', "
+            f"street='{self.street}', "
+            f"street_id='{self.street_id}', "
+            f"zip='{self.zip}', "
+            f"country_id='{self.country_id}', "
+            f"house='{self.house}', "
+            f"flat='{self.flat}', "
+            f"location_country='{self.location_country}', "
+            f"location_state='{self.location_state}', "
+            f"location_city='{self.location_city}', "
+            f"location_street='{self.location_street}' "
+            ") "
+        )
 
 
 class LmsDivision(LmsBase):
