@@ -74,29 +74,30 @@ class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
         if session:
             # get data
             out_div_list = self.__create_dataset(session)
+            report_dir: str = self._get_data(key=ThReportGenerator.Keys.DIR)  # type: ignore
             # generate reports
             for div in out_div_list:
                 # generate foreign entities
-                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-foreign.csv")  # type: ignore
+                file_path = os.path.join(report_dir, f"{div.shortname}-foreign.csv")  # type: ignore
                 self.__writer(file_path=file_path, data=div.generate_foreign())
                 # generate buildings and collocations -
-                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-collocations.csv")  # type: ignore
+                file_path = os.path.join(report_dir, f"{div.shortname}-collocations.csv")  # type: ignore
                 # generate base stations -
-                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-base-stations.csv")  # type: ignore
+                file_path = os.path.join(report_dir, f"{div.shortname}-base-stations.csv")  # type: ignore
                 # generate nodes
-                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-nodes.csv")  # type: ignore
+                file_path = os.path.join(report_dir, f"{div.shortname}-nodes.csv")  # type: ignore
                 # generate pe
-                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-points.csv")  # type: ignore
+                file_path = os.path.join(report_dir, f"{div.shortname}-points.csv")  # type: ignore
                 # generate cable lines
-                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-cables.csv")  # type: ignore
+                file_path = os.path.join(report_dir, f"{div.shortname}-cables.csv")  # type: ignore
                 # generate wireless lines
-                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-wireless.csv")  # type: ignore
+                file_path = os.path.join(report_dir, f"{div.shortname}-wireless.csv")  # type: ignore
                 # generate ranges -
-                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-ranges.csv")  # type: ignore
+                file_path = os.path.join(report_dir, f"{div.shortname}-ranges.csv")  # type: ignore
                 # generate services
-                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-services.csv")  # type: ignore
+                file_path = os.path.join(report_dir, f"{div.shortname}-services.csv")  # type: ignore
                 # generate sidusis
-                file_path = os.path.join(self._get_data(key=ThReportGenerator.Keys.DIR), f"{div.shortname}-sidusis.csv")  # type: ignore
+                file_path = os.path.join(report_dir, f"{div.shortname}-sidusis.csv")  # type: ignore
 
             self.logs.message_info = f"{out_div_list}"
             # end connection
