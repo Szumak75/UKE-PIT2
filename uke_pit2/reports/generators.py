@@ -117,7 +117,7 @@ class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
         """Create list of records."""
         out = []
         if self.logs and self.logs.logs_queue:
-            rows = session.query(LmsDivision).all()
+            rows: List[LmsDivision] = session.query(LmsDivision).all()
             for item in rows:
                 out.append(
                     RDivision(
