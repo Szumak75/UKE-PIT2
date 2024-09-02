@@ -432,12 +432,8 @@ class TransData(BData):
             value=conn.network,
             set_default_type=int,
         )
-        if int(n1) < int(n2):
-            self._set_data(key=TransData.Keys.N1ID, value=n1, set_default_type=str)
-            self._set_data(key=TransData.Keys.N2ID, value=n2, set_default_type=str)
-        else:
-            self._set_data(key=TransData.Keys.N1ID, value=n2, set_default_type=str)
-            self._set_data(key=TransData.Keys.N2ID, value=n1, set_default_type=str)
+        self._set_data(key=TransData.Keys.N1ID, value=n1, set_default_type=str)
+        self._set_data(key=TransData.Keys.N2ID, value=n2, set_default_type=str)
 
     @property
     def rid1(self) -> str:
@@ -828,12 +824,8 @@ if not conf.errors:
 
                 print("-[START]-----------------")
                 for v1, v2, v3, v4, v5, v6 in rows:
-                    if int(nid) < v1.id:
-                        n1 = int(nid)
-                        n2 = int(v1.id)
-                    else:
-                        n2 = int(nid)
-                        n1 = int(v1.id)
+                    n1 = int(nid)
+                    n2 = int(v1.id)
                     if v1.name not in data_dict:
                         data_dict[v1.name] = []
                     data_dict[v1.name].append(
