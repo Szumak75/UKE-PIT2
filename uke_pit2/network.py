@@ -17,7 +17,7 @@ from typing import Optional
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.netaddresstool.ipv4 import Address
-from jsktoolbox.libs.base_data import BData
+from jsktoolbox.basetool.data import BData
 
 
 class _Keys(object, metaclass=ReadOnlyClass):

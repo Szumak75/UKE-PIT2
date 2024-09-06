@@ -22,7 +22,7 @@ from jsktoolbox.logstool.logs import (
     LoggerQueue,
 )
 
-from jsktoolbox.libs.base_th import ThBaseObject
+from jsktoolbox.basetool.threads import ThBaseObject
 from jsktoolbox.netaddresstool.ipv4 import Address, Network
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.datetool import Timestamp
@@ -65,7 +65,7 @@ class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
     def run(self) -> None:
         """Start procedure."""
         self.logs.message_debug = "starting..."
-        t_start = Timestamp.now
+        t_start = Timestamp.now()
         # ---- #
         # create database connection
         self.debug = True
@@ -103,7 +103,7 @@ class ThReportGenerator(Thread, ThBaseObject, BReportGenerator):
             # end connection
             session.close()
         # ---- #
-        t_end = Timestamp.now
+        t_end = Timestamp.now()
         self.logs.message_debug = f"end after: {t_end-t_start} [s]."
 
     def __writer(self, file_path: str, data: List[str]) -> None:

@@ -22,7 +22,7 @@ from jsktoolbox.logstool.logs import (
     LoggerQueue,
 )
 
-from jsktoolbox.libs.base_th import ThBaseObject
+from jsktoolbox.basetool.threads import ThBaseObject
 from jsktoolbox.netaddresstool.ipv4 import Address, Network
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.datetool import DateTime

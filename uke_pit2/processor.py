@@ -22,7 +22,7 @@ from sqlalchemy.orm import Session
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.logstool.logs import LoggerClient, LoggerQueue
-from jsktoolbox.libs.base_th import ThBaseObject
+from jsktoolbox.basetool.threads import ThBaseObject
 from jsktoolbox.netaddresstool.ipv4 import Address, Network
 from jsktoolbox.raisetool import Raise
 from jsktoolbox.devices.network.connectors import API

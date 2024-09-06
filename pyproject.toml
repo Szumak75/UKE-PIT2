@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-jsktoolbox = "^1.0.16"
+jsktoolbox = "1.0.19"
 sqlalchemy = "^2.0.29"
 pymysql = "^1.1.0"
 pysqlite3 = "^0.5.2"

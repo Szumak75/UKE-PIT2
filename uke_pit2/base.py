@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 
 import uke_pit2
 
-from jsktoolbox.libs.base_data import BData
+from jsktoolbox.basetool.data import BData
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.configtool.main import Config as ConfigTool
 from jsktoolbox.logstool.logs import LoggerClient, ThLoggerProcessor

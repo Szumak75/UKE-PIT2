@@ -14,7 +14,7 @@ from typing import Optional, Union, List, Dict, Any
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.logstool.logs import LoggerClient, LoggerQueue
-from jsktoolbox.libs.base_data import BData
+from jsktoolbox.basetool.data import BData
 from jsktoolbox.netaddresstool.ipv4 import Address, Network
 from jsktoolbox.devices.mikrotik.routerboard import RouterBoard
 from jsktoolbox.devices.mikrotik.elements.libs.search import RBQuery

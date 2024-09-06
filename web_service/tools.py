@@ -13,8 +13,8 @@ from typing import Optional, Any
 from jsktoolbox.attribtool import NoDynamicAttributes, ReadOnlyClass
 from jsktoolbox.configtool.main import Config as ConfigTool
 from jsktoolbox.raisetool import Raise
-from jsktoolbox.libs.system import PathChecker
-from jsktoolbox.libs.base_data import BData
+from jsktoolbox.systemtool import PathChecker
+from jsktoolbox.basetool.data import BData
 from jsktoolbox.stringtool.crypto import SimpleCrypto
 from jsktoolbox.netaddresstool.ipv4 import Address
 

@@ -22,7 +22,7 @@ from jsktoolbox.datetool import DateTime
 from jsktoolbox.stringtool.crypto import SimpleCrypto
 from jsktoolbox.logstool.logs import LoggerEngine, LoggerClient, LoggerQueue
 from jsktoolbox.netaddresstool.ipv4 import Address
-from jsktoolbox.libs.base_data import BData
+from jsktoolbox.basetool.data import BData
 from jsktoolbox.attribtool import ReadOnlyClass
 
 

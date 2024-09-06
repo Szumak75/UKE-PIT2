@@ -1,6 +1,7 @@
 {
     "python.analysis.typeCheckingMode": "basic",
     "cSpell.words": [
+        "basetool",
         "dbpassword",
         "dlugosc",
         "netnodes",
@@ -9,6 +10,7 @@
         "sidusis",
         "simc",
         "SPZOO",
+        "systemtool",
         "terc",
         "tytul",
         "uslug",

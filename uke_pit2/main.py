@@ -15,7 +15,7 @@ from typing import Optional, List
 
 from jsktoolbox.attribtool import ReadOnlyClass
 from jsktoolbox.raisetool import Raise
-from jsktoolbox.libs.system import CommandLineParser, PathChecker
+from jsktoolbox.systemtool import CommandLineParser, PathChecker
 from jsktoolbox.netaddresstool.ipv4 import Address
 from jsktoolbox.logstool.logs import (
     LoggerEngine,
@@ -27,7 +27,7 @@ from jsktoolbox.logstool.logs import (
     ThLoggerProcessor,
 )
 from jsktoolbox.logstool.formatters import LogFormatterNull, LogFormatterDateTime
-from jsktoolbox.libs.system import Env
+from jsktoolbox.systemtool import Env
 from jsktoolbox.stringtool.crypto import SimpleCrypto
 
 import uke_pit2
@@ -120,7 +120,7 @@ class SpiderApp(BaseApp, BVerbose):
 
         # set configuration filename
         self.conf.config_file = os.path.join(
-            Env.home, f".{self.conf.section}", "config"
+            Env().home, f".{self.conf.section}", "config"
         )
 
         # config file
@@ -655,7 +655,7 @@ class UkeApp(BaseApp, BVerbose):
 
         # set configuration filename
         self.conf.config_file = os.path.join(
-            Env.home, f".{self.conf.section}", "config"
+            Env().home, f".{self.conf.section}", "config"
         )
 
         # config file
@@ -770,7 +770,7 @@ class UkeApp(BaseApp, BVerbose):
             # create section
             self.conf.cfh.set(self.section, desc="The generator configuration section")
             dir = os.path.join(
-                Env.home,
+                Env().home,
                 "Reports",
                 f"{self.conf.app_name}/" if self.conf and self.conf.app_name else "",
             )
