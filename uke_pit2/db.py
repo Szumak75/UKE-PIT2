@@ -145,7 +145,7 @@ class Database(BDebug, BVerbose, BLogs):
                 if self.debug:
                     if self.verbose:
                         self.logs.message_debug = f"add connection to server: {self._get_data(_Keys.CONF).host} with backend: pymysql"  # type: ignore
-                    self._set_data(_Keys.DB_POLL, value=engine)
+                self._set_data(_Keys.DB_POLL, value=engine)
         except Exception as ex:
             self.logs.message_critical = f"connection to server: {self._get_data(_Keys.CONF).host} with backend: pymyslq error: {ex}"  # type: ignore
         if self._get_data(_Keys.DB_POLL) is not None:

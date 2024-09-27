@@ -94,7 +94,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
         # communication queue
         self.__comms_queue = comms_queue
         # set runtime
-        self._set_data(_Keys.RUNTIME, set_default_type=int, value=Timestamp.now)
+        self._set_data(_Keys.RUNTIME, set_default_type=int, value=Timestamp.now())
 
     def run(self) -> None:
         """Start processor."""
@@ -137,7 +137,7 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
 
         # set runtime
         tlu = TLastUpdate()
-        tlu.last_update = self._get_data(_Keys.RUNTIME, default_value=Timestamp.now)  # type: ignore
+        tlu.last_update = self._get_data(_Keys.RUNTIME, default_value=Timestamp.now())  # type: ignore
         session.add(tlu)
         session.commit()
 
@@ -276,51 +276,52 @@ class DbProcessor(Thread, ThBaseObject, BLogs, BVerbose):
     def __purge_routers(self, session: Session) -> None:
         """Purge old routers."""
         runtime: Optional[int] = self._get_data(_Keys.RUNTIME)
-        if runtime and session:
-            # update filter - one week limit
-            oldest_update: int = runtime - 60 * 60 * 24 * 7
-            rows = (
-                session.query(TRouter, TNodeAssignment, TConnection, TCustomer)
-                .outerjoin(
-                    TConnection,
-                    TConnection.rid == TRouter.id,
-                )
-                .outerjoin(
-                    TNodeAssignment,
-                    TNodeAssignment.rid == TRouter.id,
-                )
-                .outerjoin(
-                    TCustomer,
-                    TCustomer.rid == TRouter.id,
-                )
-                # .outerjoin(TFlow, TFlow.network == TConnection.network)
-                .filter(
-                    TRouter.last_update < oldest_update,
-                )
-                .all()
-            )
+        # if runtime and session:
+        #     # update filter - one week limit
+        #     oldest_update: int = runtime - 60 * 60 * 24 * 7
+        #     # self.logs.message_debug = f"runtime: {runtime}"
+        #     rows = (
+        #         session.query(TRouter, TNodeAssignment, TConnection, TCustomer)
+        #         .outerjoin(
+        #             TConnection,
+        #             TConnection.rid == TRouter.id,
+        #         )
+        #         .outerjoin(
+        #             TNodeAssignment,
+        #             TNodeAssignment.rid == TRouter.id,
+        #         )
+        #         .outerjoin(
+        #             TCustomer,
+        #             TCustomer.rid == TRouter.id,
+        #         )
+        #         # .outerjoin(TFlow, TFlow.network == TConnection.network)
+        #         .filter(
+        #             TRouter.last_update < oldest_update,
+        #         )
+        #         .all()
+        #     )
 
-            if rows:
-                count = 0
-                r_count = 0
-                c_count = 0
-                for router, assignment, connection, customer in rows:
-                    count += 1
+        #     if rows:
+        #         count = 0
+        #         r_count = 0
+        #         c_count = 0
+        #         for router, assignment, connection, customer in rows:
+        #             count += 1
 
-                    if router:
-                        r_count += 1
-                        session.delete(router)
-                    if connection:
-                        c_count += 1
-                        session.delete(connection)
-                    if assignment:
-                        session.delete(assignment)
-                    if customer:
-                        session.delete(customer)
-                    # if flow:
-                    #     session.delete(flow)
-                session.commit()
-                self.logs.message_info = f"purge {count} records: {r_count} routers and {c_count} connections."
+        #             if router:
+        #                 r_count += 1
+        #                 session.delete(router)
+        #             if connection:
+        #                 c_count += 1
+        #                 session.delete(connection)
+        #             if assignment:
+        #                 session.delete(assignment)
+        #             if customer:
+        #                 session.delete(customer)
+        #             # if flow:
+        #             #     session.delete(flow)
+        #         session.commit()
+        #         self.logs.message_info = f"purge {count} records: {r_count} routers and {c_count} connections."
 
     def __update_router_connections(
         self, session: Session, data: RBData, router_record_id: int

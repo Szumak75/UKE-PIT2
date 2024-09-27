@@ -31,7 +31,13 @@ from jsktoolbox.stringtool.crypto import SimpleCrypto
 
 from uke_pit2.base import BReportObject
 
-from uke_pit2.db_models.reports import LmsDivision, Division, LmsNetNode, Foreign
+from uke_pit2.db_models.reports import (
+    LmsDivision,
+    Division,
+    LmsNetNode,
+    Foreign,
+    LmsAddress,
+)
 
 
 class RNode(BReportObject):
@@ -40,6 +46,7 @@ class RNode(BReportObject):
     class Keys(object, metaclass=ReadOnlyClass):
         """Internal keys class."""
 
+        ADDRESS: str = "__address__"
         IDENT: str = "__ident__"
         MAIN: str = "__main__"
         NODE: str = "__node__"
@@ -69,6 +76,13 @@ class RNode(BReportObject):
 
         # set ident
         self._set_data(key=RNode.Keys.IDENT, set_default_type=str, value=foreign_ident)
+
+        # set address
+
+    def __address_update(self) -> None:
+        """Get address record."""
+
+        row = self.session.query(LmsAddress)
 
     @property
     def foreign_ident(self) -> str:
